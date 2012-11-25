@@ -1,19 +1,20 @@
+#pragma once
+
 #include <string>
 #include <iostream>
 #include <sstream>
 #include "Instruction.h"
 using namespace std;
 
+/**
+ * Factory for parsing assembly code lines and generating an Instruction object out of each.
+ */
 class InstructionFactory {
 public:
 	// Parse a single line of assembly code
-	Instruction& parseInstruction(string& line);
-
-	enum Opcode {
-		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
-	};
+	static Instruction* parseInstruction(string& line);
 
 private:
 	// string->Opcode converter
-	Opcode toOpcode(string& opcode);
+	static Instruction::Opcode toOpcode(string& opcodeName);
 };

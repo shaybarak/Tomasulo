@@ -1,5 +1,5 @@
 #include "Instruction.h"
 
-const std::string& Instruction::getOpcode() {
+Instruction::Opcode Instruction::getOpcode() const {
 	return opcode;
 }

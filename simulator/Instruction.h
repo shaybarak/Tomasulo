@@ -1,3 +1,5 @@
+#pragma once
+
 #include <map>
 #include <string>
 #include <iostream>
@@ -5,13 +7,19 @@
 #include <sstream>
 using namespace std;
 
-// Instruction abstract base class
+/**
+ * Instruction abstract base class.
+ */
 class Instruction {
 public:
-	Instruction(string& opcode) : opcode(opcode) {}
+	enum Opcode {
+		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
+	};
+
+	Instruction(Opcode opcode) : opcode(opcode) {}
 	virtual ~Instruction() = 0;
-	const string& getOpcode();
+	Opcode getOpcode() const;
 
 private:
-	string opcode;
+	Opcode opcode;
 };

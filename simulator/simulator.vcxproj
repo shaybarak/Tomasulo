@@ -77,11 +77,19 @@
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Instruction.cpp" />
     <ClCompile Include="InstructionFactory.cpp" />
+    <ClCompile Include="ITypeInstruction.cpp" />
+    <ClCompile Include="JTypeInstruction.cpp" />
+    <ClCompile Include="RTypeInstruction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Instruction.h" />
     <ClInclude Include="InstructionFactory.h" />
+    <ClInclude Include="ITypeInstruction.h" />
+    <ClInclude Include="JTypeInstruction.h" />
+    <ClInclude Include="RTypeInstruction.h" />
+    <ClInclude Include="SpecialInstruction.h" />
+    <ClInclude Include="UnknownInstruction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,18 +13,18 @@ bool Configuration::load(ifstream& inputFile) {
 		getline(inputFile, line);
 		istringstream lineStream(line);
 		lineStream >> key >> equals >> value;
-		if ((lineStream.rdstate() == ios::failbit) && (equals == equals_token)) {
-			cerr << "Invalid format: " << line;
+		if ((lineStream.rdstate() == ios::failbit) || (equals != equals_token)) {
+			cerr << "Invalid format: " << line << endl;
 			return false;
 		}
 	}
 	return true;
 }
 
-bool Configuration::get(string& key, int& value) {
-	map<string, int>::iterator it = configs.find(key);
+bool Configuration::get(string& key, int& value) const {
+	map<string, int>::const_iterator it = configs.find(key);
 	if (it == configs.end()) {
-		cerr << "Missing key " << key;
+		cerr << "Missing key " << key << endl;
 		return false;
 	}
 	value = it->second;
