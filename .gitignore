@@ -16,3 +16,6 @@ Debug
 *.sdf
 *.opensdf
 *.ipch
+
+# OSX shit
+.DS_Store
