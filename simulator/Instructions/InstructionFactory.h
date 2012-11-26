@@ -16,7 +16,7 @@ public:
 	// Initialize with a mapping of symbols to immediates
 	InstructionFactory(const map<string, int>& symbols) : symbols(symbols) {}
 	// Parse a single line of assembly code, on error returns NULL
-	Instruction* parseInstruction(string& line);
+	Instruction* parse(string& line) const;
 
 private:
 	// Convert string to Opcode

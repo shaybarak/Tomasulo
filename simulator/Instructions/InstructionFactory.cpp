@@ -8,7 +8,7 @@
 #include "UnknownInstruction.h"
 #include <stdlib.h>
 
-Instruction* InstructionFactory::parseInstruction(string& line) {
+Instruction* InstructionFactory::parse(string& line) {
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)
