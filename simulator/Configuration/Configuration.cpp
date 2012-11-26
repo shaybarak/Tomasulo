@@ -2,19 +2,19 @@
 
 static const string equals_token("=");
 
-bool Configuration::load(ifstream& inputFile) {
+bool Configuration::load(istream& in) {
 	// TODO handle comments
-	string line, key, equals;
+	string line, key;
 	int value;
-	if (!inputFile.is_open()) {
-		cerr << "Unable to open file";
-		return false;
-	}
-	while (inputFile.good()) {
-		getline(inputFile, line);
-		istringstream lineStream(line);
-		lineStream >> key >> equals >> value;
-		if ((!lineStream.good()) || (equals != equals_token)) {
+	smatch match;
+	while (in.good() && !in.eof()) {
+		getline(in, line);
+		if (regex_search(line, match, configLine)) {
+			// Parsed a configuration line
+			configs[match[1]] = match[2];
+		} else if (regex_match(line, commentLine)) {
+			// Matched a commented line, ignore
+		} else {
 			cerr << "Invalid format: " << line << endl;
 			return false;
 		}
