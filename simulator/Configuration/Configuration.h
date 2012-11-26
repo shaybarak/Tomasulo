@@ -21,8 +21,8 @@ public:
 
 private:
 	// Line with key and value, possible trailing comment; group 1 matches key, group 2 matches value
-	static regex configLine("(\\w*) = (\\d*)(?:\\s*//.*)?");
+	static regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
 	// Line with comment only
-	static regex commentLine("\\s*//.*");
+	static regex commentLine("^\\s*\\s*//.*$");
 	std::map<std::string, int> configs;
 };
