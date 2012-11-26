@@ -50,7 +50,7 @@ Instruction* InstructionFactory::parse(string& line) {
 		break;
 	default:
 		// Unidentified instruction (bug? error?)
-		instruction = new UnknownInstruction();
+		instruction = NULL;
 		break;
 	}
 	if (instruction == NULL) {
