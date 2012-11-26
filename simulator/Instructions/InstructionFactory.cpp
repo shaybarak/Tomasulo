@@ -117,33 +117,36 @@ Instruction* parseInstruction(string& line) {
 }
 
 static Instruction::Opcode toOpcode(string& opcode) {
-	if (opcode == "add") {
+	// Convert opcode to lowercase for comparison
+	string opcodeLowered;
+	transform(opcode.begin(), opcode.end(), opcodeLowered.begin(), tolower);
+	if (opcodeLowered == "add") {
 		return Instruction::add;
-	} else if (opcode == "sub") {
+	} else if (opcodeLowered == "sub") {
 		return Instruction::sub;
-	} else if (opcode == "mul") {
+	} else if (opcodeLowered == "mul") {
 		return Instruction::mul;
-	} else if (opcode == "div") {
+	} else if (opcodeLowered == "div") {
 		return Instruction::div;
-	} else if (opcode == "addi") {
+	} else if (opcodeLowered == "addi") {
 		return Instruction::addi;
-	} else if (opcode == "subi") {
+	} else if (opcodeLowered == "subi") {
 		return Instruction::subi;
-	} else if (opcode == "lw") {
+	} else if (opcodeLowered == "lw") {
 		return Instruction::lw;
-	} else if (opcode == "sw") {
+	} else if (opcodeLowered == "sw") {
 		return Instruction::sw;
-	} else if (opcode == "beq") {
+	} else if (opcodeLowered == "beq") {
 		return Instruction::beq;
-	} else if (opcode == "bne") {
+	} else if (opcodeLowered == "bne") {
 		return Instruction::bne;
-	} else if (opcode == "slt") {
+	} else if (opcodeLowered == "slt") {
 		return Instruction::slt;
-	} else if (opcode == "slti") {
+	} else if (opcodeLowered == "slti") {
 		return Instruction::slti;
-	} else if (opcode == "j") {
+	} else if (opcodeLowered == "j") {
 		return Instruction::j;
-	} else if (opcode == "halt") {
+	} else if (opcodeLowered == "halt") {
 		return Instruction::halt;
 	} else {
 		return Instruction::unknown;
