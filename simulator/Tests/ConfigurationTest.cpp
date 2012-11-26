@@ -1,4 +1,4 @@
-#include "../Configuration.h"
+#include "../Configuration/Configuration.h"
 #include <fstream>
 using namespace std;
 
