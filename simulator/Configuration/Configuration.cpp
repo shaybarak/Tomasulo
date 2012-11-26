@@ -8,7 +8,7 @@ bool Configuration::load(istream& in) {
 	smatch match;
 	while (in.good() && !in.eof()) {
 		getline(in, line);
-		if (regex_search(line, match, configLine)) {
+		if (regex_search(line, match)) {
 			// Parsed a configuration line
 			configs[match[1]] = match[2];
 		} else if (regex_match(line, commentLine)) {
