@@ -14,7 +14,7 @@ bool Configuration::load(ifstream& inputFile) {
 		getline(inputFile, line);
 		istringstream lineStream(line);
 		lineStream >> key >> equals >> value;
-		if ((lineStream.rdstate() == ios::failbit) || (equals != equals_token)) {
+		if ((!lineStream.good()) || (equals != equals_token)) {
 			cerr << "Invalid format: " << line << endl;
 			return false;
 		}
