@@ -8,26 +8,43 @@
 #include "UnknownInstruction.h"
 
 Instruction* parseInstruction(string& line) {
-	string opcodeName;
-	istringstream lineStream(line);
-	// Parse opcode
-	lineStream >> opcodeName;
-	if (lineStream.rdstate() == ios::failbit) {
-		cerr << "Parse error on opcode name in line " << line << endl;
+	smatch match;
+	// Attempt to match either labeled or unlabeled instructions
+	// (we don't care about labels here)
+	if (regex_search(line, match, labeledInstruction) ||
+		regex_search(line, match, unlabeledInstruction)) {
+	} else {
+		cerr << "Cannot parse command line " << line << endl;
 		return NULL;
 	}
-	Instruction::Opcode opcode = toOpcode(opcodeName);
-	char rest[21];
-	lineStream.getline(rest, sizeof(rest) / sizeof(char));
-	if (lineStream.rdstate() == ios::failbit) {
-		cerr << "Rest of line too long in line " << line << endl;
-		return NULL;
-	}
-	// TODO extract methods out of this huge switch statement
-	int rs, rt, rd;
-	short immediate;
-	int target;
+	Instruction::Opcode opcode = toOpcode(match[1]);
 	switch (opcode) {
+	add:
+	sub:
+	mul:
+	div:
+	slt:
+		return parseRegisterArithmeticInstruction(opcode, match[2]);
+	addi:
+	subi:
+	slti:
+		return parseImmediateArithmeticInstruction(opcode, match[2]);
+	lw:
+	sw:
+		return parseMemoryInstruction(opcode, match[2]);
+	beq:
+	bne:
+		return parseBranchInstruction(opcode, match[2]);
+	j:
+		return parseJumpInstruction(opcode, match[2]);
+	halt:
+		// Handle special instruction
+		return new SpecialInstruction(opcode);
+	default:
+		// Unidentified instruction (bug? error?)
+		return new UnknownInstruction();
+	}
+	/*switch (opcode) {
 	add:
 	sub:
 	mul:
@@ -113,7 +130,7 @@ Instruction* parseInstruction(string& line) {
 	default:
 		// Unidentified instruction (bug? error?)
 		return new UnknownInstruction();
-	}
+	}*/
 }
 
 static Instruction::Opcode toOpcode(string& opcode) {
@@ -151,4 +168,24 @@ static Instruction::Opcode toOpcode(string& opcode) {
 	} else {
 		return Instruction::unknown;
 	}
+}
+
+Instruction* parseRegisterArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+	return NULL;
+}
+
+Instruction* parseImmediateArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+	return NULL;
+}
+
+Instruction* parseMemoryInstruction(Instruction::Opcode opcode, string& arguments) {
+	return NULL;
+}
+
+Instruction* parseBranchInstruction(Instruction::Opcode opcode, string& arguments) {
+	return NULL;
+}
+
+Instruction* parseJumpInstruction(Instruction::Opcode opcode, string& arguments) {
+	return NULL;
 }
