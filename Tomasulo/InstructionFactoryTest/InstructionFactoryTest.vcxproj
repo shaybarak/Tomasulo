@@ -10,31 +10,10 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Configuration\Configuration.h" />
-    <ClInclude Include="Instructions\Instruction.h" />
-    <ClInclude Include="Instructions\InstructionFactory.h" />
-    <ClInclude Include="Instructions\ITypeInstruction.h" />
-    <ClInclude Include="Instructions\JTypeInstruction.h" />
-    <ClInclude Include="Instructions\RTypeInstruction.h" />
-    <ClInclude Include="Instructions\SpecialInstruction.h" />
-    <ClInclude Include="Output\HexDump.h" />
-    <ClInclude Include="Output\RegisterDump.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Configuration\Configuration.cpp" />
-    <ClCompile Include="Instructions\Instruction.cpp" />
-    <ClCompile Include="Instructions\InstructionFactory.cpp" />
-    <ClCompile Include="Instructions\ITypeInstruction.cpp" />
-    <ClCompile Include="Instructions\JTypeInstruction.cpp" />
-    <ClCompile Include="Instructions\RTypeInstruction.cpp" />
-    <ClCompile Include="Output\HexDump.cpp" />
-    <ClCompile Include="Output\RegisterDump.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{2FCA150E-C347-4BFE-B4CF-49336EBB1377}</ProjectGuid>
+    <ProjectGuid>{AD2547C8-BE71-4F1B-8284-8F45238B52AD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>simulator</RootNamespace>
+    <RootNamespace>InstructionFactoryTest</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -94,6 +73,9 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\simulator\Tests\InstructionFactoryTest.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
