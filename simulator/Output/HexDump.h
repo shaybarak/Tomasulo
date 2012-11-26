@@ -12,5 +12,5 @@
 class HexDump {
 public:
 	// Returns whether successful
-	static bool dumpToFile(char* buffer, int length, ostream& out);
+	static bool dump(char* buffer, int length, ostream& out);
 };

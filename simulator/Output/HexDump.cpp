@@ -1,6 +1,6 @@
 #include "HexDump.h"
 
-bool dumpToFile(char* buffer, int length, ostream& out) {
+bool dump(char* buffer, int length, ostream& out) {
 	// 8 bytes per line
 	for (int line = 0; line < length / 8; line++) {
 		// Handle all bytes in line except the last
