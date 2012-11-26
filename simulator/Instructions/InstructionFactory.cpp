@@ -6,8 +6,9 @@
 #include "SymbolicJTypeInstruction.h"
 #include "SpecialInstruction.h"
 #include "UnknownInstruction.h"
+#include <stdlib.h>
 
-Instruction* parseInstruction(string& line) {
+Instruction* InstructionFactory::parseInstruction(string& line) {
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)
@@ -18,119 +19,44 @@ Instruction* parseInstruction(string& line) {
 		return NULL;
 	}
 	Instruction::Opcode opcode = toOpcode(match[1]);
+	Instruction* instruction = NULL;
 	switch (opcode) {
 	add:
 	sub:
 	mul:
 	div:
 	slt:
-		return parseRegisterArithmeticInstruction(opcode, match[2]);
+		instruction = parseRegisterArithmeticInstruction(opcode, match[2]);
+		break;
 	addi:
 	subi:
 	slti:
-		return parseImmediateArithmeticInstruction(opcode, match[2]);
+		instruction = parseImmediateArithmeticInstruction(opcode, match[2]);
+		break;
 	lw:
 	sw:
-		return parseMemoryInstruction(opcode, match[2]);
+		instruction = parseMemoryInstruction(opcode, match[2]);
+		break;
 	beq:
 	bne:
-		return parseBranchInstruction(opcode, match[2]);
+		instruction = parseBranchInstruction(opcode, match[2]);
+		break;
 	j:
-		return parseJumpInstruction(opcode, match[2]);
+		instruction = parseJumpInstruction(opcode, match[2]);
+		break;
 	halt:
 		// Handle special instruction
-		return new SpecialInstruction(opcode);
+		instruction = new SpecialInstruction(opcode);
+		break;
 	default:
 		// Unidentified instruction (bug? error?)
-		return new UnknownInstruction();
+		instruction = new UnknownInstruction();
+		break;
 	}
-	/*switch (opcode) {
-	add:
-	sub:
-	mul:
-	div:
-	slt:
-		// Handle R-Type instruction
-		if (sscanf("$%d $%d $%d", &rs, &rt, &rd) != 3) {
-			cerr << "Error parsing arguments in line " << line << endl;
-			return NULL;
-		}
-		// TODO extract this to a method with ellipsis
-		if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31 && 0 <= rd && rd <= 31)) {
-			cerr << "Register index out of range in line " << line << endl;
-			return NULL;
-		}
-		return new RTypeInstruction(opcode, rs, rt, rd);
-	addi:
-	subi:
-	slti:
-		// Handle I-Type arithmetic instruction
-		if (sscanf("$%d $%d %hd", &rs, &rt, &immediate) != 3) {
-			cerr << "Error parsing arguments in line " << line << endl;
-			return NULL;
-		}
-		if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31)) {
-			cerr << "Register index out of range in line " << line << endl;
-			return NULL;
-		}
-		return new ITypeInstruction(opcode, rs, rt, immediate);
-	lw:
-	sw:
-		// Handle I-Type memory instruction
-		if (sscanf("$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
-			cerr << "Error parsing arguments in line " << line << endl;
-			return NULL;
-		}
-	beq:
-	bne:
-		// Handle I-Type branch instruction
-		if (sscanf("$%d $%d %hd", &rs, &rt, &immediate) == 3) {
-			return new ITypeInstruction(opcode, rs, rt, immediate);
-		} else {
-			// Literal target not identified, try symbolic target
-			char symbolicTarget[21];
-			if (sscanf("$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
-				cerr << "Bad jump target in line " << line << endl;
-				return NULL;
-			}
-			string symbol(symbolicTarget);
-			map<string, int>::iterator symbolValue = symbols.find(symbol);
-			if (symbolValue == symbols.end()) {
-				cerr << "Unidentified symbol in line " << line << endl;
-				return NULL;
-			}
-			return new ITypeInstruction(opcode, rs, rt, *symbolValue);
-		}
-	j:
-		// Handle J-Type instruction
-		if (sscanf("%d", &literalTarget) == 1) {
-			if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
-				cerr << "Literal jump target out of range in line " << line << endl;
-				return NULL;
-			}
-			return new JTypeInstruction(opcode, literalTarget);
-		} else {
-			// Literal target not identified, try symbolic target
-			char symbolicTarget[21];
-			if (sscanf("%20s", &symbolicTarget) != 1) {
-				cerr << "Bad jump target in line " << line << endl;
-				return NULL;
-			}
-			string symbol(symbolicTarget);
-			map<string, int>::iterator symbolValue = symbols.find(symbol);
-			if (symbolValue == symbols.end()) {
-				cerr << "Unidentified symbol in line " << line << endl;
-				return NULL;
-			}
-			return new JTypeInstruction(opcode, *symbolValue);
-		}
-	halt:
-		// Handle special instruction
-		return new SpecialInstruction(opcode);
-	default:
-		// Unidentified instruction (bug? error?)
-		return new UnknownInstruction();
-	}*/
+	if (instruction == NULL) {
+		cerr << "Error while parsing " << line << endl;
+	}
+	return instruction;
 }
 
 static Instruction::Opcode toOpcode(string& opcode) {
@@ -170,22 +96,78 @@ static Instruction::Opcode toOpcode(string& opcode) {
 	}
 }
 
-Instruction* parseRegisterArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
-	return NULL;
+bool InstructionFactory::validateRegisterIndex(int index) {
+	// ISA supports 32 registers
+	return (0 <= index && index <= 31);
 }
 
-Instruction* parseImmediateArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
-	return NULL;
+Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+	int rs, rt, rd;
+	if (sscanf(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
+		return NULL;
+	}
+	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31 && 0 <= rd && rd <= 31)) {
+		return NULL;
+	}
+	return new RTypeInstruction(opcode, rs, rt, rd);
 }
 
-Instruction* parseMemoryInstruction(Instruction::Opcode opcode, string& arguments) {
-	return NULL;
+Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+	int rs, rt, immediate;
+	if (sscanf(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
+		return NULL;
+	}
+	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31)) {
+		return NULL;
+	}
+	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* parseBranchInstruction(Instruction::Opcode opcode, string& arguments) {
-	return NULL;
+Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opcode, string& arguments) {
+	int rs, rt, immediate;
+	if (sscanf(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
+		return NULL;
+	}
+	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* parseJumpInstruction(Instruction::Opcode opcode, string& arguments) {
-	return NULL;
+Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opcode, string& arguments) {
+	int rs, rt, immediate;
+	if (sscanf("$%d $%d %hd", &rs, &rt, &immediate) == 3) {
+		return new ITypeInstruction(opcode, rs, rt, immediate);
+	} else {
+		// Literal target not identified, try symbolic target
+		char symbolicTarget[21];
+		if (sscanf("$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
+			return NULL;
+		}
+		string symbol(symbolicTarget);
+		map<string, int>::iterator symbolValue = symbols.find(symbol);
+		if (symbolValue == symbols.end()) {
+			return NULL;
+		}
+		return new ITypeInstruction(opcode, rs, rt, *symbolValue);
+	}
+}
+
+Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode, string& arguments) {
+	if (sscanf("%d", &literalTarget) == 1) {
+		// Jump target is 26 bits
+		if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
+			return NULL;
+		}
+		return new JTypeInstruction(opcode, literalTarget);
+	} else {
+		// Literal target not identified, try symbolic target
+		char symbolicTarget[21];
+		if (sscanf("%20s", &symbolicTarget) != 1) {
+			return NULL;
+		}
+		string symbol(symbolicTarget);
+		map<string, int>::iterator symbolValue = symbols.find(symbol);
+		if (symbolValue == symbols.end()) {
+			return NULL;
+		}
+		return new JTypeInstruction(opcode, *symbolValue);
+	}
 }

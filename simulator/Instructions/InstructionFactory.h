@@ -19,28 +19,33 @@ public:
 	Instruction* parseInstruction(string& line);
 
 private:
-	// string->Opcode converter
+	// Convert string to Opcode
 	static Instruction::Opcode toOpcode(string& opcodeName);
+	// Validate register index
+	static bool validateRegisterIndex(int index);
+
 	/**
 	 * Matches a labeled instruction, e.g.:
 	 * L1: add1 $1 $2 3
 	 * Group 1 captures the opcode.
 	 * Group 2 captures all instruction.
 	 */
-	static regex labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$")
+	static regex labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 	/**
 	 * Matches an unlabeled instruction, e.g.:
-	 * add1 $1 $2 3
+	 * addi $1 $2 3
 	 * Group 1 captures the opcode.
 	 * Group 2 captures all instruction.
 	 */
-	static regex unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$")
+	static regex unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+	
 	// Specialized methods for parsing different types of instructions
 	Instruction* parseRegisterArithmeticInstruction(Instruction::Opcode opcode, string& arguments);
 	Instruction* parseImmediateArithmeticInstruction(Instruction::Opcode opcode, string& arguments);
 	Instruction* parseMemoryInstruction(Instruction::Opcode opcode, string& arguments);
 	Instruction* parseBranchInstruction(Instruction::Opcode opcode, string& arguments);
 	Instruction* parseJumpInstruction(Instruction::Opcode opcode, string& arguments);
+	
 	// Keep a copy of the symbolic names mapping
 	const map<string, int> symbols;
 };
