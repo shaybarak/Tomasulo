@@ -16,8 +16,9 @@ bool assertConfig(Configuration& config, char* key, int expectedValue) {
 }
 
 int main() {
-	fstream sampleConfiguration("testdata/sample_configuration.txt");
-	Configuration config(sampleConfiguration);
+	ifstream sampleConfiguration("testdata/sample_configuration.txt");
+	Configuration config;
+	config.load(sampleConfiguration);
 	bool success = false;
 	success = assertConfig(config, "addsub_delay", 1)
 	       &= assertConfig(config, "mul_delay", 3)
