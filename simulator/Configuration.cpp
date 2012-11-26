@@ -3,6 +3,7 @@
 static const string equals_token("=");
 
 bool Configuration::load(ifstream& inputFile) {
+	// TODO handle comments
 	string line, key, equals;
 	int value;
 	if (!inputFile.is_open()) {
