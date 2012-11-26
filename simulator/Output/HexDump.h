@@ -3,14 +3,17 @@
 #include <ostream>
 
 /**
- * Dumps a memory snapshot to an output stream (e.g. ofstream to write to a file).
- * Output is formatted as uppercase hexadecimal bytes with each byte separated by a new line.
- * Sample output:
+ * Works with snapshots of a byte array.
+ * Reads from or writes to a stream (e.g. dump to output file).
+ * Format is uppercase hexadecimal bytes with every 8 bytes separated by a new line.
+ * Sample:
  * FA BB 38 55 4A 3A BE 00
  * 44 DE AD FE ED 65 CA 22
  */
 class HexDump {
 public:
-	// Returns whether successful
-	static bool dump(char* buffer, int length, ostream& out);
+	// Reads formatted bytes into buffer, returns whether successful
+	static bool load(vector<char>& buffer, istream& in);
+	// Writes bytes according to format, returns whether successful
+	static bool store(vector<char>& buffer, ostream& out);
 };
