@@ -3,7 +3,6 @@
 static const string equals_token("=");
 
 bool Configuration::load(istream& in) {
-	// TODO handle comments
 	string line, key;
 	int value;
 	smatch match;
