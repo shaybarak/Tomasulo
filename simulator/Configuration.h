@@ -16,7 +16,7 @@ public:
 	// Loads from file, returns whether successful
 	bool load(std::ifstream& inputFile);
 	// Reads value for key, returns whether mapping is present
-	bool get(std::string& key, int& value) const;
+	bool get(std::string& key, int* value) const;
 
 private:
 	std::map<std::string, int> configs;

@@ -22,12 +22,12 @@ bool Configuration::load(ifstream& inputFile) {
 	return true;
 }
 
-bool Configuration::get(string& key, int& value) const {
+bool Configuration::get(string& key, int* value) const {
 	map<string, int>::const_iterator it = configs.find(key);
 	if (it == configs.end()) {
 		cerr << "Missing key " << key << endl;
 		return false;
 	}
-	value = it->second;
+	*value = it->second;
 	return true;
 }
