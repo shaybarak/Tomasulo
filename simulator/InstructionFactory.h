@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <map>
 #include "Instruction.h"
 using namespace std;
 
@@ -11,10 +12,13 @@ using namespace std;
  */
 class InstructionFactory {
 public:
+	// Initialize with a mapping of symbols to immediates
+	InstructionFactory(map<string, int>& symbols) : symbols(symbols) {}
 	// Parse a single line of assembly code
-	static Instruction* parseInstruction(string& line);
+	Instruction* parseInstruction(string& line);
 
 private:
 	// string->Opcode converter
 	static Instruction::Opcode toOpcode(string& opcodeName);
+	map<string, int> symbols;
 };

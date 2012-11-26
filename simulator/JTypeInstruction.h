@@ -1,7 +1,7 @@
 #include "Instruction.h"
 
 /**
- * A generic J-Type instruction.
+ * A literal J-Type instruction (target is expressed literally).
  */
 class JTypeInstruction : public Instruction {
 public:
