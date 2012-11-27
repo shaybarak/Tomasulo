@@ -1,5 +1,5 @@
 #include "JTypeInstruction.h"
 
-int LiteralJTypeInstruction::getTarget() const {
+int JTypeInstruction::getTarget() const {
 	return target;
 }

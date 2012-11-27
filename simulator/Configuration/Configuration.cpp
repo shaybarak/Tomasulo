@@ -1,4 +1,5 @@
 #include "Configuration.h"
+using namespace std;
 
 static const string equals_token("=");
 
@@ -10,7 +11,7 @@ bool Configuration::load(istream& in) {
 		getline(in, line);
 		if (regex_search(line, match, configLine)) {
 			// Parsed a configuration line
-			configs[match[1]] = match[2];
+			configs.insert(pair<string, int>(match[1], match[2]));
 		} else if (regex_match(line, commentLine)) {
 			// Matched a commented line, ignore
 		} else {
@@ -21,7 +22,7 @@ bool Configuration::load(istream& in) {
 	return true;
 }
 
-bool Configuration::get(string& key, int* value) const {
+bool Configuration::get(const string& key, int* value) const {
 	map<string, int>::const_iterator it = configs.find(key);
 	if (it == configs.end()) {
 		cerr << "Missing key " << key << endl;

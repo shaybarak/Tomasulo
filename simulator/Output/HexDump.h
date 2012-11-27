@@ -1,6 +1,8 @@
 #pragma once
 
-#include <ostream>
+#include <iostream>
+#include <vector>
+using namespace std;
 
 /**
  * Works with snapshots of a byte array.

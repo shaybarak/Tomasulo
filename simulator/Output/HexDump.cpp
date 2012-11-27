@@ -1,4 +1,5 @@
 #include "HexDump.h"
+using namespace std;
 
 bool load(vector<char>& buffer, istream& in) {
 	while ((!in.eof()) && (in.good())) {
@@ -14,7 +15,8 @@ bool store(vector<char>& buffer, ostream& out) {
 	// 8 bytes per line
 	for (int line = 0; line < size / 8; line++) {
 		// Handle all bytes in line except the last
-		for (int ch = 0; ch < 7 && line * 8 + ch < size - 2; ch++) {
+		int ch;
+		for (ch = 0; ch < 7 && line * 8 + ch < size - 2; ch++) {
 			out << uppercase(hex(buffer[line*8+ch])) << " ";
 		}
 		out << uppercase(hex(buffer[line*8+ch], 2)) << endl;

@@ -2,13 +2,11 @@
 #include "Instruction.h"
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
-#include "LiteralJTypeInstruction.h"
-#include "SymbolicJTypeInstruction.h"
+#include "JTypeInstruction.h"
 #include "SpecialInstruction.h"
-#include "UnknownInstruction.h"
 #include <stdlib.h>
 
-Instruction* InstructionFactory::parse(string& line) {
+Instruction* InstructionFactory::parse(string& line) const {
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)
@@ -101,7 +99,7 @@ bool InstructionFactory::validateRegisterIndex(int index) {
 	return (0 <= index && index <= 31);
 }
 
-Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if (sscanf(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
 		return NULL;
@@ -112,7 +110,7 @@ Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction:
 	return new RTypeInstruction(opcode, rs, rt, rd);
 }
 
-Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction::Opcode opcode, string& arguments) {
+Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
 		return NULL;
@@ -123,7 +121,7 @@ Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opcode, string& arguments) {
+Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
 		return NULL;
@@ -131,14 +129,14 @@ Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opco
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opcode, string& arguments) {
+Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf("$%d $%d %hd", &rs, &rt, &immediate) == 3) {
+	if (sscanf(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try symbolic target
 		char symbolicTarget[21];
-		if (sscanf("$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
+		if (sscanf(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
 			return NULL;
 		}
 		string symbol(symbolicTarget);
@@ -146,12 +144,13 @@ Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opco
 		if (symbolValue == symbols.end()) {
 			return NULL;
 		}
-		return new ITypeInstruction(opcode, rs, rt, *symbolValue);
+		return new ITypeInstruction(opcode, rs, rt, symbolValue->second);
 	}
 }
 
-Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode, string& arguments) {
-	if (sscanf("%d", &literalTarget) == 1) {
+Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode, const string& arguments) const {
+	int literalTarget;
+	if (sscanf(arguments.c_str(), "%d", &literalTarget) == 1) {
 		// Jump target is 26 bits
 		if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
 			return NULL;
@@ -160,14 +159,14 @@ Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode
 	} else {
 		// Literal target not identified, try symbolic target
 		char symbolicTarget[21];
-		if (sscanf("%20s", &symbolicTarget) != 1) {
+		if (sscanf(arguments.c_str(), "%20s", &symbolicTarget) != 1) {
 			return NULL;
 		}
 		string symbol(symbolicTarget);
-		map<string, int>::iterator symbolValue = symbols.find(symbol);
+		map<string, int>::const_iterator symbolValue = symbols.find(symbol);
 		if (symbolValue == symbols.end()) {
 			return NULL;
 		}
-		return new JTypeInstruction(opcode, *symbolValue);
+		return new JTypeInstruction(opcode, symbolValue->second);
 	}
 }

@@ -2,7 +2,7 @@
 
 #include <map>
 #include <string>
-#include <istream>
+#include <iostream>
 #include <regex>
 using namespace std;
 using namespace std::tr1;
@@ -15,14 +15,14 @@ using namespace std::tr1;
 class Configuration {
 public:
 	// Loads from stream, returns whether successful
-	bool load(std::istream& in);
+	bool load(istream& in);
 	// Reads value for key, returns whether mapping is present
-	bool get(std::string& key, int* value) const;
+	bool get(const string& key, int* value) const;
 
 private:
 	// Line with key and value, possible trailing comment; group 1 matches key, group 2 matches value
-	static regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
+	static const regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
 	// Line with comment only
-	static regex commentLine("^\\s*\\s*//.*$");
-	std::map<std::string, int> configs;
+	static const regex commentLine("^\\s*\\s*//.*$");
+	map<std::string, int> configs;
 };

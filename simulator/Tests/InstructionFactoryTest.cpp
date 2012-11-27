@@ -88,8 +88,8 @@ int main() {
 		cerr << "Test 5 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	jtype = dynamic_cast<JTypeInstruction*>(instruction);
-	if (htype->getTarget() != 6) {
-		cerr << "Test 5 failed: wrong target " << htype->getTarget() << endl;
+	if (jtype->getTarget() != 6) {
+		cerr << "Test 5 failed: wrong target " << jtype->getTarget() << endl;
 	}
 
 	// Another example

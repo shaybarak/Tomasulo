@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ostream>
+using namespace std;
 
 /**
  * Dumps registers to an output stream (e.g. ofstream to write to a file).
@@ -16,7 +17,4 @@ public:
 	// Registers is expected to be int[32]
 	// Returns whether successful
 	static bool dump(int* registers, ostream& out);
-private:
-	// Count of registers in ISA
-	static const int REGISTER_COUNT = 32;
 };
