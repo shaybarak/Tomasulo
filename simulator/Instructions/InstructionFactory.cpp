@@ -104,7 +104,7 @@ bool InstructionFactory::validateRegisterIndex(int index) {
 
 Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
-	if (sscanf(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
+	if (sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
 		return NULL;
 	}
 	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31 && 0 <= rd && rd <= 31)) {
@@ -115,7 +115,7 @@ Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction:
 
 Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
+	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
 		return NULL;
 	}
 	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31)) {
@@ -126,7 +126,7 @@ Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction
 
 Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
+	if (sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);
@@ -134,16 +134,16 @@ Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opco
 
 Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
+	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try symbolic target
 		char symbolicTarget[21];
-		if (sscanf(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
+		if (sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
 			return NULL;
 		}
 		string symbol(symbolicTarget);
-		map<string, int>::iterator symbolValue = symbols.find(symbol);
+		map<string, int>::const_iterator symbolValue = symbols.find(symbol);
 		if (symbolValue == symbols.end()) {
 			return NULL;
 		}
@@ -153,7 +153,7 @@ Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opco
 
 Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode, const string& arguments) const {
 	int literalTarget;
-	if (sscanf(arguments.c_str(), "%d", &literalTarget) == 1) {
+	if (sscanf_s(arguments.c_str(), "%d", &literalTarget) == 1) {
 		// Jump target is 26 bits
 		if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
 			return NULL;
@@ -162,7 +162,7 @@ Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode
 	} else {
 		// Literal target not identified, try symbolic target
 		char symbolicTarget[21];
-		if (sscanf(arguments.c_str(), "%20s", &symbolicTarget) != 1) {
+		if (sscanf_s(arguments.c_str(), "%20s", &symbolicTarget) != 1) {
 			return NULL;
 		}
 		string symbol(symbolicTarget);
