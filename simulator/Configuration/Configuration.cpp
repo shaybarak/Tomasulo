@@ -1,7 +1,8 @@
 #include "Configuration.h"
 using namespace std;
 
-static const string equals_token("=");
+regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
+regex commentLine("^\\s*\\s*//.*$");
 
 bool Configuration::load(istream& in) {
 	string line, key;

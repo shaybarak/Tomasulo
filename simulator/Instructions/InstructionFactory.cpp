@@ -6,6 +6,9 @@
 #include "SpecialInstruction.h"
 #include <stdlib.h>
 
+regex labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+regex unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+
 Instruction* InstructionFactory::parse(string& line) const {
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions

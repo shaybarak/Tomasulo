@@ -30,14 +30,14 @@ private:
 	 * Group 1 captures the opcode.
 	 * Group 2 captures all instruction.
 	 */
-	static regex labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+	static const regex labeledInstruction;
 	/**
 	 * Matches an unlabeled instruction, e.g.:
 	 * addi $1 $2 3
 	 * Group 1 captures the opcode.
 	 * Group 2 captures all instruction.
 	 */
-	static regex unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+	static const regex unlabeledInstruction;
 	
 	// Specialized methods for parsing different types of instructions
 	Instruction* parseRegisterArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const;
