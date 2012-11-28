@@ -61,7 +61,7 @@ Instruction* InstructionFactory::parse(string& line) const {
 	return instruction;
 }
 
-static Instruction::Opcode toOpcode(const string& opcodeName) {
+Instruction::Opcode InstructionFactory::toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
 	string opcodeLowered;
 	transform(opcodeName.begin(), opcodeName.end(), opcodeLowered.begin(), ::tolower);
