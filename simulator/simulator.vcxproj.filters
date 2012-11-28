@@ -48,9 +48,6 @@
     <ClInclude Include="Instructions\RTypeInstruction.h">
       <Filter>Header Files\Instructions</Filter>
     </ClInclude>
-    <ClInclude Include="Instructions\SpecialInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
     <ClInclude Include="Configuration\Configuration.h">
       <Filter>Header Files\Configuration</Filter>
     </ClInclude>

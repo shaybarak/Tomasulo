@@ -50,8 +50,5 @@
     <ClInclude Include="..\..\simulator\Instructions\RTypeInstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\simulator\Instructions\SpecialInstruction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

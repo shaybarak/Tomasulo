@@ -17,7 +17,7 @@ public:
 	};
 
 	Instruction(Opcode opcode) : opcode(opcode) {}
-	virtual ~Instruction() = 0;
+	virtual ~Instruction() {}
 	Opcode getOpcode() const;
 
 private:

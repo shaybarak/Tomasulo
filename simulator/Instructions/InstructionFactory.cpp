@@ -3,7 +3,6 @@
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
-#include "SpecialInstruction.h"
 #include <stdlib.h>
 #include <algorithm>
 
@@ -48,7 +47,7 @@ Instruction* InstructionFactory::parse(string& line) const {
 		break;
 	case Instruction::halt:
 		// Handle special instruction
-		instruction = new SpecialInstruction(opcode);
+		instruction = new Instruction(opcode);
 		break;
 	default:
 		// Unidentified instruction (bug? error?)

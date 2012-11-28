@@ -3,7 +3,6 @@
 #include "../Instructions/RTypeInstruction.h"
 #include "../Instructions/ITypeInstruction.h"
 #include "../Instructions/JTypeInstruction.h"
-#include "../Instructions/SpecialInstruction.h"
 #include <string>
 #include <map>
 
@@ -16,7 +15,6 @@ int main() {
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
-	SpecialInstruction* special = NULL;
 
 	// Test the first example instructions from the exercise documentation
 	instruction = factory.parse(string("L1: ADD $1 $2 $3"));
@@ -97,7 +95,6 @@ int main() {
 	if (instruction->getOpcode() != Instruction::halt) {
 		cerr << "Test 6 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
-	special = dynamic_cast<SpecialInstruction*>(instruction);
 
 	// Unknown instruction
 	instruction = factory.parse(string("blah: blah"));

@@ -17,7 +17,6 @@
     <ClInclude Include="Instructions\ITypeInstruction.h" />
     <ClInclude Include="Instructions\JTypeInstruction.h" />
     <ClInclude Include="Instructions\RTypeInstruction.h" />
-    <ClInclude Include="Instructions\SpecialInstruction.h" />
     <ClInclude Include="Output\HexDump.h" />
     <ClInclude Include="Output\RegisterDump.h" />
   </ItemGroup>

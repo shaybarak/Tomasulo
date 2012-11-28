@@ -87,7 +87,6 @@
     <ClInclude Include="..\..\simulator\Instructions\ITypeInstruction.h" />
     <ClInclude Include="..\..\simulator\Instructions\JTypeInstruction.h" />
     <ClInclude Include="..\..\simulator\Instructions\RTypeInstruction.h" />
-    <ClInclude Include="..\..\simulator\Instructions\SpecialInstruction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
