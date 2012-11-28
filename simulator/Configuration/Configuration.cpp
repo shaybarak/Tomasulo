@@ -5,8 +5,7 @@ regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
 regex commentLine("^\\s*\\s*//.*$");
 
 bool Configuration::load(istream& in) {
-	string line, key;
-	int value;
+	string line;
 	smatch match;
 	while (in.good() && !in.eof()) {
 		getline(in, line);
