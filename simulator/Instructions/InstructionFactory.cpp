@@ -5,9 +5,10 @@
 #include "JTypeInstruction.h"
 #include "SpecialInstruction.h"
 #include <stdlib.h>
+#include <algorithm>
 
-regex labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
-regex unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+const regex InstructionFactory::unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 
 Instruction* InstructionFactory::parse(string& line) const {
 	smatch match;
@@ -60,10 +61,10 @@ Instruction* InstructionFactory::parse(string& line) const {
 	return instruction;
 }
 
-static Instruction::Opcode toOpcode(string& opcode) {
+static Instruction::Opcode toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
 	string opcodeLowered;
-	transform(opcode.begin(), opcode.end(), opcodeLowered.begin(), tolower);
+	transform(opcodeName.begin(), opcodeName.end(), opcodeLowered.begin(), ::tolower);
 	if (opcodeLowered == "add") {
 		return Instruction::add;
 	} else if (opcodeLowered == "sub") {

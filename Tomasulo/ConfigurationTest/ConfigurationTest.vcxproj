@@ -74,10 +74,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\simulator\Configuration\Configuration.cpp" />
     <ClCompile Include="..\..\simulator\Tests\ConfigurationTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\simulator\Tests\testdata\sample_configuration.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\simulator\Configuration\Configuration.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

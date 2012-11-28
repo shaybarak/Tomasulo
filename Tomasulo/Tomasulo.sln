@@ -4,14 +4,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simulator", "..\simulator\simulator.vcxproj", "{2FCA150E-C347-4BFE-B4CF-49336EBB1377}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConfigurationTest", "ConfigurationTest\ConfigurationTest.vcxproj", "{6EC6EA5F-F4BD-4193-81AC-1363C76ACCE7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2FCA150E-C347-4BFE-B4CF-49336EBB1377} = {2FCA150E-C347-4BFE-B4CF-49336EBB1377}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstructionFactoryTest", "InstructionFactoryTest\InstructionFactoryTest.vcxproj", "{AD2547C8-BE71-4F1B-8284-8F45238B52AD}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2FCA150E-C347-4BFE-B4CF-49336EBB1377} = {2FCA150E-C347-4BFE-B4CF-49336EBB1377}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
