@@ -22,30 +22,30 @@ Instruction* InstructionFactory::parse(string& line) const {
 	Instruction::Opcode opcode = toOpcode(match[1]);
 	Instruction* instruction = NULL;
 	switch (opcode) {
-	add:
-	sub:
-	mul:
-	div:
-	slt:
+	case Instruction::add:
+	case Instruction::sub:
+	case Instruction::mul:
+	case Instruction::div:
+	case Instruction::slt:
 		instruction = parseRegisterArithmeticInstruction(opcode, match[2]);
 		break;
-	addi:
-	subi:
-	slti:
+	case Instruction::addi:
+	case Instruction::subi:
+	case Instruction::slti:
 		instruction = parseImmediateArithmeticInstruction(opcode, match[2]);
 		break;
-	lw:
-	sw:
+	case Instruction::lw:
+	case Instruction::sw:
 		instruction = parseMemoryInstruction(opcode, match[2]);
 		break;
-	beq:
-	bne:
+	case Instruction::beq:
+	case Instruction::bne:
 		instruction = parseBranchInstruction(opcode, match[2]);
 		break;
-	j:
+	case Instruction::j:
 		instruction = parseJumpInstruction(opcode, match[2]);
 		break;
-	halt:
+	case Instruction::halt:
 		// Handle special instruction
 		instruction = new SpecialInstruction(opcode);
 		break;
