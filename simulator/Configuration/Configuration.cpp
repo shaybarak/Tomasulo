@@ -2,7 +2,7 @@
 using namespace std;
 
 regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
-regex commentLine("^\\s*\\s*//.*$");
+regex commentLine("^\\s*//.*$");
 
 bool Configuration::load(istream& in) {
 	string line;
