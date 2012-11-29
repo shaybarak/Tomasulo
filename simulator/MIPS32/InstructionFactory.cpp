@@ -9,8 +9,7 @@
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 const regex InstructionFactory::unlabeledInstruction("^\\s*(\\w*)\\s*(.*)$");
 
-Instruction* InstructionFactory::parse(string& line, unsigned int address) const {
-	// TODO use address for branch offset calculation
+Instruction* InstructionFactory::parse(string& line) {
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)
@@ -57,8 +56,11 @@ Instruction* InstructionFactory::parse(string& line, unsigned int address) const
 	}
 	if (instruction == NULL) {
 		cerr << "Error while parsing " << line << endl;
+		return NULL;
+	} else {
+		pc = ISA::advancePc(pc);
+		return instruction;
 	}
-	return instruction;
 }
 
 bool InstructionFactory::validateRegisterIndex(int index) {
@@ -106,17 +108,19 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try labelled target
-		char labelledTarget[21];
-		if ((sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &labelledTarget) != 3) &&
-			(sscanf_s(arguments.c_str(), "$%d, $%d, %20s", &rs, &rt, &labelledTarget) != 3)){
+		char labeledTarget[101];
+		if ((sscanf(arguments.c_str(), "$%d $%d %100s", &rs, &rt, labeledTarget) != 3) &&
+			(sscanf(arguments.c_str(), "$%d, $%d, %100s", &rs, &rt, labeledTarget) != 3)){
 			return NULL;
 		}
-		string label(labelledTarget);
-		map<string, unsigned int>::const_iterator labelValue = labels.find(label);
+		string label(labeledTarget);
+		map<string, ISA::Address>::const_iterator labelValue = labels.find(label);
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		return new ITypeInstruction(opcode, rs, rt, labelValue->second);
+		// Fix up; relative_target = absolute_target - (PC+MWORD)
+		int target = labelValue->second - (pc + ISA::INSTRUCTION_SIZE);
+		return new ITypeInstruction(opcode, rs, rt, target);
 	}
 }
 
@@ -129,13 +133,13 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 		}
 		return new JTypeInstruction(opcode, literalTarget);
 	} else {
-		// Literal target not identified, try labelled target
-		char labelledTarget[101];
-		if (sscanf(arguments.c_str(), "%100s", labelledTarget) != 1) {
+		// Literal target not identified, try labeled target
+		char labeledTarget[101];
+		if (sscanf(arguments.c_str(), "%100s", labeledTarget) != 1) {
 			return NULL;
 		}
-		string label(labelledTarget);
-		map<string, unsigned int>::const_iterator labelValue = labels.find(label);
+		string label(labeledTarget);
+		map<string, ISA::Address>::const_iterator labelValue = labels.find(label);
 		if (labelValue == labels.end()) {
 			return NULL;
 		}

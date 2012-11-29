@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ISA.h"
 #include <map>
 #include <regex>
 #include <string>
@@ -16,7 +17,7 @@ public:
 	LabelAnalyzer(unsigned int base) : pc(base) {}
 	// Parse a single line of assembly code at a given memory address, returns PC after this instruction
 	unsigned int parse(string& line);
-	const map<string, unsigned int>& getLabels() const;
+	const map<string, ISA::Address>& getLabels() const;
 
 private:
 	/**
@@ -34,5 +35,5 @@ private:
 	// Current address
 	unsigned int pc;
 	// Label name to absolute address mapping
-	map<string, unsigned int> labels;
+	map<string, ISA::Address> labels;
 };

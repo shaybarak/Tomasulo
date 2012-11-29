@@ -15,8 +15,8 @@ public:
 	typedef unsigned int Address;
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	static unsigned int advancePc(unsigned int pc);
-	// Size of instruction in bits
-	static const int INSTRUCTION_SIZE = 32;
+	// Size of instruction in bytes
+	static const int INSTRUCTION_SIZE = 4;
 	// Count of registers in ISA
 	static const int REG_COUNT = 32;
 };

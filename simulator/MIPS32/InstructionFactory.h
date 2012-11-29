@@ -17,15 +17,19 @@ using namespace std::tr1;
  */
 class InstructionFactory {
 public:
-	// Initialize with a mapping of labels to immediates
-	InstructionFactory(const map<string, unsigned int>& labels) : labels(labels) {}
-	// Parse a single line of assembly code at a given memory address, on error returns NULL
-	Instruction* parse(string& line, unsigned int address) const;
+	/**
+	 * Initializes a factory for generating Instructions out of assembly source code lines.
+	 * labels: mapping of label to memory address
+	 * startPc: initial value for the Program Counter
+	 */
+	InstructionFactory(const map<string, ISA::Address>& labels, ISA::Address startPc) : labels(labels), pc(startPc) {}
+	// Parses a single line of assembly code, on error returns NULL
+	Instruction* parse(string& line);
 
 private:
-	// Convert string to Opcode
+	// Converts string to Opcode
 	static ISA::Opcode toOpcode(const string& opcodeName);
-	// Validate register index
+	// Validates register index
 	static bool validateRegisterIndex(int index);
 
 	/**
@@ -51,5 +55,7 @@ private:
 	JTypeInstruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
-	const map<string, unsigned int>& labels;
+	const map<string, ISA::Address>& labels;
+	// Program Counter
+	ISA::Address pc;
 };

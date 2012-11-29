@@ -10,16 +10,16 @@ int main() {
 	// TODO test instructions at different addresses
 
 	map<string, unsigned int> labels;
-	labels["L1"] = 6;
-	labels["sheker"] = 7;
-	InstructionFactory factory(labels);
+	labels["L1"] = 100;
+	labels["sheker"] = 107;
+	InstructionFactory factory(labels, 100);
 	Instruction* instruction = NULL;
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
 
 	// Test the first example instructions from the exercise documentation
-	instruction = factory.parse(string("L1: ADD $1 $2 $3"), 0);
+	instruction = factory.parse(string("L1: ADD $1 $2 $3"));
 	if (instruction->getOpcode() != ISA::add) {
 		cerr << "Test 1 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 10;
@@ -39,7 +39,7 @@ int main() {
 	}
 
 	// Test the second example instructions from the exercise documentation
-	instruction = factory.parse(string("MUL $2 $1 $4"), 0);
+	instruction = factory.parse(string("MUL $2 $1 $4"));
 	if (instruction->getOpcode() != ISA::mul) {
 		cerr << "Test 2 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 20;
@@ -59,7 +59,7 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("subi $7 $8 9"), 0);
+	instruction = factory.parse(string("subi $7 $8 9"));
 	if (instruction->getOpcode() != ISA::subi) {
 		cerr << "Test 3 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 30;
@@ -79,7 +79,7 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("sw $5,(-16)$3"), 0);
+	instruction = factory.parse(string("sw $5,(-16)$3"));
 	if (instruction->getOpcode() != ISA::sw) {
 		cerr << "Test 4 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 40;
@@ -99,33 +99,33 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("j L1"), 0);
+	instruction = factory.parse(string("j L1"));
 	if (instruction->getOpcode() != ISA::j) {
 		cerr << "Test 5 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 50;
 	}
 	jtype = dynamic_cast<JTypeInstruction*>(instruction);
-	if (jtype->getTarget() != 6) {
+	if (jtype->getTarget() != 100) {
 		cerr << "Test 5 failed: wrong target " << jtype->getTarget() << endl;
 		return 51;
 	}
 
 	// Another example
-	instruction = factory.parse(string("halt"), 0);
+	instruction = factory.parse(string("halt"));
 	if (instruction->getOpcode() != ISA::halt) {
 		cerr << "Test 6 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 60;
 	}
 
 	// Unknown instruction
-	instruction = factory.parse(string("blah: blah"), 0);
+	instruction = factory.parse(string("blah: blah"));
 	if (instruction != NULL) {
 		cerr << "Test 7 failed: expecting invalid instruction" << endl;
 		return 70;
 	}
 
 	// Register index out of range
-	instruction = factory.parse(string("add $30 $31 $32"), 0);
+	instruction = factory.parse(string("add $30 $31 $32"));
 	if (instruction != NULL) {
 		cerr << "Test 8 failed: expecting invalid instruction" << endl;
 		return 80;
@@ -136,14 +136,14 @@ int main() {
 	/////////////////////////////////////////////
 
 	//Only a comment
-	instruction = factory.parse(string("// This is a comment"), 0);
+	instruction = factory.parse(string("// This is a comment"));
 	if (instruction != NULL) {
 		cerr << "Test 9 failed: expecting comment" << endl;
 		return 90;
 	}
 
 	//Instruction with a comment
-	instruction = factory.parse(string("sw $5,(-16)$3 //KAKI! This is a comment"), 0);
+	instruction = factory.parse(string("sw $5,(-16)$3 //KAKI! This is a comment"));
 	if (instruction->getOpcode() != ISA::sw) {
 		cerr << "Test 4 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 91;
@@ -162,20 +162,37 @@ int main() {
 		return 94;
 	}
 
-	/////////////////////////////////////////////
-	// Empty Lines
-	/////////////////////////////////////////////
-
-	//Only blanks
-	instruction = factory.parse(string("  "), 0);
+	// Only blanks
+	instruction = factory.parse(string("  "));
 	if (instruction != NULL) {
 		cerr << "Test 10 failed: expecting blank line" << endl;
 		return 100;
 	}
 
-	instruction = factory.parse(string(""), 0);
+	// Empty line
+	instruction = factory.parse(string(""));
 	if (instruction != NULL) {
 		cerr << "Test 11 failed: expecting empty line" << endl;
 		return 110;
+	}
+
+	// Relative branch
+	instruction = factory.parse(string("bne $1 $2 L1"));
+	if (instruction->getOpcode() != ISA::bne) {
+		cerr << "Test 12 failed: wrong opcode " << instruction->getOpcode() << endl;
+		return 120;
+	}
+	itype = dynamic_cast<ITypeInstruction*>(instruction);
+	if (itype->getRs() != 1) {
+		cerr << "Test 12 failed: wrong rs " << itype->getRs() << endl;
+		return 92;
+	}
+	if (itype->getRt() != 2) {
+		cerr << "Test 12 failed: wrong rt " << itype->getRt() << endl;
+		return 93;
+	}
+	if (itype->getImmediate() != -32) {
+		cerr << "Test 12 failed: wrong immediate " << itype->getImmediate() << endl;
+		return 94;
 	}
 }
