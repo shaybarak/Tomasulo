@@ -7,7 +7,7 @@
 #include <algorithm>
 
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
-const regex InstructionFactory::unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
+const regex InstructionFactory::unlabeledInstruction("^\\s*(\\w*)\\s*(.*)$");
 
 Instruction* InstructionFactory::parse(string& line, unsigned int address) const {
 	// TODO use address for branch offset calculation
