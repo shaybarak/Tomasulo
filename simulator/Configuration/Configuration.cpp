@@ -9,7 +9,7 @@ const regex Configuration::commentLine("^\\s*//.*$");
 bool Configuration::load(istream& in) {
 	string line;
 	smatch match;
-	while (in.good() && !in.eof()) {
+	while (in) {
 		getline(in, line);
 		if (regex_search(line, match, configLine)) {
 			// Parsed a configuration line
