@@ -63,7 +63,7 @@ Instruction* InstructionFactory::parse(string& line, unsigned int address) const
 
 ISA::Opcode InstructionFactory::toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
-	string opcodeLowered;
+	string opcodeLowered(opcodeName);
 	transform(opcodeName.begin(), opcodeName.end(), opcodeLowered.begin(), ::tolower);
 	if (opcodeLowered == "add") {
 		return ISA::add;
