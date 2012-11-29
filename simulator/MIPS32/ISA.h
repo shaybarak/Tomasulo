@@ -1,3 +1,5 @@
+#pragma once
+
 /**
  * MIPS32 ISA-level types, methods and definitions.
  */

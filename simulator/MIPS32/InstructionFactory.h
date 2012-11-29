@@ -5,6 +5,9 @@
 #include <map>
 #include <regex>
 #include "Instruction.h"
+#include "RTypeInstruction.h"
+#include "ITypeInstruction.h"
+#include "JTypeInstruction.h"
 using namespace std;
 using namespace std::tr1;
 
@@ -40,11 +43,11 @@ private:
 	static const regex unlabeledInstruction;
 	
 	// Specialized methods for parsing different types of instructions
-	Instruction* parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
-	Instruction* parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
-	Instruction* parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const;
-	Instruction* parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const;
-	Instruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
+	RTypeInstruction* parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const;
+	JTypeInstruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
 	const map<string, int> labels;

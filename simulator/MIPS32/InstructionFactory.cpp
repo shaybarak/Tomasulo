@@ -103,7 +103,7 @@ bool InstructionFactory::validateRegisterIndex(int index) {
 	return (0 <= index && index <= 31);
 }
 
-Instruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
+RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if (sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
 		return NULL;
@@ -114,7 +114,7 @@ Instruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode 
 	return new RTypeInstruction(opcode, rs, rt, rd);
 }
 
-Instruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
 		return NULL;
@@ -125,7 +125,7 @@ Instruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
 		return NULL;
@@ -133,7 +133,7 @@ Instruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, cons
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
 		return new ITypeInstruction(opcode, rs, rt, immediate);
@@ -152,7 +152,7 @@ Instruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, cons
 	}
 }
 
-Instruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
+JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int literalTarget;
 	if (sscanf_s(arguments.c_str(), "%d", &literalTarget) == 1) {
 		// Jump target is 26 bits
