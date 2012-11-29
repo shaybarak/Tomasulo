@@ -9,7 +9,8 @@
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 const regex InstructionFactory::unlabeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 
-Instruction* InstructionFactory::parse(string& line) const {
+Instruction* InstructionFactory::parse(string& line, unsigned int address) const {
+	// TODO use address for branch offset calculation
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)

@@ -7,6 +7,8 @@
 #include <map>
 
 int main() {
+	// TODO test instructions at different addresses
+
 	map<string, int> symbols;
 	symbols["L1"] = 6;
 	symbols["sheker"] = 7;
@@ -17,7 +19,7 @@ int main() {
 	JTypeInstruction* jtype = NULL;
 
 	// Test the first example instructions from the exercise documentation
-	instruction = factory.parse(string("L1: ADD $1 $2 $3"));
+	instruction = factory.parse(string("L1: ADD $1 $2 $3"), 0);
 	if (instruction->getOpcode() != ISA::add) {
 		cerr << "Test 1 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
@@ -33,7 +35,7 @@ int main() {
 	}
 
 	// Test the second example instructions from the exercise documentation
-	instruction = factory.parse(string("MUL $2 $1 $4"));
+	instruction = factory.parse(string("MUL $2 $1 $4"), 0);
 	if (instruction->getOpcode() != ISA::mul) {
 		cerr << "Test 2 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
@@ -49,7 +51,7 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("subi $7 $8 9"));
+	instruction = factory.parse(string("subi $7 $8 9"), 0);
 	if (instruction->getOpcode() != ISA::subi) {
 		cerr << "Test 3 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
@@ -65,7 +67,7 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("sw $5,(-16)$3"));
+	instruction = factory.parse(string("sw $5,(-16)$3"), 0);
 	if (instruction->getOpcode() != ISA::sw) {
 		cerr << "Test 4 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
@@ -81,7 +83,7 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("j L1"));
+	instruction = factory.parse(string("j L1"), 0);
 	if (instruction->getOpcode() != ISA::j) {
 		cerr << "Test 5 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
@@ -91,19 +93,19 @@ int main() {
 	}
 
 	// Another example
-	instruction = factory.parse(string("halt"));
+	instruction = factory.parse(string("halt"), 0);
 	if (instruction->getOpcode() != ISA::halt) {
 		cerr << "Test 6 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 
 	// Unknown instruction
-	instruction = factory.parse(string("blah: blah"));
+	instruction = factory.parse(string("blah: blah"), 0);
 	if (instruction != NULL) {
 		cerr << "Test 7 failed: expecting invalid instruction" << endl;
 	}
 
 	// Register index out of range
-	instruction = factory.parse(string("add $30 $31 $32"));
+	instruction = factory.parse(string("add $30 $31 $32"), 0);
 	if (instruction != NULL) {
 		cerr << "Test 8 failed: expecting invalid instruction" << endl;
 	}

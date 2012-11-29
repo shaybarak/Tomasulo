@@ -15,8 +15,8 @@ class InstructionFactory {
 public:
 	// Initialize with a mapping of labels to immediates
 	InstructionFactory(const map<string, int>& labels) : labels(labels) {}
-	// Parse a single line of assembly code, on error returns NULL
-	Instruction* parse(string& line) const;
+	// Parse a single line of assembly code at a given memory address, on error returns NULL
+	Instruction* parse(string& line, unsigned int address) const;
 
 private:
 	// Convert string to Opcode
