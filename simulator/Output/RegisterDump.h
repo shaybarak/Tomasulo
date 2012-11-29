@@ -1,5 +1,6 @@
 #pragma once
 
+#include "..\MIPS32\ISA.h"
 #include <ostream>
 using namespace std;
 
@@ -15,5 +16,5 @@ using namespace std;
 class HexDump {
 public:
 	// Returns whether successful
-	static bool dump(int* registers, int count, ostream& out);
+	static bool dump(ISA::Register* registers, int count, ostream& out);
 };

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool dump(int* registers, int count, ostream& out) {
+bool dump(ISA::Register* registers, int count, ostream& out) {
 	for (int reg = 0; reg < count; reg++) {
 		out << "$" << reg << " " << registers[reg] << endl;
 	}
