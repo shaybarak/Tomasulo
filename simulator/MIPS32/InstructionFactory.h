@@ -4,6 +4,7 @@
 #include <istream>
 #include <map>
 #include <regex>
+#include "ISA.h"
 #include "Instruction.h"
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"

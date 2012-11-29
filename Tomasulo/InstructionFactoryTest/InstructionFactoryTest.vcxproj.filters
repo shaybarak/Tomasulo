@@ -33,6 +33,9 @@
     <ClCompile Include="..\..\simulator\MIPS32\RTypeInstruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\simulator\MIPS32\ISA.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\simulator\MIPS32\Instruction.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\simulator\MIPS32\RTypeInstruction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\simulator\MIPS32\ISA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
