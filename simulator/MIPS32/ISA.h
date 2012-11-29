@@ -11,7 +11,8 @@ public:
 	enum Opcode {
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};
-	typedef unsigned int Register;
+	typedef int Register;
+	typedef unsigned int Address;
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	static unsigned int advancePc(unsigned int pc);
 	// Size of instruction in bits

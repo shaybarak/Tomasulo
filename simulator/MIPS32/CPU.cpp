@@ -1,6 +1,6 @@
 #include "CPU.h"
 
-bool CPU::execute(vector<Instruction> instructions, ISA::Register instructionBase, ISA::Register startPc) {
+bool CPU::execute(vector<Instruction> instructions, ISA::Address instructionBase, ISA::Address pc) {
 	return false;
 }
 

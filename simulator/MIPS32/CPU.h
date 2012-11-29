@@ -18,10 +18,10 @@ public:
 	 * Executes a program.
 	 * instructions: a program represented as a series of instructions
 	 * instructionBase: absolute base memory address at which instructions are mapped
-	 * startPc: value of PC at start of execution
+	 * pc: value of Program Counter at start of execution
 	 * Returns whether execution finished successfully (reached halt instruction).
 	 */
-	bool execute(vector<Instruction> instructions, ISA::Register instructionBase, ISA::Register startPc);
+	bool execute(vector<Instruction> instructions, ISA::Address instructionBase, ISA::Address pc);
 	// Returns count of instructions executed so far
 	int getInstructionsCount() const;
 
