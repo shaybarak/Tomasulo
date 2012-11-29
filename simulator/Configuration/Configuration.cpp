@@ -1,8 +1,10 @@
 #include "Configuration.h"
+#include <utility>
+#include <stdlib.h>
 using namespace std;
 
-regex configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
-regex commentLine("^\\s*//.*$");
+const regex Configuration::configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
+const regex Configuration::commentLine("^\\s*//.*$");
 
 bool Configuration::load(istream& in) {
 	string line;
@@ -11,7 +13,7 @@ bool Configuration::load(istream& in) {
 		getline(in, line);
 		if (regex_search(line, match, configLine)) {
 			// Parsed a configuration line
-			configs.insert(pair<string, int>(match[1], match[2]));
+			configs.insert(make_pair(match[1], atoi(match[2].str().c_str())));
 		} else if (regex_match(line, commentLine)) {
 			// Matched a commented line, ignore
 		} else {
