@@ -167,8 +167,8 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 		return new JTypeInstruction(opcode, literalTarget);
 	} else {
 		// Literal target not identified, try labelled target
-		char labelledTarget[21];
-		if (sscanf_s(arguments.c_str(), "%20s", &labelledTarget) != 1) {
+		char labelledTarget[101];
+		if (sscanf(arguments.c_str(), "%100s", labelledTarget) != 1) {
 			return NULL;
 		}
 		string label(labelledTarget);
