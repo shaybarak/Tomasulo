@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "InstructionFactory.h"
 #include "Instruction.h"
 #include "RTypeInstruction.h"
@@ -71,7 +72,7 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 		(sscanf_s(arguments.c_str(), "$%d, $%d, $%d", &rs, &rt, &rd) != 3)) {
 		return NULL;
 	}
-	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31 && 0 <= rd && rd <= 31)) {
+	if (!(validateRegisterIndex(rs) && validateRegisterIndex(rt) && validateRegisterIndex(rd))) {
 		return NULL;
 	}
 	return new RTypeInstruction(opcode, rs, rt, rd);
@@ -83,7 +84,7 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) != 3)){
 		return NULL;
 	}
-	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31)) {
+	if (!(validateRegisterIndex(rs) && validateRegisterIndex(rt))) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);

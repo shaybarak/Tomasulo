@@ -63,7 +63,7 @@
     <ClInclude Include="MIPS32\LabelAnalyzer.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
-    <ClInclude Include="CPU.h">
+    <ClInclude Include="MIPS32\CPU.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,7 +98,7 @@
     <ClCompile Include="MIPS32\LabelAnalyzer.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
-    <ClCompile Include="CPU.cpp">
+    <ClCompile Include="MIPS32\CPU.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
   </ItemGroup>
