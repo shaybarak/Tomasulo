@@ -14,7 +14,6 @@ using namespace std;
  */
 class HexDump {
 public:
-	// Registers is expected to be int[32]
 	// Returns whether successful
-	static bool dump(int* registers, ostream& out);
+	static bool dump(int* registers, int count, ostream& out);
 };
