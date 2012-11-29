@@ -17,7 +17,7 @@ using namespace std::tr1;
 class InstructionFactory {
 public:
 	// Initialize with a mapping of labels to immediates
-	InstructionFactory(const map<string, int>& labels) : labels(labels) {}
+	InstructionFactory(const map<string, unsigned int>& labels) : labels(labels) {}
 	// Parse a single line of assembly code at a given memory address, on error returns NULL
 	Instruction* parse(string& line, unsigned int address) const;
 
@@ -50,5 +50,5 @@ private:
 	JTypeInstruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
-	const map<string, int> labels;
+	const map<string, unsigned int>& labels;
 };

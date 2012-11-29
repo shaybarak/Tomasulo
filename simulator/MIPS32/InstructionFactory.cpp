@@ -144,7 +144,7 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 			return NULL;
 		}
 		string label(labelledTarget);
-		map<string, int>::const_iterator labelValue = labels.find(label);
+		map<string, unsigned int>::const_iterator labelValue = labels.find(label);
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
@@ -167,7 +167,7 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 			return NULL;
 		}
 		string label(labelledTarget);
-		map<string, int>::const_iterator labelValue = labels.find(label);
+		map<string, unsigned int>::const_iterator labelValue = labels.find(label);
 		if (labelValue == labels.end()) {
 			return NULL;
 		}

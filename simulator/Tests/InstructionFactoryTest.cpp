@@ -9,10 +9,10 @@
 int main() {
 	// TODO test instructions at different addresses
 
-	map<string, int> symbols;
-	symbols["L1"] = 6;
-	symbols["sheker"] = 7;
-	InstructionFactory factory(symbols);
+	map<string, unsigned int> labels;
+	labels["L1"] = 6;
+	labels["sheker"] = 7;
+	InstructionFactory factory(labels);
 	Instruction* instruction = NULL;
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
