@@ -1,8 +1,8 @@
-#include "../Instructions/InstructionFactory.h"
-#include "../Instructions/Instruction.h"
-#include "../Instructions/RTypeInstruction.h"
-#include "../Instructions/ITypeInstruction.h"
-#include "../Instructions/JTypeInstruction.h"
+#include "../MIPS32/InstructionFactory.h"
+#include "../MIPS32/Instruction.h"
+#include "../MIPS32/RTypeInstruction.h"
+#include "../MIPS32/ITypeInstruction.h"
+#include "../MIPS32/JTypeInstruction.h"
 #include <string>
 #include <map>
 
