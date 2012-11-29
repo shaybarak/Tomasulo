@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
+    <ClInclude Include="LabelAnalyzer.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
     <ClInclude Include="MIPS32\InstructionFactory.h" />
     <ClInclude Include="MIPS32\ISA.h" />
@@ -23,8 +24,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configuration\Configuration.cpp" />
+    <ClCompile Include="LabelAnalyzer.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
     <ClCompile Include="MIPS32\InstructionFactory.cpp" />
+    <ClCompile Include="MIPS32\ISA.cpp" />
     <ClCompile Include="MIPS32\ITypeInstruction.cpp" />
     <ClCompile Include="MIPS32\JTypeInstruction.cpp" />
     <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
