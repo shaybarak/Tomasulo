@@ -13,23 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Instructions">
-      <UniqueIdentifier>{1121111d-1cac-4e4e-ae0e-074b4cbf832b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Configuration">
       <UniqueIdentifier>{034616b4-54db-44a8-97be-4beaa4d39c0e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Output">
       <UniqueIdentifier>{0db26a6c-4ace-4145-b570-ee2f53a908bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Instructions">
-      <UniqueIdentifier>{bc5ae740-a65c-4bbc-bd75-b7632e71175a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Configuration">
       <UniqueIdentifier>{23645e49-c0c1-4114-a859-0603a6415c1f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Output">
       <UniqueIdentifier>{40be67f4-a81c-406d-b2a4-f4d7e44119fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MIPS32">
+      <UniqueIdentifier>{1121111d-1cac-4e4e-ae0e-074b4cbf832b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MIPS32">
+      <UniqueIdentifier>{bc5ae740-a65c-4bbc-bd75-b7632e71175a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,22 +43,22 @@
       <Filter>Header Files\Output</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\Instruction.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\InstructionFactory.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\ISA.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\ITypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\JTypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\RTypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
+      <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -72,19 +72,19 @@
       <Filter>Source Files\Configuration</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\Instruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
+      <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\InstructionFactory.cpp">
-      <Filter>Source Files\Instructions</Filter>
+      <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\ITypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
+      <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\JTypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
+      <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\RTypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
+      <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
