@@ -137,17 +137,17 @@ Instruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, cons
 	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
-		// Literal target not identified, try symbolic target
-		char symbolicTarget[21];
-		if (sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &symbolicTarget) != 3) {
+		// Literal target not identified, try labelled target
+		char labelledTarget[21];
+		if (sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &labelledTarget) != 3) {
 			return NULL;
 		}
-		string symbol(symbolicTarget);
-		map<string, int>::const_iterator symbolValue = symbols.find(symbol);
-		if (symbolValue == symbols.end()) {
+		string label(labelledTarget);
+		map<string, int>::const_iterator labelValue = labels.find(label);
+		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		return new ITypeInstruction(opcode, rs, rt, symbolValue->second);
+		return new ITypeInstruction(opcode, rs, rt, labelValue->second);
 	}
 }
 
@@ -160,16 +160,16 @@ Instruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const 
 		}
 		return new JTypeInstruction(opcode, literalTarget);
 	} else {
-		// Literal target not identified, try symbolic target
-		char symbolicTarget[21];
-		if (sscanf_s(arguments.c_str(), "%20s", &symbolicTarget) != 1) {
+		// Literal target not identified, try labelled target
+		char labelledTarget[21];
+		if (sscanf_s(arguments.c_str(), "%20s", &labelledTarget) != 1) {
 			return NULL;
 		}
-		string symbol(symbolicTarget);
-		map<string, int>::const_iterator symbolValue = symbols.find(symbol);
-		if (symbolValue == symbols.end()) {
+		string label(labelledTarget);
+		map<string, int>::const_iterator labelValue = labels.find(label);
+		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		return new JTypeInstruction(opcode, symbolValue->second);
+		return new JTypeInstruction(opcode, labelValue->second);
 	}
 }

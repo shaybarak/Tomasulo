@@ -13,8 +13,8 @@ using namespace std::tr1;
  */
 class InstructionFactory {
 public:
-	// Initialize with a mapping of symbols to immediates
-	InstructionFactory(const map<string, int>& symbols) : symbols(symbols) {}
+	// Initialize with a mapping of labels to immediates
+	InstructionFactory(const map<string, int>& labels) : labels(labels) {}
 	// Parse a single line of assembly code, on error returns NULL
 	Instruction* parse(string& line) const;
 
@@ -47,5 +47,5 @@ private:
 	Instruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
-	const map<string, int> symbols;
+	const map<string, int> labels;
 };
