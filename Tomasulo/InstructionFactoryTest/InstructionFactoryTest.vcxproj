@@ -74,19 +74,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\simulator\Instructions\Instruction.cpp" />
-    <ClCompile Include="..\..\simulator\Instructions\InstructionFactory.cpp" />
-    <ClCompile Include="..\..\simulator\Instructions\ITypeInstruction.cpp" />
-    <ClCompile Include="..\..\simulator\Instructions\JTypeInstruction.cpp" />
-    <ClCompile Include="..\..\simulator\Instructions\RTypeInstruction.cpp" />
+    <ClCompile Include="..\..\simulator\MIPS32\Instruction.cpp" />
+    <ClCompile Include="..\..\simulator\MIPS32\InstructionFactory.cpp" />
+    <ClCompile Include="..\..\simulator\MIPS32\ITypeInstruction.cpp" />
+    <ClCompile Include="..\..\simulator\MIPS32\JTypeInstruction.cpp" />
+    <ClCompile Include="..\..\simulator\MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="..\..\simulator\Tests\InstructionFactoryTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\simulator\Instructions\Instruction.h" />
-    <ClInclude Include="..\..\simulator\Instructions\InstructionFactory.h" />
-    <ClInclude Include="..\..\simulator\Instructions\ITypeInstruction.h" />
-    <ClInclude Include="..\..\simulator\Instructions\JTypeInstruction.h" />
-    <ClInclude Include="..\..\simulator\Instructions\RTypeInstruction.h" />
+    <ClInclude Include="..\..\simulator\MIPS32\Instruction.h" />
+    <ClInclude Include="..\..\simulator\MIPS32\InstructionFactory.h" />
+    <ClInclude Include="..\..\simulator\MIPS32\ITypeInstruction.h" />
+    <ClInclude Include="..\..\simulator\MIPS32\JTypeInstruction.h" />
+    <ClInclude Include="..\..\simulator\MIPS32\RTypeInstruction.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

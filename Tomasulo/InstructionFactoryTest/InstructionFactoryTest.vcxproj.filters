@@ -18,36 +18,36 @@
     <ClCompile Include="..\..\simulator\Tests\InstructionFactoryTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\simulator\Instructions\Instruction.cpp">
+    <ClCompile Include="..\..\simulator\MIPS32\Instruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\simulator\Instructions\InstructionFactory.cpp">
+    <ClCompile Include="..\..\simulator\MIPS32\InstructionFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\simulator\Instructions\ITypeInstruction.cpp">
+    <ClCompile Include="..\..\simulator\MIPS32\ITypeInstruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\simulator\Instructions\JTypeInstruction.cpp">
+    <ClCompile Include="..\..\simulator\MIPS32\JTypeInstruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\simulator\Instructions\RTypeInstruction.cpp">
+    <ClCompile Include="..\..\simulator\MIPS32\RTypeInstruction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\simulator\Instructions\Instruction.h">
+    <ClInclude Include="..\..\simulator\MIPS32\Instruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\simulator\Instructions\InstructionFactory.h">
+    <ClInclude Include="..\..\simulator\MIPS32\InstructionFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\simulator\Instructions\ITypeInstruction.h">
+    <ClInclude Include="..\..\simulator\MIPS32\ITypeInstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\simulator\Instructions\JTypeInstruction.h">
+    <ClInclude Include="..\..\simulator\MIPS32\JTypeInstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\simulator\Instructions\RTypeInstruction.h">
+    <ClInclude Include="..\..\simulator\MIPS32\RTypeInstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

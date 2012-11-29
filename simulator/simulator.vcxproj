@@ -12,21 +12,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
-    <ClInclude Include="Instructions\Instruction.h" />
-    <ClInclude Include="Instructions\InstructionFactory.h" />
-    <ClInclude Include="Instructions\ITypeInstruction.h" />
-    <ClInclude Include="Instructions\JTypeInstruction.h" />
-    <ClInclude Include="Instructions\RTypeInstruction.h" />
+    <ClInclude Include="MIPS32\Instruction.h" />
+    <ClInclude Include="MIPS32\InstructionFactory.h" />
+    <ClInclude Include="MIPS32\ISA.h" />
+    <ClInclude Include="MIPS32\ITypeInstruction.h" />
+    <ClInclude Include="MIPS32\JTypeInstruction.h" />
+    <ClInclude Include="MIPS32\RTypeInstruction.h" />
     <ClInclude Include="Output\HexDump.h" />
     <ClInclude Include="Output\RegisterDump.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configuration\Configuration.cpp" />
-    <ClCompile Include="Instructions\Instruction.cpp" />
-    <ClCompile Include="Instructions\InstructionFactory.cpp" />
-    <ClCompile Include="Instructions\ITypeInstruction.cpp" />
-    <ClCompile Include="Instructions\JTypeInstruction.cpp" />
-    <ClCompile Include="Instructions\RTypeInstruction.cpp" />
+    <ClCompile Include="MIPS32\Instruction.cpp" />
+    <ClCompile Include="MIPS32\InstructionFactory.cpp" />
+    <ClCompile Include="MIPS32\ITypeInstruction.cpp" />
+    <ClCompile Include="MIPS32\JTypeInstruction.cpp" />
+    <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="Output\HexDump.cpp" />
     <ClCompile Include="Output\RegisterDump.cpp" />
   </ItemGroup>

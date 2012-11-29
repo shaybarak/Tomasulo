@@ -33,21 +33,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Instructions\Instruction.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
-    <ClInclude Include="Instructions\InstructionFactory.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
-    <ClInclude Include="Instructions\ITypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
-    <ClInclude Include="Instructions\JTypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
-    <ClInclude Include="Instructions\RTypeInstruction.h">
-      <Filter>Header Files\Instructions</Filter>
-    </ClInclude>
     <ClInclude Include="Configuration\Configuration.h">
       <Filter>Header Files\Configuration</Filter>
     </ClInclude>
@@ -57,6 +42,24 @@
     <ClInclude Include="Output\RegisterDump.h">
       <Filter>Header Files\Output</Filter>
     </ClInclude>
+    <ClInclude Include="MIPS32\Instruction.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\InstructionFactory.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\ISA.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\ITypeInstruction.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\JTypeInstruction.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\RTypeInstruction.h">
+      <Filter>Header Files\Instructions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
@@ -65,23 +68,23 @@
     <ClCompile Include="Output\RegisterDump.cpp">
       <Filter>Source Files\Output</Filter>
     </ClCompile>
-    <ClCompile Include="Instructions\Instruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
-    </ClCompile>
-    <ClCompile Include="Instructions\InstructionFactory.cpp">
-      <Filter>Source Files\Instructions</Filter>
-    </ClCompile>
-    <ClCompile Include="Instructions\ITypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
-    </ClCompile>
-    <ClCompile Include="Instructions\JTypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
-    </ClCompile>
-    <ClCompile Include="Instructions\RTypeInstruction.cpp">
-      <Filter>Source Files\Instructions</Filter>
-    </ClCompile>
     <ClCompile Include="Configuration\Configuration.cpp">
       <Filter>Source Files\Configuration</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\Instruction.cpp">
+      <Filter>Source Files\Instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\InstructionFactory.cpp">
+      <Filter>Source Files\Instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\ITypeInstruction.cpp">
+      <Filter>Source Files\Instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\JTypeInstruction.cpp">
+      <Filter>Source Files\Instructions</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\RTypeInstruction.cpp">
+      <Filter>Source Files\Instructions</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
