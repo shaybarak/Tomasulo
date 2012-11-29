@@ -105,7 +105,8 @@ bool InstructionFactory::validateRegisterIndex(int index) {
 
 RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
-	if (sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
+	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) &&
+		(sscanf_s(arguments.c_str(), "$%d, $%d, $%d", &rs, &rt, &rd) != 3)) {
 		return NULL;
 	}
 	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31 && 0 <= rd && rd <= 31)) {
@@ -116,7 +117,8 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 
 ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
+	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) &&
+		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) != 3)){
 		return NULL;
 	}
 	if (!(0 <= rs && rs <= 31 && 0 <= rt && rt <= 31)) {
@@ -127,7 +129,8 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 
 ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
+	if ((sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) && 
+		(sscanf_s(arguments.c_str(), "$%d, (%hd)$%d", &rs, &immediate, &rt) != 3)) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);
@@ -135,12 +138,14 @@ ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode,
 
 ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
-	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
+	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) &&
+		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) == 3)){
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try labelled target
 		char labelledTarget[21];
-		if (sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &labelledTarget) != 3) {
+		if ((sscanf_s(arguments.c_str(), "$%d $%d %20s", &rs, &rt, &labelledTarget) != 3) &&
+			(sscanf_s(arguments.c_str(), "$%d, $%d, %20s", &rs, &rt, &labelledTarget) != 3)){
 			return NULL;
 		}
 		string label(labelledTarget);
