@@ -63,6 +63,9 @@
     <ClInclude Include="MIPS32\LabelAnalyzer.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
+    <ClInclude Include="CPU.h">
+      <Filter>Header Files\MIPS32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
@@ -93,6 +96,9 @@
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\LabelAnalyzer.cpp">
+      <Filter>Source Files\MIPS32</Filter>
+    </ClCompile>
+    <ClCompile Include="CPU.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
   </ItemGroup>

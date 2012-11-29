@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
+    <ClInclude Include="CPU.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
     <ClInclude Include="MIPS32\InstructionFactory.h" />
     <ClInclude Include="MIPS32\ISA.h" />
@@ -24,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configuration\Configuration.cpp" />
+    <ClCompile Include="CPU.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
     <ClCompile Include="MIPS32\InstructionFactory.cpp" />
     <ClCompile Include="MIPS32\ISA.cpp" />
