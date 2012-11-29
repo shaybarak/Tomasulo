@@ -20,5 +20,5 @@ Debug
 # Mac OSX shit
 .DS_Store
 
-#vs shit
+# VS shit
 *.suo
