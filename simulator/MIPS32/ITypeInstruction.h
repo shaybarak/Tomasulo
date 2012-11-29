@@ -5,7 +5,7 @@
  */
 class ITypeInstruction : public Instruction {
 public:
-	ITypeInstruction(Instruction::Opcode opcode, char rs, char rt, short immediate) :
+	ITypeInstruction(ISA::Opcode opcode, char rs, char rt, short immediate) :
 	  Instruction(opcode), rs(rs), rt(rt), immediate(immediate) {}
 	char getRs() const;
 	char getRt() const;

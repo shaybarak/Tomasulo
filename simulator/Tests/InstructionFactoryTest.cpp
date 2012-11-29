@@ -18,7 +18,7 @@ int main() {
 
 	// Test the first example instructions from the exercise documentation
 	instruction = factory.parse(string("L1: ADD $1 $2 $3"));
-	if (instruction->getOpcode() != Instruction::add) {
+	if (instruction->getOpcode() != ISA::add) {
 		cerr << "Test 1 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -34,7 +34,7 @@ int main() {
 
 	// Test the second example instructions from the exercise documentation
 	instruction = factory.parse(string("MUL $2 $1 $4"));
-	if (instruction->getOpcode() != Instruction::mul) {
+	if (instruction->getOpcode() != ISA::mul) {
 		cerr << "Test 2 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -50,7 +50,7 @@ int main() {
 
 	// Another example
 	instruction = factory.parse(string("subi $7 $8 9"));
-	if (instruction->getOpcode() != Instruction::subi) {
+	if (instruction->getOpcode() != ISA::subi) {
 		cerr << "Test 3 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
@@ -66,7 +66,7 @@ int main() {
 
 	// Another example
 	instruction = factory.parse(string("sw $5,(-16)$3"));
-	if (instruction->getOpcode() != Instruction::sw) {
+	if (instruction->getOpcode() != ISA::sw) {
 		cerr << "Test 4 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
@@ -82,7 +82,7 @@ int main() {
 
 	// Another example
 	instruction = factory.parse(string("j L1"));
-	if (instruction->getOpcode() != Instruction::j) {
+	if (instruction->getOpcode() != ISA::j) {
 		cerr << "Test 5 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 	jtype = dynamic_cast<JTypeInstruction*>(instruction);
@@ -92,7 +92,7 @@ int main() {
 
 	// Another example
 	instruction = factory.parse(string("halt"));
-	if (instruction->getOpcode() != Instruction::halt) {
+	if (instruction->getOpcode() != ISA::halt) {
 		cerr << "Test 6 failed: wrong opcode " << instruction->getOpcode() << endl;
 	}
 

@@ -20,7 +20,7 @@ public:
 
 private:
 	// Convert string to Opcode
-	static Instruction::Opcode toOpcode(const string& opcodeName);
+	static ISA::Opcode toOpcode(const string& opcodeName);
 	// Validate register index
 	static bool validateRegisterIndex(int index);
 
@@ -40,11 +40,11 @@ private:
 	static const regex unlabeledInstruction;
 	
 	// Specialized methods for parsing different types of instructions
-	Instruction* parseRegisterArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const;
-	Instruction* parseImmediateArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const;
-	Instruction* parseMemoryInstruction(Instruction::Opcode opcode, const string& arguments) const;
-	Instruction* parseBranchInstruction(Instruction::Opcode opcode, const string& arguments) const;
-	Instruction* parseJumpInstruction(Instruction::Opcode opcode, const string& arguments) const;
+	Instruction* parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
+	Instruction* parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
+	Instruction* parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const;
+	Instruction* parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const;
+	Instruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
 	const map<string, int> symbols;

@@ -1,5 +1,5 @@
 #include "Instruction.h"
 
-Instruction::Opcode Instruction::getOpcode() const {
+ISA::Opcode Instruction::getOpcode() const {
 	return opcode;
 }

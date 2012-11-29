@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "ISA.h"
 using namespace std;
 
 /**
@@ -12,14 +13,10 @@ using namespace std;
  */
 class Instruction {
 public:
-	enum Opcode {
-		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
-	};
-
-	Instruction(Opcode opcode) : opcode(opcode) {}
+	Instruction(ISA::Opcode opcode) : opcode(opcode) {}
 	virtual ~Instruction() {}
-	Opcode getOpcode() const;
+	ISA::Opcode getOpcode() const;
 
 private:
-	Opcode opcode;
+	ISA::Opcode opcode;
 };

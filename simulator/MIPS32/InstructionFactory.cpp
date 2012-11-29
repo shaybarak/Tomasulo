@@ -19,33 +19,33 @@ Instruction* InstructionFactory::parse(string& line) const {
 		cerr << "Cannot parse command line " << line << endl;
 		return NULL;
 	}
-	Instruction::Opcode opcode = toOpcode(match[1]);
+	ISA::Opcode opcode = toOpcode(match[1]);
 	Instruction* instruction = NULL;
 	switch (opcode) {
-	case Instruction::add:
-	case Instruction::sub:
-	case Instruction::mul:
-	case Instruction::div:
-	case Instruction::slt:
+	case ISA::add:
+	case ISA::sub:
+	case ISA::mul:
+	case ISA::div:
+	case ISA::slt:
 		instruction = parseRegisterArithmeticInstruction(opcode, match[2]);
 		break;
-	case Instruction::addi:
-	case Instruction::subi:
-	case Instruction::slti:
+	case ISA::addi:
+	case ISA::subi:
+	case ISA::slti:
 		instruction = parseImmediateArithmeticInstruction(opcode, match[2]);
 		break;
-	case Instruction::lw:
-	case Instruction::sw:
+	case ISA::lw:
+	case ISA::sw:
 		instruction = parseMemoryInstruction(opcode, match[2]);
 		break;
-	case Instruction::beq:
-	case Instruction::bne:
+	case ISA::beq:
+	case ISA::bne:
 		instruction = parseBranchInstruction(opcode, match[2]);
 		break;
-	case Instruction::j:
+	case ISA::j:
 		instruction = parseJumpInstruction(opcode, match[2]);
 		break;
-	case Instruction::halt:
+	case ISA::halt:
 		// Handle special instruction
 		instruction = new Instruction(opcode);
 		break;
@@ -60,40 +60,40 @@ Instruction* InstructionFactory::parse(string& line) const {
 	return instruction;
 }
 
-Instruction::Opcode InstructionFactory::toOpcode(const string& opcodeName) {
+ISA::Opcode InstructionFactory::toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
 	string opcodeLowered;
 	transform(opcodeName.begin(), opcodeName.end(), opcodeLowered.begin(), ::tolower);
 	if (opcodeLowered == "add") {
-		return Instruction::add;
+		return ISA::add;
 	} else if (opcodeLowered == "sub") {
-		return Instruction::sub;
+		return ISA::sub;
 	} else if (opcodeLowered == "mul") {
-		return Instruction::mul;
+		return ISA::mul;
 	} else if (opcodeLowered == "div") {
-		return Instruction::div;
+		return ISA::div;
 	} else if (opcodeLowered == "addi") {
-		return Instruction::addi;
+		return ISA::addi;
 	} else if (opcodeLowered == "subi") {
-		return Instruction::subi;
+		return ISA::subi;
 	} else if (opcodeLowered == "lw") {
-		return Instruction::lw;
+		return ISA::lw;
 	} else if (opcodeLowered == "sw") {
-		return Instruction::sw;
+		return ISA::sw;
 	} else if (opcodeLowered == "beq") {
-		return Instruction::beq;
+		return ISA::beq;
 	} else if (opcodeLowered == "bne") {
-		return Instruction::bne;
+		return ISA::bne;
 	} else if (opcodeLowered == "slt") {
-		return Instruction::slt;
+		return ISA::slt;
 	} else if (opcodeLowered == "slti") {
-		return Instruction::slti;
+		return ISA::slti;
 	} else if (opcodeLowered == "j") {
-		return Instruction::j;
+		return ISA::j;
 	} else if (opcodeLowered == "halt") {
-		return Instruction::halt;
+		return ISA::halt;
 	} else {
-		return Instruction::unknown;
+		return ISA::unknown;
 	}
 }
 
@@ -102,7 +102,7 @@ bool InstructionFactory::validateRegisterIndex(int index) {
 	return (0 <= index && index <= 31);
 }
 
-Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
+Instruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if (sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) {
 		return NULL;
@@ -113,7 +113,7 @@ Instruction* InstructionFactory::parseRegisterArithmeticInstruction(Instruction:
 	return new RTypeInstruction(opcode, rs, rt, rd);
 }
 
-Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction::Opcode opcode, const string& arguments) const {
+Instruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) {
 		return NULL;
@@ -124,7 +124,7 @@ Instruction* InstructionFactory::parseImmediateArithmeticInstruction(Instruction
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opcode, const string& arguments) const {
+Instruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) {
 		return NULL;
@@ -132,7 +132,7 @@ Instruction* InstructionFactory::parseMemoryInstruction(Instruction::Opcode opco
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
-Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opcode, const string& arguments) const {
+Instruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, immediate;
 	if (sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) {
 		return new ITypeInstruction(opcode, rs, rt, immediate);
@@ -151,7 +151,7 @@ Instruction* InstructionFactory::parseBranchInstruction(Instruction::Opcode opco
 	}
 }
 
-Instruction* InstructionFactory::parseJumpInstruction(Instruction::Opcode opcode, const string& arguments) const {
+Instruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int literalTarget;
 	if (sscanf_s(arguments.c_str(), "%d", &literalTarget) == 1) {
 		// Jump target is 26 bits
