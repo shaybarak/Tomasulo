@@ -16,5 +16,5 @@ using namespace std;
 class RegisterDump {
 public:
 	// Returns whether successful
-	static bool dump(ISA::Register* registers, int count, ostream& out);
+	static bool store(ISA::Register* registers, int count, ostream& out);
 };
