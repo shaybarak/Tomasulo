@@ -1,4 +1,4 @@
-#include "LabelAnalyzer.h"
+#include "Labeler.h"
 #include "ISA.h"
 
 const regex LabelAnalyzer::labeledInstruction("^\\s*(\\w*)\\s*:\\s*\\w*\\s*.*$");

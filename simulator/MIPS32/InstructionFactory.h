@@ -5,6 +5,7 @@
 #include <map>
 #include <regex>
 #include "ISA.h"
+#include "Labeler.h"
 #include "Instruction.h"
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
@@ -22,7 +23,7 @@ public:
 	 * labels: mapping of label to memory address
 	 * startPc: initial value for the Program Counter
 	 */
-	InstructionFactory(const map<string, ISA::Address>& labels, ISA::Address startPc) : labels(labels), pc(startPc) {}
+	InstructionFactory(const Labeler::Labels& labels, ISA::Address startPc) : labels(labels), pc(startPc) {}
 	// Parses a single line of assembly code, on error returns NULL
 	Instruction* parse(string& line);
 
@@ -55,7 +56,7 @@ private:
 	JTypeInstruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
-	const map<string, ISA::Address>& labels;
+	const Labeler::Labels& labels;
 	// Program Counter
 	ISA::Address pc;
 };

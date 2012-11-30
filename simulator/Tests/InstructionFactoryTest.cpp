@@ -3,13 +3,14 @@
 #include "../MIPS32/RTypeInstruction.h"
 #include "../MIPS32/ITypeInstruction.h"
 #include "../MIPS32/JTypeInstruction.h"
+#include "../MIPS32/Labeler.h"
 #include <string>
 #include <map>
 
 int main() {
 	// TODO test instructions at different addresses
 
-	map<string, unsigned int> labels;
+	Labeler::Labels labels;
 	labels["L1"] = 100;
 	labels["sheker"] = 107;
 	InstructionFactory factory(labels, 100);
