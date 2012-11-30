@@ -16,7 +16,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(char* memory, int memorySize, ISA::Register gpr[]) :
+	CPU(char* memory, int memorySize, int gpr[]) :
 		memory(memory),
 		memorySize(memorySize),
 		gpr(gpr) {}
@@ -27,17 +27,17 @@ public:
 	 * pc: value of Program Counter at start of execution
 	 * Returns whether execution finished successfully (reached halt instruction).
 	 */
-	bool execute(vector<Instruction> instructions, ISA::Address instructionBase, ISA::Address pc);
+	bool execute(vector<Instruction>& instructions, int instructionBase, int pc);
 	// Returns count of instructions executed so far
 	int getInstructionsCount() const;
 
 private:
 	// Reads a machine word from memory; offset is in mwords
-	ISA::Register readMemory(ISA:Address address);
+	int readMemory(int address);
 	// Writes a machine word to memory; offset is in mwords
-	void writeMemory(ISA::Register value);
+	void writeMemory(int address, int value);
 	char* memory;
 	int memorySize;
-	ISA::Register gpr[ISA::REG_COUNT];
+	int gpr[ISA::REG_COUNT];
 	int instructionsExecuted;
 };

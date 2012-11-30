@@ -4,64 +4,85 @@
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
 
-
-bool CPU::execute(vector<Instruction> instructions, ISA::Address instructionBase, ISA::Address pc) {
-	char rTypeResult = 0;
-
-	for (std::vector<Instruction>::iterator inst_iter = instructions.begin(); inst_iter < instructions.end(); inst_iter++) {
-		switch (inst_iter->getOpcode()) {
+bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc) {
+	bool halted = false;
+	bool error = false;
+	while (!error && !finished) {
+		if ((pc - instructionBase < 0) || (pc - instructionBase >= instructions.size())) {
+			cerr << "CPU exception: program counter out of range!" << endl;
+			error = true;
+			continue;
+		}
+		Instruction instruction& = instructions[pc - instructionBase];
+		pc++;
+		instructionsExecuted++;
+		switch (instruction.getOpcode()) {
 		case ISA::add:
-			RTypeInstruction* pRInst = dynamic_cast<RTypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRd()] = gpr[pRInst->getRs()] + gpr[pRInst->getRt()];
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			gpr[rtype->getRd()] = gpr[rtype->getRs()] + gpr[rtype->getRt()];
+			break;
 		case ISA::sub:
-			RTypeInstruction* pRInst = dynamic_cast<RTypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRd()] = gpr[pRInst->getRs()] - gpr[pRInst->getRt()];
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			gpr[rtype->getRd()] = gpr[rtype->getRs()] - gpr[rtype->getRt()];
+			break;
 		case ISA::mul:
-			RTypeInstruction* pRInst = dynamic_cast<RTypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRd()] = gpr[pRInst->getRs()] - gpr[pRInst->getRt()];
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			gpr[rtype->getRd()] = gpr[rtype->getRs()] * gpr[rtype->getRt()];
+			break;
 		case ISA::div:
-			RTypeInstruction* pRInst = dynamic_cast<RTypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRd()] = gpr[pRInst->getRs()] / gpr[pRInst->getRt()];
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			if 
+			gpr[rtype->getRd()] = gpr[rtype->getRs()] / gpr[rtype->getRt()];
+			break;
 		case ISA::slt:
-			RTypeInstruction* pRInst = dynamic_cast<RTypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRd()] = gpr[pRInst->getRs()] < gpr[pRInst->getRt()];
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			gpr[rtype->getRd()] = (gpr[rtype->getRs()] < gpr[rtype->getRt()]) ? 1 : 0;
+			break;
 		case ISA::addi:
-			ITypeInstruction* pIInst = dynamic_cast<ITypeInstruction*>(&*inst_iter);			
-			gpr[pRInst->getRt()] = gpr[pIInst->getRs()] + gpr[pIInst->getImmediate()];
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			gpr[itype->getRt()] = gpr[itype->getRs()] + itype->getImmediate();
+			break;
 		case ISA::subi:
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			gpr[itype->getRt()] = gpr[itype->getRs()] - itype->getImmediate();
+			break;
 		case ISA::slti:
-			//instruction = parseImmediateArithmeticInstruction(opcode, match[2]);
+			RTypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			gpr[itype->getRt()] = (gpr[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
 			break;
 		case ISA::lw:
+			break;
 		case ISA::sw:
-			//TODO use shay's private memory access methds.			
+			break;
 		case ISA::beq:
+			break;
 		case ISA::bne:
-			//instruction = parseBranchInstruction(opcode, match[2]);
 			break;
 		case ISA::j:
-			//instruction = parseJumpInstruction(opcode, match[2]);
 			break;
 		case ISA::halt:
-			// Handle special instruction
-			//instruction = new Instruction(opcode);
+			finished = true;
 			break;
-	default:
-		// Unidentified instruction (bug? error?)
-		//instruction = NULL;
-		break;
+		default:
+			cerr << "CPU exception: invalid opcode!" << endl;
+			error = true;
+			pc--;
+			instructionsExecuted--;
+			break;
+		}
+		instructionsExecuted++;
 	}
-	return false;
+	return !error;
 }
 
 int CPU::getInstructionsCount() const {
 	return instructionsExecuted;
 }
 
-ISA::Register CPU::readMemory(ISA:Address address) {
-	return ISA::reverseEndianity(((int*)memory)[address]);
+int CPU::readMemory(int address) {
+	return *(int*)(&memory[address]);
 }
 
-void CPU::writeMemory(ISA::Register value) {
-	((int*)memory)[address] = ISA::reverseEndianity(value);
+void CPU::writeMemory(int address, int value) {
+	*(int*)(&memory[address]) = value;
 }
