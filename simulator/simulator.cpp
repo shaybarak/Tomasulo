@@ -127,10 +127,10 @@ int main(int argc, char** argv) {
 	HexDump.store(memory, mem_dump);
 	mem_dump.close();
 	// Write execution time
-	time_txt << cpu.getInstructionsCount();
+	time_txt << cpu.getInstructionsCount() << endl;
 	time_txt.close();
 	// Write instructions count
-	committed_txt << cpu.getInstructionsCount();
+	committed_txt << cpu.getInstructionsCount() << endl;
 	committed_txt.close();
 
 	return SUCCESS;
