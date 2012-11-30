@@ -57,3 +57,11 @@ bool CPU::execute(vector<Instruction> instructions, ISA::Address instructionBase
 int CPU::getInstructionsCount() const {
 	return instructionsExecuted;
 }
+
+ISA::Register CPU::readMemory(ISA:Address address) {
+	return ISA::reverseEndianity(((int*)memory)[address]);
+}
+
+void CPU::writeMemory(ISA::Register value) {
+	((int*)memory)[address] = ISA::reverseEndianity(value);
+}

@@ -41,3 +41,10 @@ ISA::Opcode ISA::toOpcode(const string& opcodeName) {
 		return ISA::unknown;
 	}
 }
+
+ISA::Register ISA::reverseEndianity(ISA::Register value) {
+	return (value << 24) +
+	       ((value >> 8) << 16) +
+	       ((value >> 16) << 8) +
+	       (value >> 24);
+}
