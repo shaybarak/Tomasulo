@@ -14,7 +14,8 @@ bool load(vector<char>& buffer, istream& in) {
 	}
 	// Reset flags
 	in.flags(flags);
-	return (in.good());
+	// Expect all file contents to have been read
+	return (in.eof());
 }
 
 bool store(vector<char>& buffer, ostream& out) {
@@ -33,5 +34,6 @@ bool store(vector<char>& buffer, ostream& out) {
 	}
 	// Reset flags
 	out.flags(flags);
-	return (out.good());
+	// Expect no errors
+	return (!out.bad() && !out.fail());
 }
