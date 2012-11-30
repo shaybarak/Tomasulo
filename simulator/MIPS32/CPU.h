@@ -32,6 +32,10 @@ public:
 	int getInstructionsCount() const;
 
 private:
+	// Reads a machine word from memory; offset is in mwords
+	ISA::Register readMemory(ISA:Address address);
+	// Writes a machine word to memory; offset is in mwords
+	void writeMemory(ISA::Register value);
 	char* memory;
 	int memorySize;
 	ISA::Register gpr[ISA::REG_COUNT];
