@@ -12,8 +12,14 @@ using namespace std;
  */
 class CPU {
 public:
-	// Initialize with a given memory block and GPR
-	CPU(char* memory, int memorySize) : memory(memory), memorySize(memorySize) {}
+	/**
+	  * Initialize with a given memory block and GPR.
+	  * Shares memory & GPR with caller.
+	  */
+	CPU(char* memory, int memorySize, ISA::Register gpr[]) :
+		memory(memory),
+		memorySize(memorySize),
+		gpr(gpr) {}
 	/**
 	 * Executes a program.
 	 * instructions: a program represented as a series of instructions
