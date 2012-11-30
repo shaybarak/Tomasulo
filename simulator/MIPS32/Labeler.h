@@ -13,12 +13,12 @@ using namespace std::tr1;
  */
 class Labeler {
 public:
-	typedef map<string, ISA::Address> labels;
+	typedef map<string, int> labels;
 	// Initialize with absolute base address of code
 	LabelAnalyzer(unsigned int base) : pc(base) {}
 	// Parse a single line of assembly code at a given memory address, returns PC after this instruction
 	unsigned int parse(string& line);
-	const map<string, ISA::Address>& getLabels() const;
+	const map<string, int>& getLabels() const;
 
 private:
 	/**
@@ -34,7 +34,7 @@ private:
 	static const regex unlabeledInstruction;
 
 	// Current address
-	ISA::Address pc;
+	int pc;
 	// Label name to absolute address mapping
-	map<string, ISA::Address> labels;
+	map<string, int> labels;
 };

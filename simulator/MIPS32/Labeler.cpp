@@ -19,6 +19,6 @@ unsigned int LabelAnalyzer::parse(string& line) {
 	return pc;
 }
 
-const map<string, ISA::Address>& LabelAnalyzer::getLabels() const {
+const map<string, int>& LabelAnalyzer::getLabels() const {
 	return labels;
 }
