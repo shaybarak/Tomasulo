@@ -1,6 +1,7 @@
 #include "Configuration\Configuration.h"
 #include "MIPS32\CPU.h"
 #include "MIPS32\InstructionFactory.h"
+#include "MIPS\ISA.h"
 #include "MIPS32\LabelAnalyzer.h"
 #include "Output\HexDump.h"
 #include "Output\RegisterDump.h"
@@ -14,12 +15,17 @@ enum retvals {
 	SUCCESS,	// Alles gut!
 	BAD_USAGE,	// Invalid cmdline invocation
 	FIO_ERROR,	// File I/O error
+	BAD_INPUT,	// Bad formatting in one or more input files
 }
+
+// Code is based at address 0
+const int CODE_BASE = 0;
 
 // Entry point for the simulator program
 // simulator.exe cmd_file.txt config_file.txt mem_init.txt regs_dump.txt mem_dump.txt time.txt committed.txt
 int main(int argc, char** argv) {
 	// Handle command line arguments
+	////////////////////////////////
 	if (argc < 8) {
 		cout << "Usage: " << argv[0] << " cmd_file config_file mem_init regs_dump mem_dump time_txt committed_txt" << endl;
 		return BAD_USAGE;
@@ -66,5 +72,66 @@ int main(int argc, char** argv) {
 		cerr << "Error reading from " << argv[7] << endl;
 		return FIO_ERROR;
 	}
+
+	// Read inputs
+	//////////////
+	LabelAnalyzer labeler(CODE_BASE);
+	vector<Instruction> program;
+	// First pass on code: find and process labels
+	while (cmd_file) {
+		string line;
+		getline(cmd_file, line);
+		labeler.parse(line);
+	}
+	InstructionFactory instructionFactory(labeler.getLabels(), CODE_BASE);
+	cmd_file.seekg(beg);
+	// Second pass on code: process instructions
+	while (cmd_file) {
+		string line;
+		getline(cmd_file, line);
+		Instruction* instruction = instructionFactory.parse(line);
+		if (instruction != NULL) {
+			program.push_back(*instruction);
+			delete instruction;
+		}
+	}
+	cmd_file.close();
+	// Read configuration
+	Configuration config;
+	config.load(config_file);  // Configuration not used in part 1
+	config_file.close();
+	// Read memory initialization
+	vector<char> memory;
+	if (!HexDump.load(memory, mem_init)) {
+		cerr << "Error reading memory" << endl;
+		return BAD_INPUT;
+	}
+	mem_init.close();
+
+	// Run program
+	//////////////
+	// Initialize all registers to zero
+	ISA::Register gpr[ISA::REG_COUNT] = {0};
+	// Execute program
+	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
+	// It works because the standard guarantees that vector's internal members are contiguous and packed.
+	CPU cpu(&memory[0], memory.size(), gpr);
+	cpu.execute(program, CODE_BASE, CODE_BASE);
+
+	// Write outputs
+	////////////////
+	// Write register dump
+	RegisterDump.store(gpr, ISA::REG_COUNT, regs_dump);
+	regs_dump.close();
+	// Write memory dump
+	HexDump.store(memory, mem_dump);
+	mem_dump.close();
+	// Write execution time
+	time_txt << cpu.getInstructionsCount();
+	time_txt.close();
+	// Write instructions count
+	committed_txt << cpu.getInstructionsCount();
+	committed_txt.close();
+
 	return SUCCESS;
 }
