@@ -15,7 +15,8 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 		}
 		Instruction instruction& = instructions[pc - instructionBase];
 		pc++;
-		instructionsExecuted++;
+		instructionsCommitted++;
+		executionTime++;
 		switch (instruction.getOpcode()) {
 		case ISA::add:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
@@ -35,6 +36,7 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 				cerr << "CPU exception: division by zero!" << endl;
 				error = true;
 				pc--;
+				instructionsCommitted--;
 				continue;
 			}
 			gpr[rtype->getRd()] = gpr[rtype->getRs()] / gpr[rtype->getRt()];
@@ -62,6 +64,7 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 				cerr << "CPU exception: memory offset out of range!" << endl;
 				error = true;
 				pc--;
+				instructionsCommitted--;
 				continue;
 			}
 			gpr[itype->getRt()] = mem;
@@ -72,6 +75,7 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 				cerr << "CPU exception: memory offset out of range!" << endl;
 				error = true;
 				pc--;
+				instructionsCommitted--;
 				continue;
 			}
 			break;
@@ -98,16 +102,15 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			cerr << "CPU exception: invalid opcode!" << endl;
 			error = true;
 			pc--;
-			instructionsExecuted--;
+			instructionsCommitted--;
 			break;
 		}
-		instructionsExecuted++;
 	}
 	return !error;
 }
 
-int CPU::getInstructionsCount() const {
-	return instructionsExecuted;
+int CPU::getInstructionsCommitted() const {
+	return instructionsCommitted;
 }
 
 bool CPU::readMemory(int address, int* value) {

@@ -19,7 +19,9 @@ public:
 	CPU(char* memory, int memorySize, int gpr[]) :
 		memory(memory),
 		memorySize(memorySize),
-		gpr(gpr) {}
+		gpr(gpr),
+		instructionsCommitted(0),
+		executionTime(0) {}
 	/**
 	 * Executes a program.
 	 * instructions: a program represented as a series of instructions
@@ -28,8 +30,10 @@ public:
 	 * Returns whether execution finished successfully (reached halt instruction).
 	 */
 	bool execute(vector<Instruction>& instructions, int instructionBase, int pc);
-	// Returns count of instructions executed so far
-	int getInstructionsCount() const;
+	// Returns count of instructions committed so far
+	int getInstructionsCommitted() const;
+	// Returns total execution time
+	int getExecutionTime() const;
 
 private:
 	/**
@@ -49,5 +53,6 @@ private:
 	char* memory;
 	int memorySize;
 	int gpr[ISA::REG_COUNT];
-	int instructionsExecuted;
+	int instructionsCommitted;
+	int executionTime;
 };
