@@ -17,7 +17,7 @@ bool assertConfig(Configuration& config, char* key, int expectedValue) {
 }
 
 int main() {
-	ifstream sampleConfiguration("testdata/sample_configuration.txt");
+	ifstream sampleConfiguration("testdata/config_file.txt");
 	Configuration config;
 	config.load(sampleConfiguration);
 	bool success = false;
