@@ -34,7 +34,7 @@ private:
 	static const regex unlabeledInstruction;
 
 	// Current address
-	unsigned int pc;
+	ISA::Address pc;
 	// Label name to absolute address mapping
 	map<string, ISA::Address> labels;
 };

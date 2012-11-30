@@ -1,10 +1,6 @@
 #include "ISA.h"
 #include <algorithm>
 
-unsigned int ISA::advancePc(unsigned int pc) {
-	return pc + ISA::INSTRUCTION_SIZE;
-}
-
 ISA::Opcode ISA::toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
 	string opcodeLowered(opcodeName);

@@ -58,7 +58,7 @@ Instruction* InstructionFactory::parse(string& line) {
 		cerr << "Error while parsing " << line << endl;
 		return NULL;
 	} else {
-		pc = ISA::advancePc(pc);
+		pc++;
 		return instruction;
 	}
 }
@@ -118,8 +118,8 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		// Fix up; relative_target = absolute_target - (PC+MWORD)
-		int target = labelValue->second - (pc + ISA::INSTRUCTION_SIZE);
+		// Fix up; relative_target = absolute_target - (PC + 1)
+		int target = labelValue->second - (pc + 1);
 		return new ITypeInstruction(opcode, rs, rt, target);
 	}
 }
