@@ -13,7 +13,7 @@ using namespace std;
  * $31 14
  * (output is in decimal digits)
  */
-class HexDump {
+class RegisterDump {
 public:
 	// Returns whether successful
 	static bool dump(ISA::Register* registers, int count, ostream& out);
