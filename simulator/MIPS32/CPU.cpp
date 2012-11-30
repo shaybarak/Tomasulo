@@ -18,15 +18,15 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 		instructionsExecuted++;
 		switch (instruction.getOpcode()) {
 		case ISA::add:
-			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
 			gpr[rtype->getRd()] = gpr[rtype->getRs()] + gpr[rtype->getRt()];
 			break;
 		case ISA::sub:
-			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
 			gpr[rtype->getRd()] = gpr[rtype->getRs()] - gpr[rtype->getRt()];
 			break;
 		case ISA::mul:
-			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
 			gpr[rtype->getRd()] = gpr[rtype->getRs()] * gpr[rtype->getRt()];
 			break;
 		case ISA::div:
@@ -35,30 +35,56 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			gpr[rtype->getRd()] = gpr[rtype->getRs()] / gpr[rtype->getRt()];
 			break;
 		case ISA::slt:
-			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);			
+			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
 			gpr[rtype->getRd()] = (gpr[rtype->getRs()] < gpr[rtype->getRt()]) ? 1 : 0;
 			break;
 		case ISA::addi:
-			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
 			gpr[itype->getRt()] = gpr[itype->getRs()] + itype->getImmediate();
 			break;
 		case ISA::subi:
-			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
 			gpr[itype->getRt()] = gpr[itype->getRs()] - itype->getImmediate();
 			break;
 		case ISA::slti:
-			RTypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);			
+			RTypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
 			gpr[itype->getRt()] = (gpr[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
 			break;
 		case ISA::lw:
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			int mem;
+			if (!readMemory(itype->getRs() + itype->getImmediate(), &mem)) {
+				cerr << "CPU exception: memory offset out of range!" << endl;
+				error = true;
+				pc--;
+				continue;
+			}
+			gpr[itype->getRt()] = mem;
 			break;
 		case ISA::sw:
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			if (!writeMemory(itype->getRs() + itype->getImmediate(), itype->getRt())) {
+				cerr << "CPU exception: memory offset out of range!" << endl;
+				error = true;
+				pc--;
+				continue;
+			}
 			break;
 		case ISA::beq:
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			if (itype->getRs() == itype->getRt()) {
+				pc += itype->getImmediate();
+			}
 			break;
 		case ISA::bne:
+			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			if (itype->getRs() != itype->getRt()) {
+				pc += itype->getImmediate();
+			}
 			break;
 		case ISA::j:
+			JTypeInstruction* jtype = dynamic_cast<JTypeInstruction*>(&instruction);
+			pc = jtype->getTarget();
 			break;
 		case ISA::halt:
 			finished = true;
@@ -79,10 +105,18 @@ int CPU::getInstructionsCount() const {
 	return instructionsExecuted;
 }
 
-int CPU::readMemory(int address) {
-	return *(int*)(&memory[address]);
+bool CPU::readMemory(int address, int* value) {
+	if ((address < 0) || (address >= memorySize)) {
+		return false;
+	}
+	*value = *(int*)(&memory[address]);
+	return true;
 }
 
-void CPU::writeMemory(int address, int value) {
+bool CPU::writeMemory(int address, int value) {
+	if ((address < 0) || (address >= memorySize)) {
+		return false;
+	}
 	*(int*)(&memory[address]) = value;
+	return true;
 }
