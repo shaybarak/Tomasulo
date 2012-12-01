@@ -15,4 +15,6 @@ public:
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	// Count of registers in ISA
 	static const int REG_COUNT = 32;
+	// Size of RAM in bytes
+	static const int RAM_SIZE = 16000000;
 };

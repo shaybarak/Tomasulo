@@ -21,6 +21,21 @@ enum retvals {
 // Code is based at address 0
 const int CODE_BASE = 0;
 
+// Trim trailing zeroes from memory
+int trimMemory(vector<char>& ram) {
+	int newSize = ram.size();
+	for (vector<char>::reverse_iterator iter = ram.rbegin(); iter != ram.rend(); iter++) {
+		if (*iter == 0) {
+			newSize--;
+		} else {
+			// Found last non-zero
+			break;
+		}
+	}
+	ram.resize(newSize);
+	return newSize;
+}
+
 // Entry point for the simulator program
 // simulator.exe cmd_file.txt config_file.txt mem_init.txt regs_dump.txt mem_dump.txt time.txt committed.txt
 int main(int argc, char** argv) {
@@ -107,6 +122,8 @@ int main(int argc, char** argv) {
 		return BAD_INPUT;
 	}
 	mem_init.close();
+	// Expand memory to maximum size (new bytes are zero-initializes automatically)
+	memory.resize(ISA::RAM_SIZE);
 
 	// Run program
 	//////////////
@@ -117,6 +134,8 @@ int main(int argc, char** argv) {
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
 	CPU cpu(&memory[0], memory.size(), gpr);
 	cpu.execute(program, CODE_BASE, CODE_BASE);
+	// Trim trailing zeroes from memory
+	trimMemory(memory);
 
 	// Write outputs
 	////////////////
