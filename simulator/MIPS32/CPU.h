@@ -29,7 +29,7 @@ public:
 	 * pc: value of Program Counter at start of execution
 	 * Returns whether execution finished successfully (reached halt instruction).
 	 */
-	bool execute(vector<Instruction>& instructions, int instructionBase, int pc);
+	bool execute(vector<Instruction*>& instructions, int instructionBase, int pc);
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const;
 	// Returns total execution time

@@ -99,14 +99,15 @@ int main(int argc, char** argv) {
 	cmd_file.clear();
 	cmd_file.seekg(0);
 	// Second pass on code: process instructions
-	vector<Instruction> program;
+	vector<Instruction*> program;
 	while (cmd_file) {
 		string line;
 		getline(cmd_file, line);
 		Instruction* instruction = instructionFactory.parse(line);
 		if (instruction != NULL) {
-			program.push_back(*instruction);
-			delete instruction;
+			program.push_back(instruction);
+			// BUGBUG instruction pointer never deleted
+			// Consider using a scoped container ptr deleter to automate this
 		}
 	}
 	cmd_file.close();

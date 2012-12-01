@@ -4,7 +4,7 @@
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
 
-bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc) {
+bool CPU::execute(vector<Instruction*>& instructions, int instructionBase, int pc) {
 	bool halted = false;
 	bool error = false;
 	RTypeInstruction* rtype = NULL;
@@ -19,25 +19,25 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			error = true;
 			continue;
 		}
-		Instruction& instruction = instructions[pc - instructionBase];
+		Instruction* instruction = instructions[pc - instructionBase];
 		pc++;
 		instructionsCommitted++;
 		executionTime++;
-		switch (instruction.getOpcode()) {
+		switch (instruction->getOpcode()) {
 		case ISA::add:
-			rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			rtype = dynamic_cast<RTypeInstruction*>(instruction);
 			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] + (*gpr)[rtype->getRt()];
 			break;
 		case ISA::sub:
-			rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			rtype = dynamic_cast<RTypeInstruction*>(instruction);
 			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] - (*gpr)[rtype->getRt()];
 			break;
 		case ISA::mul:
-			rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			rtype = dynamic_cast<RTypeInstruction*>(instruction);
 			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] * (*gpr)[rtype->getRt()];
 			break;
 		case ISA::div:
-			rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			rtype = dynamic_cast<RTypeInstruction*>(instruction);
 			if (rtype->getRt() == 0) {
 				cerr << "CPU exception: division by zero!" << endl;
 				error = true;
@@ -48,23 +48,23 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] / (*gpr)[rtype->getRt()];
 			break;
 		case ISA::slt:
-			rtype = dynamic_cast<RTypeInstruction*>(&instruction);
+			rtype = dynamic_cast<RTypeInstruction*>(instruction);
 			(*gpr)[rtype->getRd()] = ((*gpr)[rtype->getRs()] < (*gpr)[rtype->getRt()]) ? 1 : 0;
 			break;
 		case ISA::addi:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] + itype->getImmediate();
 			break;
 		case ISA::subi:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] - itype->getImmediate();
 			break;
 		case ISA::slti:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			(*gpr)[itype->getRt()] = ((*gpr)[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
 			break;
 		case ISA::lw:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			int mem;
 			if (!readMemory(itype->getRs() + itype->getImmediate(), &mem)) {
 				cerr << "CPU exception: memory offset out of range!" << endl;
@@ -76,7 +76,7 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			(*gpr)[itype->getRt()] = mem;
 			break;
 		case ISA::sw:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			if (!writeMemory(itype->getRs() + itype->getImmediate(), itype->getRt())) {
 				cerr << "CPU exception: memory offset out of range!" << endl;
 				error = true;
@@ -86,19 +86,19 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 			}
 			break;
 		case ISA::beq:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			if (itype->getRs() == itype->getRt()) {
 				pc += itype->getImmediate();
 			}
 			break;
 		case ISA::bne:
-			itype = dynamic_cast<ITypeInstruction*>(&instruction);
+			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			if (itype->getRs() != itype->getRt()) {
 				pc += itype->getImmediate();
 			}
 			break;
 		case ISA::j:
-			jtype = dynamic_cast<JTypeInstruction*>(&instruction);
+			jtype = dynamic_cast<JTypeInstruction*>(instruction);
 			pc = jtype->getTarget();
 			break;
 		case ISA::halt:
