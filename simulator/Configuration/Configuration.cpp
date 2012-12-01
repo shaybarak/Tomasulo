@@ -5,6 +5,7 @@ using namespace std;
 
 const regex Configuration::configLine("^\\s*(\\w*) = (\\d*)(?:\\s*//.*)?$");
 const regex Configuration::commentLine("^\\s*//.*$");
+const regex Configuration::emptyLine("^\\s*");
 
 bool Configuration::load(istream& in) {
 	string line;

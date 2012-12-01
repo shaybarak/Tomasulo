@@ -10,8 +10,13 @@
 
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 const regex InstructionFactory::unlabeledInstruction("^\\s*(\\w*)\\s*(.*)$");
+const regex InstructionFactory::emptyLine("^\\s*");
 
 Instruction* InstructionFactory::parse(string& line) {
+	// Skip empty lines
+	if (regex_match(line, emptyLine)) {
+		return NULL;
+	}
 	smatch match;
 	// Attempt to match either labeled or unlabeled instructions
 	// (we don't care about labels here)

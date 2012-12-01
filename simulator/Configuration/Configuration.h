@@ -24,5 +24,7 @@ private:
 	static const regex configLine;
 	// Line with comment only
 	static const regex commentLine;
+	// Line with whitespaces only
+	static const regex emptyLine;
 	map<std::string, int> configs;
 };

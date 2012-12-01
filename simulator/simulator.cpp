@@ -90,7 +90,6 @@ int main(int argc, char** argv) {
 	// Read inputs
 	//////////////
 	Labeler labeler(CODE_BASE);
-	vector<Instruction> program;
 	// First pass on code: find and process labels
 	while (cmd_file) {
 		string line;
@@ -100,6 +99,7 @@ int main(int argc, char** argv) {
 	InstructionFactory instructionFactory(labeler.getLabels(), CODE_BASE);
 	cmd_file.seekg(ios_base::beg);
 	// Second pass on code: process instructions
+	vector<Instruction> program;
 	while (cmd_file) {
 		string line;
 		getline(cmd_file, line);

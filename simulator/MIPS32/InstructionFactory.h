@@ -45,6 +45,8 @@ private:
 	 * Group 2 captures all instruction.
 	 */
 	static const regex unlabeledInstruction;
+	// Matches an empty line or line with whitespaces only
+	static const regex emptyLine;
 	
 	// Specialized methods for parsing different types of instructions
 	RTypeInstruction* parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
