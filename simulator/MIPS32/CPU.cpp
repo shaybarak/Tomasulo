@@ -20,15 +20,15 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 		switch (instruction.getOpcode()) {
 		case ISA::add:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] + (*(*gpr))[rtype->getRt()];
+			(*gpr)[rtype->getRd()] = (*(*gpr))[rtype->getRs()] + (*gpr)[rtype->getRt()];
 			break;
 		case ISA::sub:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] - (*(*gpr))[rtype->getRt()];
+			(*gpr)[rtype->getRd()] = (*(*gpr))[rtype->getRs()] - (*gpr)[rtype->getRt()];
 			break;
 		case ISA::mul:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] * (*(*gpr))[rtype->getRt()];
+			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] * (*gpr)[rtype->getRt()];
 			break;
 		case ISA::div:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
