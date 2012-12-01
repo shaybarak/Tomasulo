@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
+#include <stdio.h>
 using namespace std;
 
 /**
@@ -15,7 +15,7 @@ using namespace std;
 class HexDump {
 public:
 	// Reads formatted bytes into buffer, returns whether successful
-	static bool load(vector<char>& buffer, istream& in);
+	static bool load(vector<char>& buffer, FILE* in);
 	// Writes bytes according to format, returns whether successful
-	static bool store(vector<char>& buffer, ostream& out);
+	static bool store(vector<char>& buffer, FILE* out);
 };

@@ -1,39 +1,30 @@
 #include "HexDump.h"
-#include <iostream>
-#include <iomanip>
 using namespace std;
 
-bool HexDump::load(vector<char>& buffer, istream& in) {
-	// Configure input stream for hex reading
-	ios_base::fmtflags flags = in.flags();
-	in >> hex >> setw(2);
-	char byte;
-	while ((!in.eof()) && (in.good())) {
-		in >> byte;
-		buffer.push_back(byte);
+bool HexDump::load(vector<char>& buffer, FILE* in) {
+	char bytes[8];
+	while (!feof(in)) {
+		buffer.resize(buffer.size() + 8);
+		char* base = &buffer[buffer.size() - 8];
+		// Line is of format:
+		// 00 11 22 33 44 55 66 77
+		if (fscanf_s(in, "%02x %02x %02x %02x %02x %02x %02x %02x",
+		             base, base+1, base+2, base+3, base+4, base+5, base+6, base+7) != 8) {
+			return false;
+		}
 	}
-	// Reset flags
-	in.flags(flags);
-	// Expect all file contents to have been read
-	return (in.eof());
+	return true;
 }
 
-bool HexDump::store(vector<char>& buffer, ostream& out) {
-	// Configure output stream for uppercase hex with 0-padded width of 2
-	ios_base::fmtflags flags = out.flags();
-	out << uppercase << hex << setw(2) << setfill('0');
+bool HexDump::store(vector<char>& buffer, FILE* out) {
 	int size = buffer.size();
 	// 8 bytes per line
-	for (int line = 0; line < size / 8; line++) {
-		// Handle all bytes in line except the last
-		int ch;
-		for (ch = 0; ch < 7 && line * 8 + ch < size - 2; ch++) {
-			out << buffer[line*8+ch] << " ";
+	for (int ch = 0; ch < size - 8; ch+=8) {
+		char* base = &buffer[ch];
+		if (fprintf(out, "%02x %02x %02x %02x %02x %02x %02x %02x",
+			        base, base+1, base+2, base+3, base+4, base+5, base+6, base+7) < 0) {
+			return false;
 		}
-		out << buffer[line*8+ch] << endl;
 	}
-	// Reset flags
-	out.flags(flags);
-	// Expect no errors
-	return (!out.bad() && !out.fail());
+	return true;
 }

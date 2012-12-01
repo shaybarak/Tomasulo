@@ -56,9 +56,9 @@ int main(int argc, char** argv) {
 		cerr << "Error opening " << argv[2] << endl;
 		return FIO_ERROR;
 	}
-	ifstream mem_init;
-	mem_init.open(argv[3]);
-	if (!mem_init) {
+	errno_t err;
+	FILE* mem_init;
+	if ((err = fopen_s(&mem_init, argv[3], "r")) != 0) {
 		cerr << "Error opening " << argv[3] << endl;
 		return FIO_ERROR;
 	}
@@ -68,9 +68,8 @@ int main(int argc, char** argv) {
 		cerr << "Error opening " << argv[4] << endl;
 		return FIO_ERROR;
 	}
-	ofstream mem_dump;
-	mem_dump.open(argv[5]);
-	if (!mem_dump) {
+	FILE* mem_dump;
+	if ((err = fopen_s(&mem_dump, argv[5], "r")) != 0) {
 		cerr << "Error opening " << argv[5] << endl;
 		return FIO_ERROR;
 	}
@@ -97,7 +96,8 @@ int main(int argc, char** argv) {
 		labeler.parse(line);
 	}
 	InstructionFactory instructionFactory(labeler.getLabels(), CODE_BASE);
-	cmd_file.seekg(ios_base::beg);
+	cmd_file.clear();
+	cmd_file.seekg(0);
 	// Second pass on code: process instructions
 	vector<Instruction> program;
 	while (cmd_file) {
@@ -117,10 +117,10 @@ int main(int argc, char** argv) {
 	// Read memory initialization
 	vector<char> memory;
 	if (!HexDump::load(memory, mem_init)) {
-		cerr << "Error reading memory" << endl;
+		cerr << "Error reading memory initialization" << endl;
 		return BAD_INPUT;
 	}
-	mem_init.close();
+	fclose(mem_init);
 	// Expand memory to maximum size (new bytes are zero-initializes automatically)
 	memory.resize(ISA::RAM_SIZE);
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
 	regs_dump.close();
 	// Write memory dump
 	HexDump::store(memory, mem_dump);
-	mem_dump.close();
+	fclose(mem_dump);
 	// Write execution time (assumes 1 per instruction committed)
 	time_txt << cpu.getInstructionsCommitted() << endl;
 	time_txt.close();
