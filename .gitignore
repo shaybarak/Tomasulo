@@ -22,3 +22,8 @@ Debug
 
 # VS shit
 *.suo
+Debug/
+Release/
+
+# System test output files
+*_actual.txt
