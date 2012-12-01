@@ -21,16 +21,18 @@ enum retvals {
 const int CODE_BASE = 0;
 
 // Trim trailing zeroes from memory
-void trimMemory(vector<char>& ram) {
-	if (ram.empty()) {
+void trimMemory(vector<char>& memory) {
+	if (memory.empty()) {
 		return;
 	}
 	// Find last non-zero byte
 	char* byte;
-	for (byte = &ram[ram.size() - 1]; byte >= &ram[0]; byte--) {
+	for (byte = &memory[memory.size() - 1]; byte >= &memory[0]; byte--) {
 		if (*byte != 0) break;
 	}
-	ram.resize(byte - &ram[0] + 1);
+	int trimmed = byte - &memory[0] + 1;
+	// Align size to multiple of eight, round up
+	memory.resize(((trimmed / 8) + (trimmed % 8 == 0 ? 0 : 1)) * 8);
 }
 
 // Entry point for the simulator program
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
 		return FIO_ERROR;
 	}
 	FILE* mem_dump;
-	if ((err = fopen_s(&mem_dump, argv[5], "r")) != 0) {
+	if ((err = fopen_s(&mem_dump, argv[5], "w")) != 0) {
 		cerr << "Error opening " << argv[5] << endl;
 		return FIO_ERROR;
 	}
@@ -131,23 +133,35 @@ int main(int argc, char** argv) {
 	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
 	CPU cpu(&memory[0], memory.size(), &gpr);
-	cpu.execute(program, CODE_BASE, CODE_BASE);
+	if (!cpu.execute(program, CODE_BASE, CODE_BASE)) {
+		cerr << "CPU execution error" << endl;
+	}
 	// Trim trailing zeroes from memory
 	trimMemory(memory);
 
 	// Write outputs
 	////////////////
 	// Write register dump
-	gpr.dump(regs_dump);
+	if (!gpr.dump(regs_dump)) {
+		cerr << "Error writing registers dump" << endl;
+	}
 	regs_dump.close();
 	// Write memory dump
-	HexDump::store(memory, mem_dump);
+	if (!HexDump::store(memory, mem_dump)) {
+		cerr << "Error writing memory dump" << endl;
+	}
 	fclose(mem_dump);
 	// Write execution time (assumes 1 per instruction committed)
 	time_txt << cpu.getInstructionsCommitted() << endl;
+	if (time_txt.fail()) {
+		cerr << "Error writing time" << endl;
+	}
 	time_txt.close();
 	// Write instructions count
 	committed_txt << cpu.getInstructionsCommitted() << endl;
+	if (committed_txt.fail()) {
+		cerr << "Error writing instructions committed count" << endl;
+	}
 	committed_txt.close();
 
 	return SUCCESS;
