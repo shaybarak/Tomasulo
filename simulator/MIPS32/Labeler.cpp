@@ -7,7 +7,7 @@ const regex Labeler::unlabeledInstruction("^\\s*\\w*\\s*.*$");
 unsigned int Labeler::parse(string& line) {
 	smatch match;
 	if (regex_search(line, match, labeledInstruction)) {
-		labels[match[0].str()] = pc;
+		labels[match[1].str()] = pc;
 		// Advance to next instruction
 		pc++;
 	} else if (regex_match(line, unlabeledInstruction)) {
