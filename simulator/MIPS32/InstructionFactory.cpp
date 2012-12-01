@@ -109,6 +109,9 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) &&
 		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rs, &rt, &immediate) == 3)){
+		if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
+			return NULL;
+		}
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try labelled target
@@ -119,6 +122,9 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 			// Can't use sscanf_s with string.c_str() due to VS CRT bug
 			#pragma warning(disable:4996)
 			(sscanf(arguments.c_str(), "$%d,$%d,%100s", &rs, &rt, labeledTarget) != 3)){
+			return NULL;
+		}
+		if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 			return NULL;
 		}
 		string label(labeledTarget);
