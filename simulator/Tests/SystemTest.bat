@@ -1,5 +1,5 @@
-..\..\Tomasulo\Release\simulator.exe cmd_file.txt config_file.txt mem_init.txt regs_dump_actual.txt mem_dump_actual.txt time_actual.txt committed_actual.txt
-fc regs_dump_expected.txt regs_dump_actual.txt
-fc mem_dump_expected.txt mem_dump_actual.txt
-fc time_expected.txt time_actual.txt
-fc committed_expected.txt committed_actual.txt
+..\..\Tomasulo\Release\simulator.exe testdata\cmd_file.txt testdata\config_file.txt testdata\mem_init.txt testdata\regs_dump_actual.txt testdata\mem_dump_actual.txt testdata\time_actual.txt testdata\committed_actual.txt
+fc testdata\regs_dump_expected.txt testdata\regs_dump_actual.txt
+fc testdata\mem_dump_expected.txt testdata\mem_dump_actual.txt
+fc testdata\time_expected.txt testdata\time_actual.txt
+fc testdata\committed_expected.txt testdata\committed_actual.txt
