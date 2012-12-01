@@ -38,7 +38,7 @@ bool CPU::execute(vector<Instruction*>& instructions, int instructionBase, int p
 			break;
 		case ISA::div:
 			rtype = dynamic_cast<RTypeInstruction*>(instruction);
-			if (rtype->getRt() == 0) {
+			if ((*gpr)[rtype->getRt()] == 0) {
 				cerr << "CPU exception: division by zero!" << endl;
 				error = true;
 				pc--;
