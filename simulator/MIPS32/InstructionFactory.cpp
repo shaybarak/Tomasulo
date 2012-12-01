@@ -9,7 +9,7 @@
 
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
 const regex InstructionFactory::unlabeledInstruction("^\\s*(\\w*)\\s*(.*)$");
-const regex InstructionFactory::emptyLine("^\\s*");
+const regex InstructionFactory::emptyLine("^\\s*$");
 
 Instruction* InstructionFactory::parse(string& line) {
 	// Skip empty lines
@@ -72,7 +72,7 @@ Instruction* InstructionFactory::parse(string& line) {
 RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) &&
-		(sscanf_s(arguments.c_str(), "$%d, $%d, $%d", &rs, &rt, &rd) != 3)) {
+		(sscanf_s(arguments.c_str(), "$%d,$%d,$%d", &rs, &rt, &rd) != 3)) {
 		return NULL;
 	}
 	if (!(GPR::isValid(rs) && GPR::isValid(rt) && GPR::isValid(rd))) {
@@ -82,9 +82,10 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 }
 
 ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
-	int rs, rt, immediate;
+	int rs, rt;
+	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) &&
-		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) != 3)){
+		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rs, &rt, &immediate) != 3)){
 		return NULL;
 	}
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
@@ -94,18 +95,20 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 }
 
 ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
-	int rs, rt, immediate;
+	int rs, rt;
+	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) && 
-		(sscanf_s(arguments.c_str(), "$%d, (%hd)$%d", &rs, &immediate, &rt) != 3)) {
+		(sscanf_s(arguments.c_str(), "$%d,(%hd)$%d", &rs, &immediate, &rt) != 3)) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
 ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
-	int rs, rt, immediate;
+	int rs, rt;
+	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) &&
-		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) == 3)){
+		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rs, &rt, &immediate) == 3)){
 		return new ITypeInstruction(opcode, rs, rt, immediate);
 	} else {
 		// Literal target not identified, try labelled target
@@ -115,7 +118,7 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 			(sscanf(arguments.c_str(), "$%d $%d %100s", &rs, &rt, labeledTarget) != 3) &&
 			// Can't use sscanf_s with string.c_str() due to VS CRT bug
 			#pragma warning(disable:4996)
-			(sscanf(arguments.c_str(), "$%d, $%d, %100s", &rs, &rt, labeledTarget) != 3)){
+			(sscanf(arguments.c_str(), "$%d,$%d,%100s", &rs, &rt, labeledTarget) != 3)){
 			return NULL;
 		}
 		string label(labeledTarget);
