@@ -186,14 +186,14 @@ int main() {
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
 	if (itype->getRs() != 1) {
 		cerr << "Test 12 failed: wrong rs " << itype->getRs() << endl;
-		return 92;
+		return 121;
 	}
 	if (itype->getRt() != 2) {
 		cerr << "Test 12 failed: wrong rt " << itype->getRt() << endl;
-		return 93;
+		return 122;
 	}
-	if (itype->getImmediate() != -32) {
+	if (itype->getImmediate() != -8) {
 		cerr << "Test 12 failed: wrong immediate " << itype->getImmediate() << endl;
-		return 94;
+		return 123;
 	}
 }
