@@ -20,15 +20,15 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 		switch (instruction.getOpcode()) {
 		case ISA::add:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			gpr[rtype->getRd()] = gpr[rtype->getRs()] + gpr[rtype->getRt()];
+			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] + (*(*gpr))[rtype->getRt()];
 			break;
 		case ISA::sub:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			gpr[rtype->getRd()] = gpr[rtype->getRs()] - gpr[rtype->getRt()];
+			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] - (*(*gpr))[rtype->getRt()];
 			break;
 		case ISA::mul:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			gpr[rtype->getRd()] = gpr[rtype->getRs()] * gpr[rtype->getRt()];
+			(*(*gpr))[rtype->getRd()] = (*(*gpr))[rtype->getRs()] * (*(*gpr))[rtype->getRt()];
 			break;
 		case ISA::div:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
@@ -39,23 +39,23 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 				instructionsCommitted--;
 				continue;
 			}
-			gpr[rtype->getRd()] = gpr[rtype->getRs()] / gpr[rtype->getRt()];
+			(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] / (*gpr)[rtype->getRt()];
 			break;
 		case ISA::slt:
 			RTypeInstruction* rtype = dynamic_cast<RTypeInstruction*>(&instruction);
-			gpr[rtype->getRd()] = (gpr[rtype->getRs()] < gpr[rtype->getRt()]) ? 1 : 0;
+			(*gpr)[rtype->getRd()] = ((*gpr)[rtype->getRs()] < (*gpr)[rtype->getRt()]) ? 1 : 0;
 			break;
 		case ISA::addi:
 			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
-			gpr[itype->getRt()] = gpr[itype->getRs()] + itype->getImmediate();
+			(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] + itype->getImmediate();
 			break;
 		case ISA::subi:
 			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
-			gpr[itype->getRt()] = gpr[itype->getRs()] - itype->getImmediate();
+			(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] - itype->getImmediate();
 			break;
 		case ISA::slti:
 			RTypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
-			gpr[itype->getRt()] = (gpr[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
+			(*gpr)[itype->getRt()] = ((*gpr)[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
 			break;
 		case ISA::lw:
 			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);
@@ -67,7 +67,7 @@ bool CPU::execute(vector<Instruction>& instructions, int instructionBase, int pc
 				instructionsCommitted--;
 				continue;
 			}
-			gpr[itype->getRt()] = mem;
+			(*gpr)[itype->getRt()] = mem;
 			break;
 		case ISA::sw:
 			ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(&instruction);

@@ -30,8 +30,6 @@ public:
 private:
 	// Converts string to Opcode
 	static ISA::Opcode toOpcode(const string& opcodeName);
-	// Validates register index
-	static bool validateRegisterIndex(int index);
 
 	/**
 	 * Matches a labeled instruction, e.g.:

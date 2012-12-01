@@ -4,6 +4,7 @@
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
+#include "ISA.h"
 #include <stdlib.h>
 
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
@@ -63,18 +64,13 @@ Instruction* InstructionFactory::parse(string& line) {
 	}
 }
 
-bool InstructionFactory::validateRegisterIndex(int index) {
-	// ISA supports 32 registers
-	return (0 <= index && index < (ISA::REG_COUNT));
-}
-
 RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) &&
 		(sscanf_s(arguments.c_str(), "$%d, $%d, $%d", &rs, &rt, &rd) != 3)) {
 		return NULL;
 	}
-	if (!(validateRegisterIndex(rs) && validateRegisterIndex(rt) && validateRegisterIndex(rd))) {
+	if (!(GPR::isValid(rs) && GPR::isValid(rt) && GPR::isValid(rd))) {
 		return NULL;
 	}
 	return new RTypeInstruction(opcode, rs, rt, rd);
@@ -86,7 +82,7 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 		(sscanf_s(arguments.c_str(), "$%d, $%d, %hd", &rs, &rt, &immediate) != 3)){
 		return NULL;
 	}
-	if (!(validateRegisterIndex(rs) && validateRegisterIndex(rt))) {
+	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);

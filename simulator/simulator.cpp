@@ -127,8 +127,8 @@ int main(int argc, char** argv) {
 
 	// Run program
 	//////////////
-	// Initialize all registers to zero
-	ISA::Register gpr[ISA::REG_COUNT] = {0};
+	// Initialize GPR
+	GPR gpr;
 	// Execute program
 	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.

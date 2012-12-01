@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ISA.h"
 #include "Instruction.h"
+#include "GPR.h"
 #include <vector>
 using namespace std;
 
@@ -16,7 +16,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(char* memory, int memorySize, int gpr[]) :
+	CPU(char* memory, int memorySize, GPR* gpr) :
 		memory(memory),
 		memorySize(memorySize),
 		gpr(gpr),
@@ -52,7 +52,7 @@ private:
 	bool writeMemory(int address, int value);
 	char* memory;
 	int memorySize;
-	int gpr[ISA::REG_COUNT];
+	GPR* gpr;
 	int instructionsCommitted;
 	int executionTime;
 };
