@@ -13,9 +13,9 @@ using namespace std::tr1;
  */
 class Labeler {
 public:
-	typedef map<string, int> labels;
+	typedef map<string, int> Labels;
 	// Initialize with absolute base address of code
-	LabelAnalyzer(unsigned int base) : pc(base) {}
+	Labeler(unsigned int base) : pc(base) {}
 	// Parse a single line of assembly code at a given memory address, returns PC after this instruction
 	unsigned int parse(string& line);
 	const map<string, int>& getLabels() const;
@@ -36,5 +36,5 @@ private:
 	// Current address
 	int pc;
 	// Label name to absolute address mapping
-	map<string, int> labels;
+	Labels labels;
 };

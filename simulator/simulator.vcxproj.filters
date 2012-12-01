@@ -39,9 +39,6 @@
     <ClInclude Include="Output\HexDump.h">
       <Filter>Header Files\Output</Filter>
     </ClInclude>
-    <ClInclude Include="Output\RegisterDump.h">
-      <Filter>Header Files\Output</Filter>
-    </ClInclude>
     <ClInclude Include="MIPS32\Instruction.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
@@ -60,18 +57,18 @@
     <ClInclude Include="MIPS32\RTypeInstruction.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
-    <ClInclude Include="MIPS32\LabelAnalyzer.h">
+    <ClInclude Include="MIPS32\CPU.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
-    <ClInclude Include="MIPS32\CPU.h">
+    <ClInclude Include="MIPS32\GPR.h">
+      <Filter>Header Files\MIPS32</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\Labeler.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
-      <Filter>Source Files\Output</Filter>
-    </ClCompile>
-    <ClCompile Include="Output\RegisterDump.cpp">
       <Filter>Source Files\Output</Filter>
     </ClCompile>
     <ClCompile Include="Configuration\Configuration.cpp">
@@ -95,11 +92,17 @@
     <ClCompile Include="MIPS32\ISA.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
-    <ClCompile Include="MIPS32\LabelAnalyzer.cpp">
-      <Filter>Source Files\MIPS32</Filter>
-    </ClCompile>
     <ClCompile Include="MIPS32\CPU.cpp">
       <Filter>Source Files\MIPS32</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\GPR.cpp">
+      <Filter>Source Files\MIPS32</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\Labeler.cpp">
+      <Filter>Source Files\MIPS32</Filter>
+    </ClCompile>
+    <ClCompile Include="simulator.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

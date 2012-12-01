@@ -1,10 +1,10 @@
 #include "Labeler.h"
 #include "ISA.h"
 
-const regex LabelAnalyzer::labeledInstruction("^\\s*(\\w*)\\s*:\\s*\\w*\\s*.*$");
-const regex LabelAnalyzer::unlabeledInstruction("^\\s*\\w*\\s*.*$");
+const regex Labeler::labeledInstruction("^\\s*(\\w*)\\s*:\\s*\\w*\\s*.*$");
+const regex Labeler::unlabeledInstruction("^\\s*\\w*\\s*.*$");
 
-unsigned int LabelAnalyzer::parse(string& line) {
+unsigned int Labeler::parse(string& line) {
 	smatch match;
 	if (regex_search(line, match, labeledInstruction)) {
 		labels[match[0].str()] = pc;
@@ -19,6 +19,6 @@ unsigned int LabelAnalyzer::parse(string& line) {
 	return pc;
 }
 
-const map<string, int>& LabelAnalyzer::getLabels() const {
+const map<string, int>& Labeler::getLabels() const {
 	return labels;
 }

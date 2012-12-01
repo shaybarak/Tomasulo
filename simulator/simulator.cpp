@@ -1,10 +1,9 @@
 #include "Configuration\Configuration.h"
 #include "MIPS32\CPU.h"
 #include "MIPS32\InstructionFactory.h"
-#include "MIPS\ISA.h"
-#include "MIPS32\LabelAnalyzer.h"
+#include "MIPS32\ISA.h"
+#include "MIPS32\Labeler.h"
 #include "Output\HexDump.h"
-#include "Output\RegisterDump.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -16,7 +15,7 @@ enum retvals {
 	BAD_USAGE,	// Invalid cmdline invocation
 	FIO_ERROR,	// File I/O error
 	BAD_INPUT,	// Bad formatting in one or more input files
-}
+};
 
 // Code is based at address 0
 const int CODE_BASE = 0;
@@ -48,49 +47,49 @@ int main(int argc, char** argv) {
 	ifstream cmd_file;
 	cmd_file.open(argv[1]);
 	if (!cmd_file) {
-		cerr << "Error reading from " << argv[1] << endl;
+		cerr << "Error opening " << argv[1] << endl;
 		return FIO_ERROR;
 	}
 	ifstream config_file;
 	config_file.open(argv[2]);
 	if (!config_file) {
-		cerr << "Error reading from " << argv[2] << endl;
+		cerr << "Error opening " << argv[2] << endl;
 		return FIO_ERROR;
 	}
 	ifstream mem_init;
 	mem_init.open(argv[3]);
 	if (!mem_init) {
-		cerr << "Error reading from " << argv[3] << endl;
+		cerr << "Error opening " << argv[3] << endl;
 		return FIO_ERROR;
 	}
-	ifstream regs_dump;
+	ofstream regs_dump;
 	regs_dump.open(argv[4]);
 	if (!regs_dump) {
-		cerr << "Error reading from " << argv[4] << endl;
+		cerr << "Error opening " << argv[4] << endl;
 		return FIO_ERROR;
 	}
 	ofstream mem_dump;
 	mem_dump.open(argv[5]);
 	if (!mem_dump) {
-		cerr << "Error reading from " << argv[5] << endl;
+		cerr << "Error opening " << argv[5] << endl;
 		return FIO_ERROR;
 	}
 	ofstream time_txt;
 	time_txt.open(argv[6]);
 	if (!time_txt) {
-		cerr << "Error reading from " << argv[6] << endl;
+		cerr << "Error opening " << argv[6] << endl;
 		return FIO_ERROR;
 	}
-	ifstream committed_txt;
+	ofstream committed_txt;
 	committed_txt.open(argv[7]);
 	if (!committed_txt) {
-		cerr << "Error reading from " << argv[7] << endl;
+		cerr << "Error opening " << argv[7] << endl;
 		return FIO_ERROR;
 	}
 
 	// Read inputs
 	//////////////
-	LabelAnalyzer labeler(CODE_BASE);
+	Labeler labeler(CODE_BASE);
 	vector<Instruction> program;
 	// First pass on code: find and process labels
 	while (cmd_file) {
@@ -99,7 +98,7 @@ int main(int argc, char** argv) {
 		labeler.parse(line);
 	}
 	InstructionFactory instructionFactory(labeler.getLabels(), CODE_BASE);
-	cmd_file.seekg(beg);
+	cmd_file.seekg(ios_base::beg);
 	// Second pass on code: process instructions
 	while (cmd_file) {
 		string line;
@@ -117,7 +116,7 @@ int main(int argc, char** argv) {
 	config_file.close();
 	// Read memory initialization
 	vector<char> memory;
-	if (!HexDump.load(memory, mem_init)) {
+	if (!HexDump::load(memory, mem_init)) {
 		cerr << "Error reading memory" << endl;
 		return BAD_INPUT;
 	}
@@ -132,7 +131,7 @@ int main(int argc, char** argv) {
 	// Execute program
 	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
-	CPU cpu(&memory[0], memory.size(), gpr);
+	CPU cpu(&memory[0], memory.size(), &gpr);
 	cpu.execute(program, CODE_BASE, CODE_BASE);
 	// Trim trailing zeroes from memory
 	trimMemory(memory);
@@ -140,10 +139,10 @@ int main(int argc, char** argv) {
 	// Write outputs
 	////////////////
 	// Write register dump
-	RegisterDump.store(gpr, ISA::REG_COUNT, regs_dump);
+	gpr.dump(regs_dump);
 	regs_dump.close();
 	// Write memory dump
-	HexDump.store(memory, mem_dump);
+	HexDump::store(memory, mem_dump);
 	mem_dump.close();
 	// Write execution time (assumes 1 per instruction committed)
 	time_txt << cpu.getInstructionsCommitted() << endl;

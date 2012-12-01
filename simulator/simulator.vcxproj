@@ -13,28 +13,29 @@
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
     <ClInclude Include="MIPS32\CPU.h" />
+    <ClInclude Include="MIPS32\GPR.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
     <ClInclude Include="MIPS32\InstructionFactory.h" />
     <ClInclude Include="MIPS32\ISA.h" />
     <ClInclude Include="MIPS32\ITypeInstruction.h" />
     <ClInclude Include="MIPS32\JTypeInstruction.h" />
-    <ClInclude Include="MIPS32\LabelAnalyzer.h" />
+    <ClInclude Include="MIPS32\Labeler.h" />
     <ClInclude Include="MIPS32\RTypeInstruction.h" />
     <ClInclude Include="Output\HexDump.h" />
-    <ClInclude Include="Output\RegisterDump.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configuration\Configuration.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
+    <ClCompile Include="MIPS32\GPR.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
     <ClCompile Include="MIPS32\InstructionFactory.cpp" />
     <ClCompile Include="MIPS32\ISA.cpp" />
     <ClCompile Include="MIPS32\ITypeInstruction.cpp" />
     <ClCompile Include="MIPS32\JTypeInstruction.cpp" />
-    <ClCompile Include="MIPS32\LabelAnalyzer.cpp" />
+    <ClCompile Include="MIPS32\Labeler.cpp" />
     <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="Output\HexDump.cpp" />
-    <ClCompile Include="Output\RegisterDump.cpp" />
+    <ClCompile Include="simulator.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2FCA150E-C347-4BFE-B4CF-49336EBB1377}</ProjectGuid>

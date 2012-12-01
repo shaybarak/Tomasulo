@@ -3,7 +3,7 @@
 #include <iomanip>
 using namespace std;
 
-bool load(vector<char>& buffer, istream& in) {
+bool HexDump::load(vector<char>& buffer, istream& in) {
 	// Configure input stream for hex reading
 	ios_base::fmtflags flags = in.flags();
 	in >> hex >> setw(2);
@@ -18,7 +18,7 @@ bool load(vector<char>& buffer, istream& in) {
 	return (in.eof());
 }
 
-bool store(vector<char>& buffer, ostream& out) {
+bool HexDump::store(vector<char>& buffer, ostream& out) {
 	// Configure output stream for uppercase hex with 0-padded width of 2
 	ios_base::fmtflags flags = out.flags();
 	out << uppercase << hex << setw(2) << setfill('0');

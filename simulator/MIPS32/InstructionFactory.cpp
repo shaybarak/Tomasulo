@@ -5,6 +5,7 @@
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
 #include "ISA.h"
+#include "GPR.h"
 #include <stdlib.h>
 
 const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");

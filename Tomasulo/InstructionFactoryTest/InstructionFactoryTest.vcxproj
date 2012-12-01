@@ -74,6 +74,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\simulator\MIPS32\GPR.cpp" />
     <ClCompile Include="..\..\simulator\MIPS32\Instruction.cpp" />
     <ClCompile Include="..\..\simulator\MIPS32\InstructionFactory.cpp" />
     <ClCompile Include="..\..\simulator\MIPS32\ISA.cpp" />
@@ -83,6 +84,7 @@
     <ClCompile Include="..\..\simulator\Tests\InstructionFactoryTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\simulator\MIPS32\GPR.h" />
     <ClInclude Include="..\..\simulator\MIPS32\Instruction.h" />
     <ClInclude Include="..\..\simulator\MIPS32\InstructionFactory.h" />
     <ClInclude Include="..\..\simulator\MIPS32\ISA.h" />
