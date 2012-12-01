@@ -109,12 +109,9 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) &&
 		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rs, &rt, &immediate) == 3)){
-		if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
-			return NULL;
-		}
-		return new ITypeInstruction(opcode, rs, rt, immediate);
+		// Parsed a literal target
 	} else {
-		// Literal target not identified, try labelled target
+		// Try to parse labeled target
 		char labeledTarget[101];
 		if (// Can't use sscanf_s with string.c_str() when %s is present due to VS CRT bug
 			#pragma warning(disable:4996)
@@ -124,18 +121,18 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 			(sscanf(arguments.c_str(), "$%d,$%d,%100s", &rs, &rt, labeledTarget) != 3)){
 			return NULL;
 		}
-		if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
-			return NULL;
-		}
 		string label(labeledTarget);
 		map<string, int>::const_iterator labelValue = labels.find(label);
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
 		// Fix up; relative_target = absolute_target - (PC + 1)
-		int target = labelValue->second - (pc + 1);
-		return new ITypeInstruction(opcode, rs, rt, target);
+		immediate = labelValue->second - (pc + 1);
 	}
+	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
+		return NULL;
+	}
+	return new ITypeInstruction(opcode, rs, rt, immediate);
 }
 
 JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
