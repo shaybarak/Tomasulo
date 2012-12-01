@@ -1,4 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "InstructionFactory.h"
 #include "Instruction.h"
 #include "RTypeInstruction.h"
@@ -111,7 +110,11 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 	} else {
 		// Literal target not identified, try labelled target
 		char labeledTarget[101];
-		if ((sscanf(arguments.c_str(), "$%d $%d %100s", &rs, &rt, labeledTarget) != 3) &&
+		if (// Can't use sscanf_s with string.c_str() when %s is present due to VS CRT bug
+			#pragma warning(disable:4996)
+			(sscanf(arguments.c_str(), "$%d $%d %100s", &rs, &rt, labeledTarget) != 3) &&
+			// Can't use sscanf_s with string.c_str() due to VS CRT bug
+			#pragma warning(disable:4996)
 			(sscanf(arguments.c_str(), "$%d, $%d, %100s", &rs, &rt, labeledTarget) != 3)){
 			return NULL;
 		}
