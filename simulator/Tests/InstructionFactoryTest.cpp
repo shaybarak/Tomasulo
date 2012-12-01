@@ -26,16 +26,16 @@ int main() {
 		return 10;
 	}
 	rtype = dynamic_cast<RTypeInstruction*>(instruction);
-	if (rtype->getRs() != 1) {
-		cerr << "Test 1 failed: wrong rs " << rtype->getRs() << endl;
+	if (rtype->getRd() != 1) {
+		cerr << "Test 1 failed: wrong rd " << rtype->getRd() << endl;
 		return 12;
 	}
-	if (rtype->getRt() != 2) {
-		cerr << "Test 1 failed: wrong rt " << rtype->getRt() << endl;
+	if (rtype->getRs() != 2) {
+		cerr << "Test 1 failed: wrong rs " << rtype->getRs() << endl;
 		return 13;
 	}
-	if (rtype->getRd() != 3) {
-		cerr << "Test 1 failed: wrong rd " << rtype->getRd() << endl;
+	if (rtype->getRt() != 3) {
+		cerr << "Test 1 failed: wrong rt " << rtype->getRt() << endl;
 		return 14;
 	}
 
@@ -46,16 +46,16 @@ int main() {
 		return 20;
 	}
 	rtype = dynamic_cast<RTypeInstruction*>(instruction);
-	if (rtype->getRs() != 2) {
-		cerr << "Test 2 failed: wrong rs " << rtype->getRs() << endl;
+	if (rtype->getRd() != 2) {
+		cerr << "Test 2 failed: wrong rd " << rtype->getRd() << endl;
 		return 21;
 	}
-	if (rtype->getRt() != 1) {
-		cerr << "Test 2 failed: wrong rt " << rtype->getRt() << endl;
+	if (rtype->getRs() != 1) {
+		cerr << "Test 2 failed: wrong rs " << rtype->getRs() << endl;
 		return 22;
 	}
-	if (rtype->getRd() != 4) {
-		cerr << "Test 2 failed: wrong rd " << rtype->getRd() << endl;
+	if (rtype->getRt() != 4) {
+		cerr << "Test 2 failed: wrong rt " << rtype->getRt() << endl;
 		return 23;
 	}
 
@@ -66,12 +66,12 @@ int main() {
 		return 30;
 	}
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
-	if (itype->getRs() != 7) {
-		cerr << "Test 3 failed: wrong rs " << itype->getRs() << endl;
+	if (itype->getRt() != 7) {
+		cerr << "Test 3 failed: wrong rt " << itype->getRt() << endl;
 		return 31;
 	}
-	if (itype->getRt() != 8) {
-		cerr << "Test 3 failed: wrong rt " << itype->getRt() << endl;
+	if (itype->getRs() != 8) {
+		cerr << "Test 3 failed: wrong rs " << itype->getRs() << endl;
 		return 32;
 	}
 	if (itype->getImmediate() != 9) {
@@ -86,12 +86,12 @@ int main() {
 		return 40;
 	}
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
-	if (itype->getRs() != 5) {
-		cerr << "Test 4 failed: wrong rs " << itype->getRs() << endl;
+	if (itype->getRt() != 5) {
+		cerr << "Test 4 failed: wrong rt " << itype->getRt() << endl;
 		return 41;
 	}
-	if (itype->getRt() != 3) {
-		cerr << "Test 4 failed: wrong rt " << itype->getRt() << endl;
+	if (itype->getRs() != 3) {
+		cerr << "Test 4 failed: wrong rs " << itype->getRs() << endl;
 		return 42;
 	}
 	if (itype->getImmediate() != -16) {
@@ -136,26 +136,26 @@ int main() {
 	// Lines with comments
 	/////////////////////////////////////////////
 
-	//Only a comment
+	// Only a comment
 	instruction = factory.parse(string("// This is a comment"));
 	if (instruction != NULL) {
 		cerr << "Test 9 failed: expecting comment" << endl;
 		return 90;
 	}
 
-	//Instruction with a comment
+	// Instruction with a comment
 	instruction = factory.parse(string("sw $5,(-16)$3 //KAKI! This is a comment"));
 	if (instruction->getOpcode() != ISA::sw) {
 		cerr << "Test 4 failed: wrong opcode " << instruction->getOpcode() << endl;
 		return 91;
 	}
 	itype = dynamic_cast<ITypeInstruction*>(instruction);
-	if (itype->getRs() != 5) {
-		cerr << "Test 9 failed: wrong rs " << itype->getRs() << endl;
+	if (itype->getRt() != 5) {
+		cerr << "Test 9 failed: wrong rt " << itype->getRt() << endl;
 		return 92;
 	}
-	if (itype->getRt() != 3) {
-		cerr << "Test 9 failed: wrong rt " << itype->getRt() << endl;
+	if (itype->getRs() != 3) {
+		cerr << "Test 9 failed: wrong rt " << itype->getRs() << endl;
 		return 93;
 	}
 	if (itype->getImmediate() != -16) {

@@ -71,8 +71,8 @@ Instruction* InstructionFactory::parse(string& line) {
 
 RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
-	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rs, &rt, &rd) != 3) &&
-		(sscanf_s(arguments.c_str(), "$%d,$%d,$%d", &rs, &rt, &rd) != 3)) {
+	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rd, &rs, &rt) != 3) &&
+		(sscanf_s(arguments.c_str(), "$%d,$%d,$%d", &rd, &rs, &rt) != 3)) {
 		return NULL;
 	}
 	if (!(GPR::isValid(rs) && GPR::isValid(rt) && GPR::isValid(rd))) {
@@ -84,8 +84,8 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt;
 	short immediate;
-	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) != 3) &&
-		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rs, &rt, &immediate) != 3)){
+	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rt, &rs, &immediate) != 3) &&
+		(sscanf_s(arguments.c_str(), "$%d,$%d,%hd", &rt, &rs, &immediate) != 3)){
 		return NULL;
 	}
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
@@ -97,8 +97,8 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt;
 	short immediate;
-	if ((sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rs, &immediate, &rt) != 3) && 
-		(sscanf_s(arguments.c_str(), "$%d,(%hd)$%d", &rs, &immediate, &rt) != 3)) {
+	if ((sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rt, &immediate, &rs) != 3) && 
+		(sscanf_s(arguments.c_str(), "$%d,(%hd)$%d", &rt, &immediate, &rs) != 3)) {
 		return NULL;
 	}
 	return new ITypeInstruction(opcode, rs, rt, immediate);
