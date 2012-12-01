@@ -17,6 +17,8 @@ bool Configuration::load(istream& in) {
 			configs.insert(make_pair(match[1], atoi(match[2].str().c_str())));
 		} else if (regex_match(line, commentLine)) {
 			// Matched a commented line, ignore
+		} else if (regex_match(line, emptyLine)) {
+			// Matched an empty line, ignore
 		} else {
 			cerr << "Invalid format: " << line << endl;
 			return false;
