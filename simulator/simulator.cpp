@@ -21,18 +21,16 @@ enum retvals {
 const int CODE_BASE = 0;
 
 // Trim trailing zeroes from memory
-int trimMemory(vector<char>& ram) {
-	int newSize = ram.size();
-	for (vector<char>::reverse_iterator iter = ram.rbegin(); iter != ram.rend(); iter++) {
-		if (*iter == 0) {
-			newSize--;
-		} else {
-			// Found last non-zero
-			break;
-		}
+void trimMemory(vector<char>& ram) {
+	if (ram.empty()) {
+		return;
 	}
-	ram.resize(newSize);
-	return newSize;
+	// Find last non-zero byte
+	char* byte;
+	for (byte = &ram[ram.size() - 1]; byte >= &ram[0]; byte--) {
+		if (*byte != 0) break;
+	}
+	ram.resize(byte - &ram[0] + 1);
 }
 
 // Entry point for the simulator program
