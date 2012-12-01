@@ -66,7 +66,7 @@ bool CPU::execute(vector<Instruction*>& instructions, int instructionBase, int p
 		case ISA::lw:
 			itype = dynamic_cast<ITypeInstruction*>(instruction);
 			int mem;
-			if (!readMemory(itype->getRs() + itype->getImmediate(), &mem)) {
+			if (!readMemory((*gpr)[itype->getRs()] + itype->getImmediate(), &mem)) {
 				cerr << "CPU exception: memory offset out of range!" << endl;
 				error = true;
 				pc--;
@@ -77,7 +77,7 @@ bool CPU::execute(vector<Instruction*>& instructions, int instructionBase, int p
 			break;
 		case ISA::sw:
 			itype = dynamic_cast<ITypeInstruction*>(instruction);
-			if (!writeMemory(itype->getRs() + itype->getImmediate(), itype->getRt())) {
+			if (!writeMemory((*gpr)[itype->getRs()] + itype->getImmediate(), (*gpr)[itype->getRt()])) {
 				cerr << "CPU exception: memory offset out of range!" << endl;
 				error = true;
 				pc--;
@@ -87,13 +87,13 @@ bool CPU::execute(vector<Instruction*>& instructions, int instructionBase, int p
 			break;
 		case ISA::beq:
 			itype = dynamic_cast<ITypeInstruction*>(instruction);
-			if (itype->getRs() == itype->getRt()) {
+			if ((*gpr)[itype->getRs()] == (*gpr)[itype->getRt()]) {
 				pc += itype->getImmediate();
 			}
 			break;
 		case ISA::bne:
 			itype = dynamic_cast<ITypeInstruction*>(instruction);
-			if (itype->getRs() != itype->getRt()) {
+			if ((*gpr)[itype->getRs()] != (*gpr)[itype->getRt()]) {
 				pc += itype->getImmediate();
 			}
 			break;
