@@ -108,8 +108,6 @@ int main(int argc, char** argv) {
 			program.push_back(instruction);
 			// BUGBUG instruction pointer never deleted
 			// Consider using a scoped container ptr deleter to automate this
-		} else {
-			cerr << "Ignored bad instruction" << endl;
 		}
 	}
 	cmd_file.close();
