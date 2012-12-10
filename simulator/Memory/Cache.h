@@ -12,7 +12,7 @@ private:
 	// Invalid tag
 	static const int INVALID = -1;
 	// Cache line tags
-	vector<int> tags;
+	vector<short> tags;
 	int sizeOfBlock;
 	// Statistics
 	int hits;
