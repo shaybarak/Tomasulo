@@ -21,19 +21,26 @@ public:
 		memorySize(memorySize),
 		gpr(gpr),
 		instructionsCommitted(0),
-		executionTime(0) {}
+		executionTime(0).
+		instructions(NULL) {}
 	/**
-	 * Executes a program.
+	 * Loads a program.
 	 * instructions: a program represented as a series of instructions
 	 * instructionBase: absolute base memory address at which instructions are mapped
 	 * pc: value of Program Counter at start of execution
-	 * Returns whether execution finished successfully (reached halt instruction).
 	 */
-	bool execute(vector<Instruction*>& instructions, int instructionBase, int pc);
+	void loadProgram(vector<Instruction*>* instructions, int instructionBase, int pc);
+	/**
+	 * Handles clock tick.
+	 * time: current clock time.
+	 */
+	void onTick(int time);
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const;
 	// Returns total execution time
 	int getExecutionTime() const;
+	// Returns whether the CPU has halted due to a halt instruction or an exception
+	bool isHalted() const;
 
 private:
 	/**
@@ -55,4 +62,8 @@ private:
 	GPR* gpr;
 	int instructionsCommitted;
 	int executionTime;
+	vector<Instruction*>* instructions;
+	int instructionsBase;
+	int pc;
+	bool halted;
 };
