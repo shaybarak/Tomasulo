@@ -1,0 +1,28 @@
+//Example Configuration File
+//All fields names provided below are constant
+//double slash indicates a comment
+
+//Pipeline Configurations
+addsub_delay = 1 //Number of clocks to execute an add / sub command
+mul_delay = 3 //Number of clocks to execute a multiplication command
+div_delay = 7 //Number of clocks to execute a div command
+instruction_q_depth = 4 //Maximum number of entries in the instruction queue
+addsub_rs = 2 //Number of reservation stations per add/sub ALU
+muldiv_rs = 3 //Number of reservation stations per mul/div ALU
+load_q_depth = 4 //Maximum number of entries in the load queue
+reorder_buffer = 16 //Size of the reorder buffer, in number of commands
+
+//Branch Prediction Configurations
+ghr_width = 6 //Width of global history register
+
+//Multi Threading Configurations
+two_threads_enabled = 1 //0 - Multithreading disabled, 1- Multithreading enabled
+
+//Memory Configurations
+l1_block_size = 8 //L1 cache block size in bytes, word aligned
+l1_access_delay = 1 //L1 access delay, for hit, in clock cycles
+l1_cache_size = 128 //L1 cache size in bytes
+l2_block_size = 32 //L2 cache block size in bytes, word aligned
+l2_access_delay = 10 //L2 access delay, for hit, in clock cycles
+l2_cache_size = 1024 //L2 cache size in bytes
+mem_access_delay = 100 //Main memory/disk access delay in clock cycles, for L2 miss
