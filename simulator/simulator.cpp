@@ -3,6 +3,7 @@
 #include "MIPS32\InstructionFactory.h"
 #include "MIPS32\ISA.h"
 #include "MIPS32\Labeler.h"
+#include "Clock\Clock.h"
 #include "Output\HexDump.h"
 #include <fstream>
 #include <iostream>
@@ -134,9 +135,10 @@ int main(int argc, char** argv) {
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
 	CPU cpu(&memory[0], memory.size(), &gpr);
 	cpu.loadProgram(program, CODE_BASE, CODE_BASE);
-	int time = 0;
+	Clock clock();
+	clock.register(&cpu);
 	while (!cpu.isHalted()) {
-		cpu.onTick(time++);
+		clock.tick();
 	}
 	// Trim trailing zeroes from memory
 	trimMemory(memory);
@@ -153,7 +155,7 @@ int main(int argc, char** argv) {
 		cerr << "Error writing memory dump" << endl;
 	}
 	fclose(mem_dump);
-	time_txt << time << endl;
+	time_txt << clock.getTime() << endl;
 	if (time_txt.fail()) {
 		cerr << "Error writing time" << endl;
 	}

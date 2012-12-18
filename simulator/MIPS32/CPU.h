@@ -2,6 +2,7 @@
 
 #include "Instruction.h"
 #include "GPR.h"
+#include "../Clock/Clocked.h"
 #include <vector>
 using namespace std;
 
@@ -10,7 +11,7 @@ using namespace std;
  * No pipelining.
  * Single memory level (no caches).
  */
-class CPU {
+class CPU : public Clocked {
 public:
 	/**
 	  * Initialize with a given memory block and GPR.
@@ -30,11 +31,8 @@ public:
 	 * pc: value of Program Counter at start of execution
 	 */
 	void loadProgram(vector<Instruction*>* instructions, int instructionBase, int pc);
-	/**
-	 * Handles clock tick.
-	 * time: current clock time.
-	 */
-	void onTick(int time);
+	// Clock tick handler
+	virtual void onTick(int time);
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const;
 	// Returns total execution time
