@@ -4,5 +4,5 @@
 class Clocked {
 public:
 	// Clock tick handler
-	virtual void onTick(int time) = 0;
+	virtual void onTick(int now) = 0;
 };
