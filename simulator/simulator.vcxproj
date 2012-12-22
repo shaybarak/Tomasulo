@@ -11,7 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Clock\Clock.h" />
+    <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
+    <ClInclude Include="Memory\MainMemoryStub.h" />
+    <ClInclude Include="Memory\TimedQueue.h" />
+    <ClInclude Include="Memory\WriteRequest.h" />
     <ClInclude Include="MIPS32\CPU.h" />
     <ClInclude Include="MIPS32\GPR.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
@@ -24,7 +29,25 @@
     <ClInclude Include="Output\HexDump.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Clock\Clock.cpp" />
     <ClCompile Include="Configuration\Configuration.cpp" />
+    <ClCompile Include="Memory\MainMemoryStub.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</BasicRuntimeChecks>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="Memory\TimedQueue.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
     <ClCompile Include="MIPS32\GPR.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
@@ -36,6 +59,13 @@
     <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="Output\HexDump.cpp" />
     <ClCompile Include="simulator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2FCA150E-C347-4BFE-B4CF-49336EBB1377}</ProjectGuid>
@@ -77,6 +107,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
