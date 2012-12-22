@@ -133,12 +133,14 @@ int main(int argc, char** argv) {
 	// Execute program
 	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
-	CPU cpu(&memory[0], memory.size(), &gpr);
-	cpu.loadProgram(program, CODE_BASE, CODE_BASE);
-	Clock clock();
-	clock.register(&cpu);
+	TimedQueue<int> l1CacheReadQueue();
+	TimedQueue<int> l1CacheWriteQueue();
+	CPU cpu(&l1CacheReadQueue, &l1CacheWriteQueue, 16*1024*1024, &gpr);
+	cpu.loadProgram(&program, CODE_BASE, CODE_BASE);
+	Clock sysClock();
+	sysClock.addObserver(&cpu);
 	while (!cpu.isHalted()) {
-		clock.tick();
+		sysClock.tick();
 	}
 	// Trim trailing zeroes from memory
 	trimMemory(memory);
@@ -155,7 +157,7 @@ int main(int argc, char** argv) {
 		cerr << "Error writing memory dump" << endl;
 	}
 	fclose(mem_dump);
-	time_txt << clock.getTime() << endl;
+	time_txt << sysClock.getTime() << endl;
 	if (time_txt.fail()) {
 		cerr << "Error writing time" << endl;
 	}
