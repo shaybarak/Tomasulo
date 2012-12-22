@@ -188,7 +188,7 @@ void CPU::execute(int instructionIndex) {
 	}
 }
 
-void execute(int instructionIndex, int data) {
+void CPU::execute(int instructionIndex, int data) {
 	ITypeInstruction* itype = NULL;
 	Instruction* instruction = instructions->at(pc - instructionsBase);
 	pc++;
@@ -218,7 +218,7 @@ bool CPU::isValidInstructionAddress(int address) {
 	}
 	// (pc-instructionsBase) is known to be non-negative at this time
 	#pragma warning(disable:4018)
-	if (address - instructionsBase >= instructions.size() * sizeof(int)) {
+	if (address - instructionsBase >= instructions->size() * sizeof(int)) {
 		return false;
 	}
 	return true;
