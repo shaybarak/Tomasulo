@@ -5,10 +5,10 @@ void Clock::tick() {
 	time++;
 	// Notify observers
 	for (vector<Clocked*>::iterator it = observers.begin() ; it < observers.end(); it++) {
-		it->onTick(time);
+		(*it)->onTick(time);
 	}
 }
 
-void Clock::register(Clocked* clocked) {
+void Clock::addObserver(Clocked* clocked) {
 	observers.push_back(clocked);
 }

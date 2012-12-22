@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "Clocked.h"
 using namespace std;
 
 /** A system clock. */
@@ -11,11 +12,11 @@ public:
 	// Initializes clock with a given start time
 	Clock(int time) : time(time) {}
 	// Register a new clocked component
-	void register(Clocked* clocked);
+	void addObserver(Clocked* clocked);
 	// Generate a clock tick and notify all clocked components
 	void tick();
 	// Returns the current time
-	void getTime() { return time; }
+	int getTime() { return time; }
 
 private:
 	int time;
