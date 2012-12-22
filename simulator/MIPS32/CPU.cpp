@@ -5,14 +5,14 @@
 #include "JTypeInstruction.h"
 
 void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, int pc) {
-	this.instructions = instructions;
-	this.instructionsBase = instructionsBase;
-	this.pc = pc;
+	this->instructions = instructions;
+	this->instructionsBase = instructionsBase;
+	this->pc = pc;
 	halted = false;
 }
 
-void onTick(int now) {
-	this.now = now;
+void CPU::onTick(int now) {
+	this->now = now;
 	// Don't execute if halted
 	if (halted) {
 		return;
@@ -21,7 +21,7 @@ void onTick(int now) {
 	// If stalled on reading instruction
 	if (instructionReadStall) {
 		int instruction;
-		if (!l1CacheReadQueue->(&instruction, now)) {
+		if (!l1CacheReadQueue->pop(&instruction, now)) {
 			// Read did not return yet
 			return;
 		}
@@ -39,11 +39,11 @@ void onTick(int now) {
 	// Otherwise if stalled on reading/writing data
 	if (dataReadStall) {
 		int data;
-		if (!l1CacheReadQueue->(&data, now)) {
+		if (!l1CacheReadQueue->pop(&data, now)) {
 			// Read did not return yet
 			return;
 		}
-		dataStall = false;
+		dataReadStall = false;
 		execute(pc - instructionsBase, data);
 		return;
 	}
@@ -54,7 +54,7 @@ void onTick(int now) {
 		halted = true;
 		return;
 	}
-	l1CacheQueue->push(pc * sizeof(int), now);
+	l1CacheReadQueue->push(pc * sizeof(int), now);
 	instructionReadStall = true;
 }
 
@@ -66,7 +66,7 @@ bool CPU::isHalted() const {
 	return halted;
 }
 
-void execute(int instructionIndex) {
+void CPU::execute(int instructionIndex) {
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
@@ -129,7 +129,7 @@ void execute(int instructionIndex) {
 	case ISA::lw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		int address = (*gpr)[itype->getRs()] + itype->getImmediate();
-		if (!isValidAddress(address)) {
+		if (!isValidMemoryAddress(address)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
 			halted = true;
 			break;
@@ -141,7 +141,7 @@ void execute(int instructionIndex) {
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		int address = (*gpr)[itype->getRs()] + itype->getImmediate();
 		int data = (*gpr)[itype->getRt()];
-		if (!isValidAddress(address)) {
+		if (!isValidMemoryAddress(address)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
 			halted = true;
 			break;

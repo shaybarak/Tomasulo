@@ -27,7 +27,8 @@ public:
 		now(0),
 		instructionsCommitted(0),
 		instructions(NULL),		
-		stalled(false),
+		instructionReadStall(false),
+		dataReadStall(false),
 		halted(false) {}
 	/**
 	 * Loads a program.
