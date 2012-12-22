@@ -32,7 +32,7 @@ void onTick(int now) {
 			return;
 		}
 		instructionReadStall = false;
-		execute(instruction);
+		execute((instruction - instructionsBase) / sizeof(int));
 		return;
 	}
 
@@ -49,7 +49,7 @@ void onTick(int now) {
 	}
 
 	// Otherwise read next instruction
-	if (!isValidInstructionAddress(pc)) {
+	if (!isValidInstructionAddress(pc * sizeof(int))) {
 		cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
 		halted = true;
 		return;
@@ -218,7 +218,7 @@ bool CPU::isValidInstructionAddress(int address) {
 	}
 	// (pc-instructionsBase) is known to be non-negative at this time
 	#pragma warning(disable:4018)
-	if (address - instructionsBase >= instructions.size()) {
+	if (address - instructionsBase >= instructions.size() * sizeof(int)) {
 		return false;
 	}
 	return true;
