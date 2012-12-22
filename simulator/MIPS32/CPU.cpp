@@ -54,7 +54,7 @@ void onTick(int now) {
 		halted = true;
 		return;
 	}
-	l1CacheQueue->push(pc, now);
+	l1CacheQueue->push(pc * sizeof(int), now);
 	instructionReadStall = true;
 }
 
