@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
 	fclose(mem_init);
 	// Expand memory to maximum size (new bytes are zero-initializes automatically)
 	memory.resize(ISA::RAM_SIZE);
-
+	
 	// Run program
 	//////////////
 	// Initialize GPR
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
 	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
 	// It works because the standard guarantees that vector's internal members are contiguous and packed.
 	TimedQueue<int> l1CacheReadQueue();
-	TimedQueue<int> l1CacheWriteQueue();
+	TimedQueue<WriteRequest> l1CacheWriteQueue();
 	CPU cpu(&l1CacheReadQueue, &l1CacheWriteQueue, 16*1024*1024, &gpr);
 	cpu.loadProgram(&program, CODE_BASE, CODE_BASE);
 	Clock sysClock();
