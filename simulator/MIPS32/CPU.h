@@ -3,7 +3,7 @@
 #include "Instruction.h"
 #include "GPR.h"
 #include "../Clock/Clocked.h"
-#include "../Memory/Queued.h"
+#include "../Memory/NextMemoryLevel.h"
 #include <vector>
 using namespace std;
 
@@ -18,7 +18,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(NextMemoryLevel* nextMemoryLevel, int memorySize, GPR* gpr) :
+	CPU(NextMemoryLevel<int, int>* nextMemoryLevel, int memorySize, GPR* gpr) :
 		nextMemoryLevel(nextMemoryLevel),
 		memorySize(memorySize),
 		gpr(gpr),
@@ -65,7 +65,7 @@ private:
 	/** Converts memory offset to index of instruction in program. */
 	int memoryOffsetToInstructionIndex(int pc);
 	// Next memory level (e.g. L1 cache)
-	NextMemoryLevel* nextMemoryLevel;
+	NextMemoryLevel<int, int>* nextMemoryLevel;
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers

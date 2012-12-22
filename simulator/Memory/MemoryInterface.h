@@ -1,7 +1,6 @@
 #pragma once
 
 #include "TimedQueue.h"
-#include "WriteRequest.h"
 
 /**
  * Base class for an interface between any two memory levels in any particular direction.
