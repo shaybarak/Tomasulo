@@ -49,14 +49,10 @@ void onTick(int now) {
 	}
 
 	// Otherwise read next instruction
-	if ((pc - instructionsBase < 0) ||
-		// (pc-instructionsBase) is known to be non-negative at this time
-		#pragma warning(disable:4018)
-		(pc - instructionsBase >= instructions.size())) {
-			cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
-			halted = true;
-			return;
-		}
+	if (!isValidInstructionAddress(pc)) {
+		cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
+		halted = true;
+		return;
 	}
 	l1CacheQueue->push(pc, now);
 	instructionReadStall = true;
@@ -212,6 +208,18 @@ void execute(int instructionIndex, int data) {
 	}
 }
 
-bool CPU::isValidAddress(int address) {
+bool CPU::isValidMemoryAddress(int address) {
 	return (address >= 0) && (address < memorySize);
+}
+
+bool CPU::isValidInstructionAddress(int address) {
+	if (address < instructionsBase) {
+		return false;
+	}
+	// (pc-instructionsBase) is known to be non-negative at this time
+	#pragma warning(disable:4018)
+	if (address - instructionsBase >= instructions.size()) {
+		return false;
+	}
+	return true;
 }

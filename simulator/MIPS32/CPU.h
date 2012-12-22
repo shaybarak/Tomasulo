@@ -57,10 +57,10 @@ private:
 	 * data: data from memory for instruction
 	 */
 	void execute(int instructionIndex, int data);
-	/**
-	 * Validates a memory offset.
-	 */
-	bool isValidAddress(int address);
+	/** Returns whether the address is a valid memory offset. */
+	bool isValidMemoryAddress(int address);
+	/** Returns whether the address is a valid memory offset for instructions. */
+	bool isValidInstructionAddress(int address);
 	// Queue for reading from the L1 cache
 	TimedQueue<int>* l1CacheReadQueue;
 	// Queue for writing to the L1 cache
