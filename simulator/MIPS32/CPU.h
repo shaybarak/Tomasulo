@@ -62,6 +62,10 @@ private:
 	bool isValidMemoryAddress(int address);
 	/** Returns whether the address is a valid memory offset for instructions. */
 	bool isValidInstructionAddress(int address);
+	/** Converts PC value to memory offset. */
+	int pcToMemoryOffset(int pc);
+	/** Converts memory offset to index of instruction in program. */
+	int memoryOffsetToInstructionIndex(int pc);
 	// Queue for reading from the L1 cache
 	TimedQueue<int>* l1CacheReadQueue;
 	// Queue for writing to the L1 cache

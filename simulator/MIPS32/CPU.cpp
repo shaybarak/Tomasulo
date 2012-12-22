@@ -26,13 +26,13 @@ void CPU::onTick(int now) {
 			return;
 		}
 		// Verify that instruction was read correctly
-		if (instruction != pc * sizeof(int)) {
+		if (instruction != pcToInstructionIndex(pc)) {
 			cerr << "CPU exception: illegal opcode " << instruction << "!" << endl;
 			halted = true;
 			return;
 		}
 		instructionReadStall = false;
-		execute((instruction - instructionsBase) / sizeof(int));
+		execute(memoryOffsetToInstructionIndex(instruction));
 		return;
 	}
 
@@ -44,17 +44,17 @@ void CPU::onTick(int now) {
 			return;
 		}
 		dataReadStall = false;
-		execute(pc - instructionsBase, data);
+		execute(memoryOffsetToInstructionIndex(pcToMemoryOffset(pc)), data);
 		return;
 	}
 
 	// Otherwise read next instruction
-	if (!isValidInstructionAddress(pc * sizeof(int))) {
+	if (!isValidInstructionAddress(pcToMemoryOffset(pc))) {
 		cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
 		halted = true;
 		return;
 	}
-	l1CacheReadQueue->push(pc * sizeof(int), now);
+	l1CacheQueue->push(pcToMemoryOffset(pc), now);
 	instructionReadStall = true;
 }
 
@@ -136,6 +136,7 @@ void CPU::execute(int instructionIndex) {
 		}
 		l1CacheReadQueue->push(address, now);
 		// Note: stalled, don't advance PC and don't count instruction as committed
+		dataReadStall = true;
 		break;
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
@@ -222,4 +223,12 @@ bool CPU::isValidInstructionAddress(int address) {
 		return false;
 	}
 	return true;
+}
+
+int CPU::pcToMemoryOffset(int pc) {
+	return pc * sizeof(int);
+}
+
+int CPU::memoryOffsetToInstructionIndex(int pc) {
+	return (pc * sizeof(int) - instructionsBase) / sizeof(int);
 }
