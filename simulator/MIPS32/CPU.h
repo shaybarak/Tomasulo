@@ -4,8 +4,8 @@
 #include "GPR.h"
 #include "../Clock/Clocked.h"
 #include "../Memory/TimedQueue.h"
+#include "../Memory/WriteRequest.h"
 #include <vector>
-#include <pair>
 using namespace std;
 
 /**
@@ -19,7 +19,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(TimedQueue<int>* l1CacheReadQueue, TimedQueue<pair<int, int>>* l1CacheWriteQueue, int memorySize, GPR* gpr) :
+	CPU(TimedQueue<int>* l1CacheReadQueue, TimedQueue<WriteRequest>* l1CacheWriteQueue, int memorySize, GPR* gpr) :
 		l1CacheReadQueue(l1CacheReadQueue),
 		l1CacheWriteQueue(l1CacheWriteQueue),
 		memorySize(memorySize),
@@ -64,7 +64,7 @@ private:
 	// Queue for reading from the L1 cache
 	TimedQueue<int>* l1CacheReadQueue;
 	// Queue for writing to the L1 cache
-	TimedQueue<pair<int, int>>* l1CacheWriteQueue;
+	TimedQueue<WriteRequest>* l1CacheWriteQueue;
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers

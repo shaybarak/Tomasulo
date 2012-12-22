@@ -150,8 +150,10 @@ void execute(int instructionIndex) {
 			halted = true;
 			break;
 		}
-		pair<int, int> write(address, data);
-		l1CacheWriteQueue->push(write, now);
+		WriteRequest request;
+		request.address = address;
+		request.data = data;
+		l1CacheWriteQueue->push(request, now);
 		// TODO do write operations stall?
 		pc++;
 		instructionsCommitted++;
