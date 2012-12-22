@@ -22,11 +22,7 @@ void CPU::onTick(int now) {
 	if (instructionReadStall) {
 		int address;
 		int instruction;
-<<<<<<< HEAD
-		if (!l1CacheReadQueue->pop(&instruction, now)) {
-=======
 		if (!nextMemoryLevel->getReadResponse(&address, &instruction, now)) {
->>>>>>> Take advantage of new memory interface
 			// Read did not return yet
 			return;
 		}
@@ -45,11 +41,7 @@ void CPU::onTick(int now) {
 	if (dataReadStall) {
 		int address;
 		int data;
-<<<<<<< HEAD
-		if (!l1CacheReadQueue->pop(&data, now)) {
-=======
 		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
->>>>>>> Take advantage of new memory interface
 			// Read did not return yet
 			return;
 		}
