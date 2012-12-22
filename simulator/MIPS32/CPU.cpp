@@ -20,8 +20,13 @@ void CPU::onTick(int now) {
 
 	// If stalled on reading instruction
 	if (instructionReadStall) {
+		int address;
 		int instruction;
+<<<<<<< HEAD
 		if (!l1CacheReadQueue->pop(&instruction, now)) {
+=======
+		if (!nextMemoryLevel->getReadResponse(&address, &instruction, now)) {
+>>>>>>> Take advantage of new memory interface
 			// Read did not return yet
 			return;
 		}
@@ -38,8 +43,13 @@ void CPU::onTick(int now) {
 
 	// Otherwise if stalled on reading/writing data
 	if (dataReadStall) {
+		int address;
 		int data;
+<<<<<<< HEAD
 		if (!l1CacheReadQueue->pop(&data, now)) {
+=======
+		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
+>>>>>>> Take advantage of new memory interface
 			// Read did not return yet
 			return;
 		}
@@ -54,7 +64,7 @@ void CPU::onTick(int now) {
 		halted = true;
 		return;
 	}
-	l1CacheQueue->push(pcToMemoryOffset(pc), now);
+	nextMemoryLevel->requestRead(pcToMemoryOffset(pc), now);
 	instructionReadStall = true;
 }
 
@@ -134,7 +144,7 @@ void CPU::execute(int instructionIndex) {
 			halted = true;
 			break;
 		}
-		l1CacheReadQueue->push(address, now);
+		nextMemoryLevel->requestRead(address, now);
 		// Note: stalled, don't advance PC and don't count instruction as committed
 		dataReadStall = true;
 		break;
@@ -147,10 +157,7 @@ void CPU::execute(int instructionIndex) {
 			halted = true;
 			break;
 		}
-		WriteRequest request;
-		request.address = address;
-		request.data = data;
-		l1CacheWriteQueue->push(request, now);
+		nextMemoryLevel->requestWrite(address, data, now);
 		// TODO do write operations stall?
 		pc++;
 		instructionsCommitted++;

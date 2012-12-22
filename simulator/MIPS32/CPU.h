@@ -3,8 +3,7 @@
 #include "Instruction.h"
 #include "GPR.h"
 #include "../Clock/Clocked.h"
-#include "../Memory/TimedQueue.h"
-#include "../Memory/WriteRequest.h"
+#include "../Memory/Queued.h"
 #include <vector>
 using namespace std;
 
@@ -19,9 +18,8 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(TimedQueue<int>* l1CacheReadQueue, TimedQueue<WriteRequest>* l1CacheWriteQueue, int memorySize, GPR* gpr) :
-		l1CacheReadQueue(l1CacheReadQueue),
-		l1CacheWriteQueue(l1CacheWriteQueue),
+	CPU(NextMemoryLevel* nextMemoryLevel, int memorySize, GPR* gpr) :
+		nextMemoryLevel(nextMemoryLevel),
 		memorySize(memorySize),
 		gpr(gpr),
 		now(0),
@@ -66,10 +64,8 @@ private:
 	int pcToMemoryOffset(int pc);
 	/** Converts memory offset to index of instruction in program. */
 	int memoryOffsetToInstructionIndex(int pc);
-	// Queue for reading from the L1 cache
-	TimedQueue<int>* l1CacheReadQueue;
-	// Queue for writing to the L1 cache
-	TimedQueue<WriteRequest>* l1CacheWriteQueue;
+	// Next memory level (e.g. L1 cache)
+	NextMemoryLevel* nextMemoryLevel;
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers
