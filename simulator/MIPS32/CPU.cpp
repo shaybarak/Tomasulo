@@ -26,7 +26,7 @@ void onTick(int now) {
 			return;
 		}
 		// Verify that instruction was read correctly
-		if (instruction != pc - instructionsBase) {
+		if (instruction != pc) {
 			cerr << "CPU exception: illegal opcode " << instruction << "!" << endl;
 			halted = true;
 			return;
