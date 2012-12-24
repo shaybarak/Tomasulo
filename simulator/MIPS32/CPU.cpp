@@ -27,7 +27,7 @@ void CPU::onTick(int now) {
 			return;
 		}
 		dataReadStall = false;
-		execute(memoryOffsetToInstructionIndex(pcToMemoryOffset(pc)), data);
+		execute(pcToInstructionIndex(pc), data);
 
 	} else if (instructionReadStall) {  // Stalled on instruction read
 		int address;
@@ -67,7 +67,7 @@ void CPU::execute(int instructionIndex) {
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
-	Instruction* instruction = instructions->at(pc - instructionsBase);
+	Instruction* instruction = instructions->at(instructionIndex);
 	switch (instruction->getOpcode()) {
 	case ISA::add:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -225,6 +225,6 @@ int CPU::pcToMemoryOffset(int pc) {
 	return pc * sizeof(int);
 }
 
-int CPU::memoryOffsetToInstructionIndex(int pc) {
+int CPU::pcToInstructionIndex(int pc) {
 	return (pc * sizeof(int) - instructionsBase) / sizeof(int);
 }

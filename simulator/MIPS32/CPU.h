@@ -62,8 +62,8 @@ private:
 	bool isValidInstructionAddress(int address);
 	/** Converts PC value to memory offset. */
 	int pcToMemoryOffset(int pc);
-	/** Converts memory offset to index of instruction in program. */
-	int memoryOffsetToInstructionIndex(int pc);
+	/** Converts PC value to index of instruction in program. */
+	int pcToInstructionIndex(int pc);
 	// Next memory level (e.g. L1 cache)
 	NextMemoryLevel<int, int>* nextMemoryLevel;
 	// Size of memory (such that memorySize == highest valid address + 1)
