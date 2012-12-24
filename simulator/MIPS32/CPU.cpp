@@ -18,8 +18,18 @@ void CPU::onTick(int now) {
 		return;
 	}
 
-	// If stalled on reading instruction
-	if (instructionReadStall) {
+	if (dataReadStall) {  // Stalled on data read
+		int address;
+		int data;
+		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
+			// Read did not return yet
+			timeStalledOnMemory++;
+			return;
+		}
+		dataReadStall = false;
+		execute(memoryOffsetToInstructionIndex(pcToMemoryOffset(pc)), data);
+
+	} else if (instructionReadStall) {  // Stalled on instruction read
 		int address;
 		int instruction;
 		if (!nextMemoryLevel->getReadResponse(&address, &instruction, now)) {
@@ -35,29 +45,19 @@ void CPU::onTick(int now) {
 		}
 		instructionReadStall = false;
 		execute(memoryOffsetToInstructionIndex(instruction));
-		return;
 	}
 
-	// Otherwise if stalled on reading/writing data
+	// If not ready for next instruction
 	if (dataReadStall) {
-		int address;
-		int data;
-		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
-			// Read did not return yet
-			timeStalledOnMemory++;
-			return;
-		}
-		dataReadStall = false;
-		execute(memoryOffsetToInstructionIndex(pcToMemoryOffset(pc)), data);
 		return;
 	}
 
-	// Otherwise read next instruction
 	if (!isValidInstructionAddress(pcToMemoryOffset(pc))) {
 		cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
 		halted = true;
 		return;
 	}
+	// Read next instruction
 	nextMemoryLevel->requestRead(pcToMemoryOffset(pc), now);
 	memoryReadsCount++;
 	instructionReadStall = true;
