@@ -121,9 +121,9 @@ int main(int argc, char** argv) {
 	// Run program
 	//////////////
 	// Initialize CPU<->RAM interface
-	MemoryInterface<int, int> cpuRam();
-	NextMemoryLevel<int, int> cpuToRam(cpuRam);
-	PreviousMemoryLevel<int, int> ramToCpu(cpuRam);
+	MemoryInterface cpuRam();
+	NextMemoryLevel cpuToRam(cpuRam);
+	PreviousMemoryLevel ramToCpu(cpuRam);
 	// Initialize main memory
 	// TODO
 	// Initialize GPR
