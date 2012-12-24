@@ -7,7 +7,7 @@ public:
 	Cache(Memory* nextLevel, int sizeInBytes, int accessDelay, int sizeOfBlock);
 	int getHitCount() { return hits; }
 	int getMissCount() { return misses; }
-	double getHitRate() { return (double)hits / (double)(hits + misses); }
+	double getHitRate() { return (double)hits / (hits + misses); }
 
 private:
 	// Invalid tag
