@@ -38,11 +38,11 @@ public:
 	// Clock tick handler
 	virtual void onTick(int now);
 	// Returns count of instructions committed so far
-	int getInstructionsCommitted() const;
-	// Returns total execution time
-	int getExecutionTime() const;
+	int getInstructionsCommitted() const { return instructionsCommitted; }
+	// Returns the Average Memory Access Time
+	double getAmat() const { return (double)timeStalledOnMemory / memoryReadsCount; }
 	// Returns whether the CPU has halted due to a halt instruction or an exception
-	bool isHalted() const;
+	bool isHalted() const { return halted; }
 
 private:
 	/**
@@ -74,6 +74,12 @@ private:
 	int now;
 	// Count of instructions committed
 	int instructionsCommitted;
+	// Clock ticks stalled on memory
+	int timeStalledOnMemory;
+	// Count of memory reads requested
+	int memoryReadsCount;
+	// Whether halted (by HALT instruction)
+	bool halted;
 	// Program to execute
 	vector<Instruction*>* instructions;
 	// Base address of instructions in memory
@@ -84,7 +90,4 @@ private:
 	bool instructionReadStall;
 	// Whether stalled on reading data from memory
 	bool dataReadStall;
-	// TODO are there write stalls?
-	// Whether halted (by HALT instruction)
-	bool halted;
 };
