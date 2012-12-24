@@ -16,5 +16,7 @@ public:
 	// Count of registers in ISA
 	static const int REG_COUNT = 32;
 	// Size of RAM in bytes
-	static const int RAM_SIZE = 16000000;
+	static const int RAM_SIZE = 16 * 1024 * 1024;
+	// Base address of code
+	static const int CODE_BASE = 15 * 1024 * 1024;
 };
