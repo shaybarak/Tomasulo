@@ -1,16 +1,13 @@
 #include "PreviousMemoryLevel.h"
 
-template <typename AddressType, typename DataType>
-void PreviousMemoryLevel::respondRead(AddressType address, DataType data, int now) {
+void PreviousMemoryLevel::respondRead(int address, int data, int now) {
 	memoryInterface->responsdRead(address, data, now);
 }
 
-template <typename AddressType, typename DataType>
-bool PreviousMemoryLevel::getReadRequest(AddressType* address, int now) {
+bool PreviousMemoryLevel::getReadRequest(int* address, int now) {
 	return memoryInterface->getReadRequest(address, now);
 }
 
-template <typename AddressType, typename DataType>
-bool PreviousMemoryLevel::getWriteRequest(AddressType* address, DataType* data, int now) {
+bool PreviousMemoryLevel::getWriteRequest(int* address, int* data, int now) {
 	return memoryInterface->getWriteRequest(address, data, now);
 }

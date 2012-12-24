@@ -1,16 +1,13 @@
 #include "NextMemoryLevel.h"
 
-template <typename AddressType, typename DataType>
-void NextMemoryLevel::requestRead(AddressType address, int now);
+void NextMemoryLevel::requestRead(int address, int now);
 	memoryInterface->responsdRead(address, data, now);
 }
 
-template <typename AddressType, typename DataType>
-bool NextMemoryLevel::getReadResponse(AddressType* address, DataType& data, int now) {
+bool NextMemoryLevel::getReadResponse(int* address, int& data, int now) {
 	return memoryInterface->getReadResponse(address, data, now);
 }
 
-template <typename AddressType, typename DataType>
-void NextMemoryLevel::requestWrite(AddressType address, DataType data, int now) {
+void NextMemoryLevel::requestWrite(int address, int data, int now) {
 	memoryInterface->requestWrite(address, data, now);
 }
