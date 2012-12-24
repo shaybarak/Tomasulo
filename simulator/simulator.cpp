@@ -120,14 +120,16 @@ int main(int argc, char** argv) {
 	
 	// Run program
 	//////////////
+	// Initialize CPU<->RAM interface
+	MemoryInterface<int, int> cpuRam();
+	NextMemoryLevel<int, int> cpuToRam(cpuRam);
+	PreviousMemoryLevel<int, int> ramToCpu(cpuRam);
+	// Initialize main memory
+	// TODO
 	// Initialize GPR
 	GPR gpr;
 	// Execute program
-	// WARNING: this dirty trick exposes vector<char>'s internal char[] to CPU.
-	// It works because the standard guarantees that vector's internal members are contiguous and packed.
-	TimedQueue<int> l1CacheReadQueue();
-	TimedQueue<WriteRequest> l1CacheWriteQueue();
-	CPU cpu(&l1CacheReadQueue, &l1CacheWriteQueue, 16*1024*1024, &gpr);
+	CPU cpu(cpuToRam, ISA::RAM_SIZE, &gpr);
 	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE);
 	Clock sysClock();
 	sysClock.addObserver(&cpu);
