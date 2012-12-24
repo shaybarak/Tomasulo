@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Memory.h"
+#include "PreviousMemoryLevel.h"
+#include "NextMemoryLevel.h"
 
-class L1Cache : public Memory {
+class Cache {
 public:
-	Cache(Memory* nextLevel, int sizeInBytes, int accessDelay, int sizeOfBlock);
+	Cache(PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel, int sizeOfBlock)
+		: previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel), sizeOfBlock(sizeOfBlock) {}
 	int getHitCount() { return hits; }
 	int getMissCount() { return misses; }
 	double getHitRate() { return (double)hits / (hits + misses); }
@@ -12,12 +14,11 @@ public:
 private:
 	// Invalid tag
 	static const int INVALID = -1;
-	// Cache line tags
-	vector<short> tags;
 	int sizeOfBlock;
 	// Statistics
 	int hits;
 	int misses;
-	// Next level of cache/memory
-	Memory* nextLevel;
+	// Interfaces to previous & next level
+	PreviousMemoryLevel* PreviousMemoryLevel;
+	NextMemoryLevel* nextMemoryLevel;
 };

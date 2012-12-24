@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Cache.h"
+#include "../Clock/Clocked.h"
 
-class L1Cache : public Cache {
+class L1Cache : public Cache, public Clocked {
 public:
-	virtual bool read(int address, int* value);
-	virtual bool write(int address, int value);
+	L1Cache(PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel, int sizeOfBlock)
+		: Cache(previousMemoryLevel, nextMemoryLevel, sizeOfBlock) {}
+	virtual void onTick(int now);
 };

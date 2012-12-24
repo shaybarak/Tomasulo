@@ -2,8 +2,9 @@
 
 #include "Cache.h"
 
-class L2Cache : public Cache {
+class L2Cache : public Cache, public Clocked {
 public:
-	virtual bool read(int address, int* value);
-	virtual bool write(int address, int value);
+	L2Cache(PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel, int sizeOfBlock)
+		: Cache(previousMemoryLevel, nextMemoryLevel, sizeOfBlock) {}
+	virtual void onTick(int now);
 };
