@@ -1,11 +1,14 @@
 #pragma once
 
-class MainMemory : Memory {
-	MainMemory(int accessDelay) : Memory(NULL, SIZE, accessDelay) {}
-	virtual bool read(int address, int* value);
-	virtual bool write(int address, int value);
+class MainMemory : Clocked {
+	MainMemory(char* memory, int accessDelay,
+		PreviousMemoryLevel* previousMemoryLevel)
+		: memory(memory), accessDelay(accessDelay), previousMemoryLevel(previousMemoryLevel) {}
+	void read(int address, int* value);
+	void write(int address, int value);
 
 private:
-	// Main memory is 16MB as defined in the exercise instructions
-	static const int SIZE = 16000000;
+	char* memory;
+	int accessDelay;
+	PreviousMemoryLevel* previousMemoryLevel;
 };
