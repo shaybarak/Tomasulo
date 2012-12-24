@@ -28,11 +28,9 @@ bool openFile(ifstream& file, char* filename) {
 }
 
 // Add instructions to memory
-void addInstructions(vector<char>& memory, int base, int instructionsCount) {
-	// Ensure memory is big enough
-	memory.resize(ISA::RAM_SIZE);
+void addInstructions(vector<char>& memory, vector<Instruction*>& program, int base) {
 	int* codePtr = &memory[base];
-	for (int i = 0; i < instructionsCount; i++) {
+	for (int i = 0; i < program.size(); i++) {
 		*codePtr = i;
 		codePtr++;
 	}
@@ -117,6 +115,8 @@ int main(int argc, char** argv) {
 	fclose(mem_init);
 	// Expand memory to maximum size (new bytes are zero-initializes automatically)
 	memory.resize(ISA::RAM_SIZE);
+	// Write instructions to memory
+	addInstructions(memory, program, ISA::CODE_BASE);
 	
 	// Run program
 	//////////////
