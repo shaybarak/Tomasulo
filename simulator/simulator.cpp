@@ -18,14 +18,33 @@ enum retvals {
 	BAD_INPUT,	// Bad formatting in one or more input files
 };
 
-// Code is based at address 0
-const int CODE_BASE = 0;
+bool openFile(ifstream& file, char* filename) {
+	cmd_file.open(filename);
+	if (!cmd_file) {
+		cerr << "Error opening " << argv[1] << endl;
+		return false;
+	}
+	return true;
+}
+
+// Add instructions to memory
+void addInstructions(vector<char>& memory, int base, int instructionsCount) {
+	// Ensure memory is big enough
+	memory.resize(ISA::RAM_SIZE);
+	int* codePtr = &memory[base];
+	for (int i = 0; i < instructionsCount; i++) {
+		*codePtr = i;
+		codePtr++;
+	}
+}
 
 // Trim trailing zeroes from memory
 void trimMemory(vector<char>& memory) {
 	if (memory.empty()) {
 		return;
 	}
+	// Trim code (not expected in dump)
+	memory.resize(ISA::CODE_BASE);
 	// Find last non-zero byte
 	char* byte;
 	for (byte = &memory[memory.size() - 1]; byte >= &memory[0]; byte--) {
@@ -37,66 +56,39 @@ void trimMemory(vector<char>& memory) {
 }
 
 // Entry point for the simulator program
-// simulator.exe cmd_file.txt config_file.txt mem_init.txt regs_dump.txt mem_dump.txt time.txt committed.txt
+// simulator.exe cmd_file.txt config_file.txt mem_init.txt regs_dump.txt \
+//     mem_dump.txt time.txt committed.txt hitrate.txt L1i.txt L1d.txt \
+//     L2i.txt L2d.txt
 int main(int argc, char** argv) {
 	// Handle command line arguments
 	////////////////////////////////
-	if (argc < 8) {
-		cout << "Usage: " << argv[0] << " cmd_file config_file mem_init regs_dump mem_dump time_txt committed_txt" << endl;
+	if (argc < 13) {
+		cout << "Usage: " << argv[0] << " cmd_file.txt config_file.txt mem_init.txt regs_dump.txt"
+			 << " mem_dump.txt time.txt committed.txt hitrate.txt L1i.txt L1d.txt"
+			 << " L2i.txt L2d.txt" << endl;
 		return BAD_USAGE;
 	}
-	ifstream cmd_file;
-	cmd_file.open(argv[1]);
-	if (!cmd_file) {
-		cerr << "Error opening " << argv[1] << endl;
-		return FIO_ERROR;
-	}
-	ifstream config_file;
-	config_file.open(argv[2]);
-	if (!config_file) {
-		cerr << "Error opening " << argv[2] << endl;
-		return FIO_ERROR;
-	}
-	errno_t err;
-	FILE* mem_init;
-	if ((err = fopen_s(&mem_init, argv[3], "r")) != 0) {
-		cerr << "Error opening " << argv[3] << endl;
-		return FIO_ERROR;
-	}
-	ofstream regs_dump;
-	regs_dump.open(argv[4]);
-	if (!regs_dump) {
-		cerr << "Error opening " << argv[4] << endl;
-		return FIO_ERROR;
-	}
-	FILE* mem_dump;
-	if ((err = fopen_s(&mem_dump, argv[5], "w")) != 0) {
-		cerr << "Error opening " << argv[5] << endl;
-		return FIO_ERROR;
-	}
-	ofstream time_txt;
-	time_txt.open(argv[6]);
-	if (!time_txt) {
-		cerr << "Error opening " << argv[6] << endl;
-		return FIO_ERROR;
-	}
-	ofstream committed_txt;
-	committed_txt.open(argv[7]);
-	if (!committed_txt) {
-		cerr << "Error opening " << argv[7] << endl;
+	ifstream cmd_file, config_file, mem_init, regs_dump, mem_dump, time_txt,
+			 committed, hitrate, L1i, L1d, L2i, L2d;
+	if (!openFile(cmd_file, argv[1]) || !openFile(config_file, argv[2]) ||
+		!openFile(mem_init, argv[3]) || !openFile(regs_dump, argv[4]) ||
+		!openFile(mem_dump, argv[5]) || !openFile(time_txt, argv[6]) ||
+		!openFile(committed, argv[7]) || !openFile(hitrate, argv[8]) ||
+		!openFile(L1i, argv[9]) || !openFile(L1d, argv[10]) ||
+		!openFile(L2i, argv[11]) || !openFile(L2d, argv[12])) {
 		return FIO_ERROR;
 	}
 
 	// Read inputs
 	//////////////
-	Labeler labeler(CODE_BASE);
+	Labeler labeler(ISA::CODE_BASE);
 	// First pass on code: find and process labels
 	while (cmd_file) {
 		string line;
 		getline(cmd_file, line);
 		labeler.parse(line);
 	}
-	InstructionFactory instructionFactory(labeler.getLabels(), CODE_BASE);
+	InstructionFactory instructionFactory(labeler.getLabels(), ISA::CODE_BASE);
 	cmd_file.clear();
 	cmd_file.seekg(0);
 	// Second pass on code: process instructions
@@ -136,7 +128,7 @@ int main(int argc, char** argv) {
 	TimedQueue<int> l1CacheReadQueue();
 	TimedQueue<WriteRequest> l1CacheWriteQueue();
 	CPU cpu(&l1CacheReadQueue, &l1CacheWriteQueue, 16*1024*1024, &gpr);
-	cpu.loadProgram(&program, CODE_BASE, CODE_BASE);
+	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE);
 	Clock sysClock();
 	sysClock.addObserver(&cpu);
 	while (!cpu.isHalted()) {
