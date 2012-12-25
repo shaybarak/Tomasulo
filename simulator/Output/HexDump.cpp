@@ -19,11 +19,9 @@ bool HexDump::load(vector<char>& buffer, FILE* in) {
 	return true;
 }
 
-bool HexDump::store(vector<char>& buffer, FILE* out) {
-	int size = buffer.size();
+bool HexDump::store(char* buffer, int size, FILE* out) {
 	// 8 bytes per line
-	for (int ch = 0; ch <= size - 8; ch+=8) {
-		char* base = &buffer[ch];
+	for (char* base = buffer; base <= buffer + size - 8; base+=8) {
 		if (fprintf(out, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
 			        base[0], base[1], base[2], base[3],
 					base[4], base[5], base[6], base[7]) < 0) {

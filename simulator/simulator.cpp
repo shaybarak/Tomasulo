@@ -16,6 +16,7 @@ enum retvals {
 	BAD_USAGE,	// Invalid cmdline invocation
 	FIO_ERROR,	// File I/O error
 	BAD_INPUT,	// Bad formatting in one or more input files
+	BAD_CONFIG,	// Missing configuration value
 };
 
 bool openFile(ifstream& file, char* filename) {
@@ -25,6 +26,12 @@ bool openFile(ifstream& file, char* filename) {
 		return false;
 	}
 	return true;
+}
+
+bool readConfig(Configuration& config, string& key, int* value) {
+	if (!config.get(key, value)) {
+		cerr << "Missing configuration " << key << endl;
+	}
 }
 
 // Add instructions to memory
@@ -107,47 +114,80 @@ int main(int argc, char** argv) {
 	config.load(config_file);  // Configuration not used in part 1
 	config_file.close();
 	// Read memory initialization
-	vector<char> memory;
-	if (!HexDump::load(memory, mem_init)) {
+	vector<char> ramBuffer;
+	if (!HexDump::load(ramBuffer, mem_init)) {
 		cerr << "Error reading memory initialization" << endl;
 		return BAD_INPUT;
 	}
 	fclose(mem_init);
 	// Expand memory to maximum size (new bytes are zero-initializes automatically)
-	memory.resize(ISA::RAM_SIZE);
+	ramBuffer.resize(ISA::RAM_SIZE);
 	// Write instructions to memory
-	addInstructions(memory, program, ISA::CODE_BASE);
+	addInstructions(ramBuffer, program, ISA::CODE_BASE);
 	
-	// Run program
-	//////////////
-	// Initialize CPU<->RAM interface
-	MemoryInterface cpuRam();
-	NextMemoryLevel cpuToRam(cpuRam);
-	PreviousMemoryLevel ramToCpu(cpuRam);
+	// Set up memory levels
+	/////////////////////////////
+	int l1_block_size, l1_access_delay, l1_cache_size,
+		l2_block_size, l2_access_delay, l2_cache_size,
+		mem_access_delay;
+	if (!readConfig(config, "l1_block_size", l1_block_size) ||
+		!readConfig(config, "l1_access_delay", l1_access_delay) ||
+		!readConfig(config, "l1_cache_size", l1_cache_size) ||
+		!readConfig(config, "l2_block_size", l2_block_size) ||
+		!readConfig(config, "l2_access_delay", l2_access_delay) ||
+		!readConfig(config, "l2_cache_size", l2_cache_size) ||
+		!readConfig(config, "mem_access_delay", mem_access_delay)) {
+		return BAD_CONFIG;
+	}
+	// Initialize memory interfaces
+	MemoryInterface cpuL1();
+	NextMemoryLevel cpuToL1(cpuL1);
+	PreviousMemoryLevel l1ToCpu(cpul1);
+	MemoryInterface l1L2();
+	NextMemoryLevel l1ToL2(l1L2);
+	PreviousMemoryLevel l2ToL1(l1L2);
+	MemoryInterface l2MainMemory();
+	NextMemoryLevel l2ToMainmemory(l2MainMemory);
+	PreviousMemoryLevel mainMemoryToL2(l2MainMemory);
+	// Initialize L1
+	vector<char> l1Buffer(l1_cache_size);
+	L1Cache l1Cache(&l1Buffer[0], l1_block_size, l1_cache_size, l1_access_delay,
+		&l1ToCpu, &l1ToL2);
+	// Initialize L2
+	L2Cache l2Cache(&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
+		&l2ToL1, &l2ToMainmemory);
 	// Initialize main memory
-	// TODO
+	// TODO connect MainMemory to L2, not directly to CPU
+	MainMemory ram(&ramBuffer[0], mem_access_delay, &l1ToCpu);
+	
+	// Set up CPU
+	/////////////
 	// Initialize GPR
 	GPR gpr;
-	// Execute program
-	CPU cpu(cpuToRam, ISA::RAM_SIZE, &gpr);
+	// Initialize CPU
+	CPU cpu(&cpuToL1, ISA::RAM_SIZE, &gpr);
 	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE);
 	Clock sysClock();
 	sysClock.addObserver(&cpu);
 	while (!cpu.isHalted()) {
 		sysClock.tick();
 	}
-	// Trim trailing zeroes from memory
-	trimMemory(memory);
 
 	// Write outputs
 	////////////////
+	// Trim trailing zeroes from memory
+	trimMemory(ramBuffer);
 	// Write register dump
 	if (!gpr.dump(regs_dump)) {
 		cerr << "Error writing registers dump" << endl;
 	}
 	regs_dump.close();
-	// Write memory dump
-	if (!HexDump::store(memory, mem_dump)) {
+	// Write memory dumps
+	if (!HexDump::store(&l1Buffer[0], L1i) ||
+		!HexDump::store(&l1Buffer[l1_cache_size / 2], L1d) ||
+		!HexDump::store(&l2Buffer[0], L2i) ||
+		!HexDump::store(&l2Buffer[l2_cache_size / 2], L2d) ||
+		!HexDump::store(&ramBuffer[0], mem_dump)) {
 		cerr << "Error writing memory dump" << endl;
 	}
 	fclose(mem_dump);
