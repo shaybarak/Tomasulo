@@ -5,8 +5,10 @@
 
 class Cache {
 public:
-	Cache(PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel, int sizeOfBlock)
-		: previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel), sizeOfBlock(sizeOfBlock) {}
+	Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
+		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
+		: buffer(buffer), blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay),
+		  previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel) {}
 	int getHitCount() { return hits; }
 	int getMissCount() { return misses; }
 	double getHitRate() { return (double)hits / (hits + misses); }
@@ -14,11 +16,14 @@ public:
 private:
 	// Invalid tag
 	static const int INVALID = -1;
-	int sizeOfBlock;
+	int* buffer;
+	int blockSize;
+	int cacheSize;
+	int accessDelay;
 	// Statistics
 	int hits;
 	int misses;
 	// Interfaces to previous & next level
-	PreviousMemoryLevel* PreviousMemoryLevel;
+	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
 };
