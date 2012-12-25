@@ -6,20 +6,25 @@
 class Cache {
 public:
 	Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
-		: buffer(buffer), blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay),
-		  previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel) {}
-	int getHitCount() { return hits; }
-	int getMissCount() { return misses; }
-	double getHitRate() { return (double)hits / (hits + misses); }
+		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
+	const vector<char>* getInstructionsBuffer() const { return &instructionsBuffer; }
+	const vector<char>* getDataBuffer() const { return &dataBuffer; }
+	int getHitCount() const { return hits; }
+	int getMissCount() const { return misses; }
+	double getHitRate() const { return (double)hits / (hits + misses); }
 
 private:
 	// Invalid tag
 	static const int INVALID = -1;
-	int* buffer;
+	// Dimensions
 	int blockSize;
 	int cacheSize;
 	int accessDelay;
+	// Buffers
+	vector<char> instructionsBuffer;
+	int* instructions;
+	vector<char> dataBuffer;
+	int* data;
 	// Statistics
 	int hits;
 	int misses;

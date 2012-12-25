@@ -17,5 +17,5 @@ public:
 	// Reads formatted bytes into buffer, returns whether successful
 	static bool load(vector<char>& buffer, FILE* in);
 	// Writes bytes according to format, returns whether successful
-	static bool store(vector<char>& buffer, FILE* out);
+	static bool store(const vector<char>& buffer, FILE* out);
 };

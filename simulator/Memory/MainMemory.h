@@ -1,13 +1,15 @@
 #pragma once
 
 class MainMemory : Clocked {
-	MainMemory(int* buffer, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel)
-		: buffer(buffer), accessDelay(accessDelay), previousMemoryLevel(previousMemoryLevel) {}
+	MainMemory(int accessDelay, PreviousMemoryLevel* previousMemoryLevel);
+	const vector<char>* getBuffer() { return buffer; }
+	// WARNING: exposes non-const pointer to data member
+	vector<char>* getBuffer() { return buffer; }
 	virtual void onTick(int now);
 
 private:
-	int* buffer;
+	vector<char> buffer;
+	int* words;
 	int accessDelay;
 	PreviousMemoryLevel* previousMemoryLevel;
 };

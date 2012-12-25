@@ -19,7 +19,7 @@ enum retvals {
 	BAD_CONFIG,	// Missing configuration value
 };
 
-bool openFile(ifstream& file, char* filename) {
+bool openFile(ifstream& file, const char* filename) {
 	cmd_file.open(filename);
 	if (!cmd_file) {
 		cerr << "Error opening " << argv[1] << endl;
@@ -28,18 +28,17 @@ bool openFile(ifstream& file, char* filename) {
 	return true;
 }
 
-bool readConfig(Configuration& config, string& key, int* value) {
+bool readConfig(const Configuration& config, const string& key, int* value) {
 	if (!config.get(key, value)) {
 		cerr << "Missing configuration " << key << endl;
 	}
 }
 
 // Add instructions to memory
-void addInstructions(vector<char>& memory, vector<Instruction*>& program, int base) {
+void addInstructions(vector<char>& memory, const vector<Instruction*>& program, int base) {
 	int* codePtr = &memory[base];
 	for (int i = 0; i < program.size(); i++) {
-		*codePtr = i;
-		codePtr++;
+		memory.write(base + i, i);
 	}
 }
 
@@ -113,17 +112,6 @@ int main(int argc, char** argv) {
 	Configuration config;
 	config.load(config_file);  // Configuration not used in part 1
 	config_file.close();
-	// Read memory initialization
-	vector<char> ramBuffer;
-	if (!HexDump::load(ramBuffer, mem_init)) {
-		cerr << "Error reading memory initialization" << endl;
-		return BAD_INPUT;
-	}
-	fclose(mem_init);
-	// Expand memory to maximum size (new bytes are zero-initializes automatically)
-	ramBuffer.resize(ISA::RAM_SIZE);
-	// Write instructions to memory
-	addInstructions(ramBuffer, program, ISA::CODE_BASE);
 	
 	// Set up memory levels
 	/////////////////////////////
@@ -158,7 +146,16 @@ int main(int argc, char** argv) {
 		&l2ToL1, &l2ToMainmemory);
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to CPU
-	MainMemory ram(&ramBuffer[0], mem_access_delay, &l1ToCpu);
+	MainMemory ram(mem_access_delay, &l1ToCpu);
+
+	// Read memory initialization
+	if (!HexDump::load(ram.getBuffer(), mem_init)) {
+		cerr << "Error reading memory initialization" << endl;
+		return BAD_INPUT;
+	}
+	fclose(mem_init);
+	// Write instructions to memory
+	addInstructions(ram.getBuffer(), program, ISA::CODE_BASE);
 	
 	// Set up CPU
 	/////////////
@@ -176,19 +173,19 @@ int main(int argc, char** argv) {
 	// Write outputs
 	////////////////
 	// Trim trailing zeroes from memory
-	trimMemory(ramBuffer);
+	trimMemory(ram.getBuffer());
 	// Write register dump
 	if (!gpr.dump(regs_dump)) {
 		cerr << "Error writing registers dump" << endl;
 	}
 	regs_dump.close();
 	// Write memory dumps
-	if (!HexDump::store(&l1Buffer[0], L1i) ||
-		!HexDump::store(&l1Buffer[l1_cache_size / 2], L1d) ||
-		!HexDump::store(&l2Buffer[0], L2i) ||
-		!HexDump::store(&l2Buffer[l2_cache_size / 2], L2d) ||
-		!HexDump::store(&ramBuffer[0], mem_dump)) {
-		cerr << "Error writing memory dump" << endl;
+	if (!HexDump::store(l1Cache.getInstructionsBuffer(), L1i) ||
+		!HexDump::store(l1Cache.getDataBuffer(), L1d) ||
+		!HexDump::store(l2Cache.getInstructionsBuffer(), L2i) ||
+		!HexDump::store(l2Cache.getDataBuffer(), L2d) ||
+		!HexDump::store(ram.getBuffer(), mem_dump)) {
+		cerr << "Error writing memory dumps" << endl;
 	}
 	fclose(mem_dump);
 	time_txt << sysClock.getTime() << endl;
