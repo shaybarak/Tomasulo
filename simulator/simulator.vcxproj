@@ -14,6 +14,9 @@
     <ClInclude Include="Clock\Clock.h" />
     <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
+    <ClInclude Include="Memory\Cache.h" />
+    <ClInclude Include="Memory\L1Cache.h" />
+    <ClInclude Include="Memory\L2Cache.h" />
     <ClInclude Include="Memory\MainMemoryStub.h" />
     <ClInclude Include="Memory\NextMemoryLevel.h" />
     <ClInclude Include="Memory\PreviousMemoryLevel.h" />
@@ -33,6 +36,9 @@
   <ItemGroup>
     <ClCompile Include="Clock\Clock.cpp" />
     <ClCompile Include="Configuration\Configuration.cpp" />
+    <ClCompile Include="Memory\Cache.cpp" />
+    <ClCompile Include="Memory\L1Cache.cpp" />
+    <ClCompile Include="Memory\L2Cache.cpp" />
     <ClCompile Include="Memory\MainMemoryStub.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
