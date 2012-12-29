@@ -14,6 +14,8 @@ public:
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
 protected:
+	// Converts an address to a tag
+	int toTag(int offset);
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;
@@ -31,6 +33,8 @@ protected:
 	// Interfaces to previous & next level
 	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
+	// Memory addresses that have pending reads
+	set<int> pendingReads;
 
 private:
 	// Internal buffers
