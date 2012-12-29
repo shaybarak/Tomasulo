@@ -14,7 +14,7 @@ public:
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
 protected:
-	// Dimensions
+	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;
 	int accessDelay;
