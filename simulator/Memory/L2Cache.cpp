@@ -8,14 +8,14 @@ L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 	dataDirty.resize(dataValid.size());
 	// Also initialize LRU bits (2 ways per block)
 	instructionsWay0IsLru.resize(instructionsValid.size() / 2);
-	dataWay0Isru.resize(dataValid.size() / 2);
+	dataWay0IsLru.resize(dataValid.size() / 2);
 }
 
 void L2Cache::onTick(int now) {
 	// TODO
 }
 
-bool L1Cache::read(int address, int* value) {
+bool L2Cache::read(int address, int* value) {
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
