@@ -17,7 +17,7 @@ public:
 	 * Reads the next value read from the next memory level if it's available.
 	 * Returns whether value was read.
 	 */
-	bool getReadResponse(int* address, int& data, int notBefore);
+	bool getReadResponse(int* address, int* data, int notBefore);
 	/** Registers a write request to the next memory level. */
 	void requestWrite(int address, int data, int notBefore);
 

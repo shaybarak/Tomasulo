@@ -1,7 +1,7 @@
 #include "PreviousMemoryLevel.h"
 
 void PreviousMemoryLevel::respondRead(int address, int data, int notBefore) {
-	memoryInterface->responsdRead(address, data, notBefore);
+	memoryInterface->respondRead(address, data, notBefore);
 }
 
 bool PreviousMemoryLevel::getReadRequest(int* address, int notBefore) {
@@ -9,5 +9,5 @@ bool PreviousMemoryLevel::getReadRequest(int* address, int notBefore) {
 }
 
 bool PreviousMemoryLevel::getWriteRequest(int* address, int* data, int notBefore) {
-	return memoryInterface->getWriteRequest(address, data, notBefore);
+	return memoryInterface->getWriteRequest(address, *data, notBefore);
 }
