@@ -19,10 +19,12 @@ protected:
 	int cacheSize;
 	int accessDelay;
 	// Buffers
-	vector<bool> instructionsValid;
 	int* instructions;
-	vector<bool> dataValid;
+	vector<int> instructionsTag;
+	vector<bool> instructionsValid;
 	int* data;
+	vector<int> dataTag;
+	vector<bool> dataValid;
 	// Statistics
 	int hits;
 	int misses;

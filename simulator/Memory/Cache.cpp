@@ -4,12 +4,14 @@ Cache::Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 	PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
 	: buffer(buffer), blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay),
 	  previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel) {
-	instructionsBuffer(cacheSize / 2);
-	// Valid bits are per block
-	instructionsValid(instructionsBuffer.size() / blockSize);
+	instructionsBuffer.resize(cacheSize / 2);
+	// Tag and valid bit are per block
+	instructionsTag.resize(instructionsBuffer.size() / blockSize);
+	instructionsValid.resize(instructionsTag.size());
 	instructions = &instructionsBuffer[0];
-	dataBuffer(cacheSize / 2);
-	// Valid bits are per block
-	dataValid(dataBuffer.size() / blockSize);
+	dataBuffer.resize(cacheSize / 2);
+	// Tag and valid bit are per block
+	dataTag.resize(dataBuffer.size() / blockSize);
+	dataValid.resize(dataTag.size());
 	data = &dataBuffer[0];
 }
