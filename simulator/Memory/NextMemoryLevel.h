@@ -12,14 +12,14 @@ public:
 	NextMemoryLevel(MemoryInterface* memoryInterface)
 		: memoryInterface(memoryInterface) {}
 	/** Requests to read data from the next memory level. */
-	void requestRead(int address, int now);
+	void requestRead(int address, int notBefore);
 	/**
 	 * Reads the next value read from the next memory level if it's available.
 	 * Returns whether value was read.
 	 */
-	bool getReadResponse(int* address, int& data, int now);
+	bool getReadResponse(int* address, int& data, int notBefore);
 	/** Registers a write request to the next memory level. */
-	void requestWrite(int address, int data, int now);
+	void requestWrite(int address, int data, int notBefore);
 
 private:
 	MemoryInterface* memoryInterface;

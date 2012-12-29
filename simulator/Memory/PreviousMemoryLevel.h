@@ -12,13 +12,13 @@ public:
 	PreviousMemoryLevel(MemoryInterface<int, int>* memoryInterface)
 		: memoryInterface(memoryInterface) {}
 	/** Responds to data read request. */
-	void respondRead(int address, int data, int now);
+	void respondRead(int address, int data, int notBefore);
 	/**
 	 * Reads the next address requested by the previous level if it's available.
 	 * Returns whether address was read.
 	 */
-	bool getReadRequest(int* address, int now);
-	bool getWriteRequest(int* address, int* data, int now);
+	bool getReadRequest(int* address, int notBefore);
+	bool getWriteRequest(int* address, int* data, int notBefore);
 	// There are no write responses. Writer doesn't wait for confirmation of commit.
 
 private:
