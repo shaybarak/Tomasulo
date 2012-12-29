@@ -5,6 +5,11 @@
 #include "MIPS32\Labeler.h"
 #include "Clock\Clock.h"
 #include "Output\HexDump.h"
+#include "Memory\L1Cache.h"
+#include "Memory\L2Cache.h"
+#include "Memory\PreviousMemoryLevel.h"
+#include "Memory\NextMemoryLevel.h"
+#include "Memory\MainMemory.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -20,9 +25,27 @@ enum retvals {
 };
 
 bool openFile(ifstream& file, const char* filename) {
-	cmd_file.open(filename);
-	if (!cmd_file) {
-		cerr << "Error opening " << argv[1] << endl;
+	file.open(filename);
+	if (!file) {
+		cerr << "Error opening " << filename << endl;
+		return false;
+	}
+	return true;
+}
+
+bool openFile(ofstream& file, const char* filename) {
+	file.open(filename);
+	if (!file) {
+		cerr << "Error opening " << filename << endl;
+		return false;
+	}
+	return true;
+}
+
+bool openFile(fstream& file, const char* filename) {
+	file.open(filename);
+	if (!file) {
+		cerr << "Error opening " << filename << endl;
 		return false;
 	}
 	return true;
@@ -31,26 +54,28 @@ bool openFile(ifstream& file, const char* filename) {
 bool readConfig(const Configuration& config, const string& key, int* value) {
 	if (!config.get(key, value)) {
 		cerr << "Missing configuration " << key << endl;
+		return false;
 	}
+	return true;
 }
 
 // Add instructions to memory
-void addInstructions(vector<char>& memory, const vector<Instruction*>& program, int base) {
-	int* codePtr = &memory[base];
-	for (int i = 0; i < program.size(); i++) {
-		memory.write(base + i, i);
+void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program, int base) {
+	int* codePtr = (int*)&memory[base];
+	for (unsigned int i = 0; i < program.size(); i++) {
+		codePtr[i] = i;
 	}
 }
 
 // Trim trailing zeroes from memory
-void trimMemory(vector<char>& memory) {
+void trimMemory(vector<unsigned char>& memory) {
 	if (memory.empty()) {
 		return;
 	}
 	// Trim code (not expected in dump)
 	memory.resize(ISA::CODE_BASE);
 	// Find last non-zero byte
-	char* byte;
+	unsigned char* byte;
 	for (byte = &memory[memory.size() - 1]; byte >= &memory[0]; byte--) {
 		if (*byte != 0) break;
 	}
@@ -72,12 +97,13 @@ int main(int argc, char** argv) {
 			 << " L2i.txt L2d.txt" << endl;
 		return BAD_USAGE;
 	}
-	ifstream cmd_file, config_file, mem_init, regs_dump, mem_dump, time_txt,
-			 committed, hitrate, L1i, L1d, L2i, L2d;
+	fstream cmd_file, config_file, regs_dump, mem_dump, mem_init, 
+			time_txt, committed_txt, hitrate, L1i, L1d, L2i, L2d;
+	
 	if (!openFile(cmd_file, argv[1]) || !openFile(config_file, argv[2]) ||
 		!openFile(mem_init, argv[3]) || !openFile(regs_dump, argv[4]) ||
 		!openFile(mem_dump, argv[5]) || !openFile(time_txt, argv[6]) ||
-		!openFile(committed, argv[7]) || !openFile(hitrate, argv[8]) ||
+		!openFile(committed_txt, argv[7]) || !openFile(hitrate, argv[8]) ||
 		!openFile(L1i, argv[9]) || !openFile(L1d, argv[10]) ||
 		!openFile(L2i, argv[11]) || !openFile(L2d, argv[12])) {
 		return FIO_ERROR;
@@ -118,44 +144,45 @@ int main(int argc, char** argv) {
 	int l1_block_size, l1_access_delay, l1_cache_size,
 		l2_block_size, l2_access_delay, l2_cache_size,
 		mem_access_delay;
-	if (!readConfig(config, "l1_block_size", l1_block_size) ||
-		!readConfig(config, "l1_access_delay", l1_access_delay) ||
-		!readConfig(config, "l1_cache_size", l1_cache_size) ||
-		!readConfig(config, "l2_block_size", l2_block_size) ||
-		!readConfig(config, "l2_access_delay", l2_access_delay) ||
-		!readConfig(config, "l2_cache_size", l2_cache_size) ||
-		!readConfig(config, "mem_access_delay", mem_access_delay)) {
+	if (!readConfig(config, "l1_block_size", &l1_block_size) ||
+		!readConfig(config, "l1_access_delay", &l1_access_delay) ||
+		!readConfig(config, "l1_cache_size", &l1_cache_size) ||
+		!readConfig(config, "l2_block_size", &l2_block_size) ||
+		!readConfig(config, "l2_access_delay", &l2_access_delay) ||
+		!readConfig(config, "l2_cache_size", &l2_cache_size) ||
+		!readConfig(config, "mem_access_delay", &mem_access_delay)) {
 		return BAD_CONFIG;
 	}
 	// Initialize memory interfaces
-	MemoryInterface cpuL1();
-	NextMemoryLevel cpuToL1(cpuL1);
-	PreviousMemoryLevel l1ToCpu(cpul1);
-	MemoryInterface l1L2();
-	NextMemoryLevel l1ToL2(l1L2);
-	PreviousMemoryLevel l2ToL1(l1L2);
-	MemoryInterface l2MainMemory();
-	NextMemoryLevel l2ToMainmemory(l2MainMemory);
-	PreviousMemoryLevel mainMemoryToL2(l2MainMemory);
+	MemoryInterface cpuL1;
+	NextMemoryLevel cpuToL1(&cpuL1);
+	PreviousMemoryLevel l1ToCpu(&cpuL1);
+	MemoryInterface l1L2;
+	NextMemoryLevel l1ToL2(&l1L2);
+	PreviousMemoryLevel l2ToL1(&l1L2);
+	MemoryInterface l2MainMemory;
+	NextMemoryLevel l2ToMainmemory(&l2MainMemory);
+	PreviousMemoryLevel mainMemoryToL2(&l2MainMemory);
 	// Initialize L1
 	vector<char> l1Buffer(l1_cache_size);
-	L1Cache l1Cache(&l1Buffer[0], l1_block_size, l1_cache_size, l1_access_delay,
+	L1Cache l1Cache((int*)&l1Buffer[0], l1_block_size, l1_cache_size, l1_access_delay,
 		&l1ToCpu, &l1ToL2);
 	// Initialize L2
-	L2Cache l2Cache(&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
+	vector<char> l2Buffer(l2_cache_size);
+	L2Cache l2Cache((int*)&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
 		&l2ToL1, &l2ToMainmemory);
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to CPU
 	MainMemory ram(mem_access_delay, l2_block_size, &l1ToCpu);
 
 	// Read memory initialization
-	if (!HexDump::load(ram.getBuffer(), mem_init)) {
+	if (!HexDump::load(*ram.getBuffer(), mem_init)) {
 		cerr << "Error reading memory initialization" << endl;
 		return BAD_INPUT;
 	}
-	fclose(mem_init);
+	mem_init.close();
 	// Write instructions to memory
-	addInstructions(ram.getBuffer(), program, ISA::CODE_BASE);
+	addInstructions(*ram.getBuffer(), program, ISA::CODE_BASE);
 	
 	// Set up CPU
 	/////////////
@@ -164,7 +191,7 @@ int main(int argc, char** argv) {
 	// Initialize CPU
 	CPU cpu(&cpuToL1, ISA::RAM_SIZE, &gpr);
 	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE);
-	Clock sysClock();
+	Clock sysClock;
 	sysClock.addObserver(&cpu);
 	while (!cpu.isHalted()) {
 		sysClock.tick();
@@ -173,21 +200,21 @@ int main(int argc, char** argv) {
 	// Write outputs
 	////////////////
 	// Trim trailing zeroes from memory
-	trimMemory(ram.getBuffer());
+	trimMemory(*ram.getBuffer());
 	// Write register dump
 	if (!gpr.dump(regs_dump)) {
 		cerr << "Error writing registers dump" << endl;
 	}
 	regs_dump.close();
 	// Write memory dumps
-	if (!HexDump::store(l1Cache.getInstructionsBuffer(), L1i) ||
-		!HexDump::store(l1Cache.getDataBuffer(), L1d) ||
-		!HexDump::store(l2Cache.getInstructionsBuffer(), L2i) ||
-		!HexDump::store(l2Cache.getDataBuffer(), L2d) ||
-		!HexDump::store(ram.getBuffer(), mem_dump)) {
+	if (!HexDump::store(*l1Cache.getInstructionsBuffer(), L1i) ||
+		!HexDump::store(*l1Cache.getDataBuffer(), L1d) ||
+		!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
+		!HexDump::store(*l2Cache.getDataBuffer(), L2d) ||
+		!HexDump::store(*ram.getBuffer(), mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
-	fclose(mem_dump);
+	mem_dump.close();
 	time_txt << sysClock.getTime() << endl;
 	if (time_txt.fail()) {
 		cerr << "Error writing time" << endl;
