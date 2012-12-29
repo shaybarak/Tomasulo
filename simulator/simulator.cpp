@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
 		&l2ToL1, &l2ToMainmemory);
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to CPU
-	MainMemory ram(mem_access_delay, &l1ToCpu);
+	MainMemory ram(mem_access_delay, l2_block_size, &l1ToCpu);
 
 	// Read memory initialization
 	if (!HexDump::load(ram.getBuffer(), mem_init)) {

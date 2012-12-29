@@ -1,7 +1,7 @@
 #pragma once
 
 class MainMemory : Clocked {
-	MainMemory(int accessDelay, PreviousMemoryLevel* previousMemoryLevel);
+	MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel);
 	const vector<char>* getBuffer() { return buffer; }
 	// WARNING: exposes non-const pointer to data member
 	vector<char>* getBuffer() { return buffer; }
@@ -11,5 +11,10 @@ private:
 	vector<char> buffer;
 	int* words;
 	int accessDelay;
+	int l2BlockSize;
+	// For identifying sequential access
+	int lastReadAddress;
+	// Busy reading until this time
+	int busyReadingUntil;
 	PreviousMemoryLevel* previousMemoryLevel;
 };
