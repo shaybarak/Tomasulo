@@ -2,13 +2,16 @@
 
 #include "PreviousMemoryLevel.h"
 #include "NextMemoryLevel.h"
+#include <set>
+
+using namespace std;
 
 class Cache {
 public:
 	Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
-	const vector<char>* getInstructionsBuffer() const { return &instructionsBuffer; }
-	const vector<char>* getDataBuffer() const { return &dataBuffer; }
+	const vector<unsigned char>* getInstructionsBuffer() const { return &instructionsBuffer; }
+	const vector<unsigned char>* getDataBuffer() const { return &dataBuffer; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
 	double getHitRate() const { return (double)hits / (hits + misses); }
@@ -38,6 +41,6 @@ protected:
 
 private:
 	// Internal buffers
-	vector<char> instructionsBuffer;
-	vector<char> dataBuffer;
+	vector<unsigned char> instructionsBuffer;
+	vector<unsigned char> dataBuffer;
 };
