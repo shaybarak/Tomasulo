@@ -27,7 +27,7 @@ void MainMemory::onTick(int now) {
 			delay = accessDelay;
 		}
 
-		previousMemoryLevel->respondRead(address, words[address / sizeof(int), now + delay);
+		previousMemoryLevel->respondRead(address, words[address / sizeof(int)], now + delay);
 		busyReadingUntil = now + delay;
 		lastReadAddress = address;
 	}
