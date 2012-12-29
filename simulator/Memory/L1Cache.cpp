@@ -12,22 +12,22 @@ bool L1Cache::read(int address, int* value) {
 	}
 	if (address < ISA::CODE_BASE) {
 		// Use instructions buffer
-		*value = instructions[address / sizeof(int)]
+		*value = instructions[toBlockNumber(address) + address % sizeof(int)]
 		// Verify valid & tag
-		return instructionsValid[address / blockSize]
-			&& (toTag(address) == instructionsTag[address / blockSize]);
+		return instructionsValid[toBlockNumber(address)]
+			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
 	} else {
-		*value = data[(address / sizeof(int)]
+		*value = data[toBlockNumber(address) + address % sizeof(int)]
 		// Verify valid & tag
-		return dataValid[address / blockSize]
-			&& (toTag(address) == dataTag[address / blockSize]);
+		return dataValid[toBlockNumber(address)]
+			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
 	}
 }
 
 void L1Cache::write(int address, int value) {
 	if (address < ISA::CODE_BASE) {
 		// Use instructions buffer
-		instructions[address / sizeof(int)] = value;
+		instructions[toBlockNumber(address)] = value;
 		instructionsTag[address / blockSize] = toTag(address);
 		instructionsValid[address / blockSize] = true;
 	} else {
@@ -37,4 +37,14 @@ void L1Cache::write(int address, int value) {
 	}
 	// If address was pending a read, no need to wait
 	pendingReads.erase(address);
+}
+
+int L1Cache::toTag(int address) {
+	address / (cacheSize / 2);
+}
+
+int L1Cache::toBlockNumber(int address) {
+	// The cache is partitioned 50%/50% between instructions and data,
+	// and is direct-mapped.
+	(address / blockSize) % ((cacheSize / 2) / blockSize);
 }

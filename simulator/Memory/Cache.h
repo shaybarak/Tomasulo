@@ -14,8 +14,6 @@ public:
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
 protected:
-	// Converts an address to a tag
-	int toTag(int offset);
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;

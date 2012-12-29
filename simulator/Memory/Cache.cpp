@@ -15,7 +15,3 @@ Cache::Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 	dataValid.resize(dataTag.size());
 	data = &dataBuffer[0];
 }
-
-int Cache::toTag(int address) {
-	address / cacheSize;
-}
