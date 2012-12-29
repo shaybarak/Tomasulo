@@ -1,14 +1,22 @@
 #pragma once
 
-class MainMemory : Clocked {
+#include <vector>
+#include "MemoryInterface.h"
+#include "NextMemoryLevel.h"
+#include "PreviousMemoryLevel.h"
+using namespace std;
+
+class MainMemory {
+public:
 	MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel);
-	const vector<char>* getBuffer() { return buffer; }
 	// WARNING: exposes non-const pointer to data member
-	vector<char>* getBuffer() { return buffer; }
+	vector<unsigned char>* getBuffer();
 	virtual void onTick(int now);
+	int read(int offset);
+	void write(int offset, int value);
 
 private:
-	vector<char> buffer;
+	vector<unsigned char> buffer;
 	int* words;
 	int accessDelay;
 	int l2BlockSize;
