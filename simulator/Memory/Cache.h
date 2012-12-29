@@ -13,17 +13,15 @@ public:
 	int getMissCount() const { return misses; }
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
-private:
-	// Invalid tag
-	static const int INVALID = -1;
+protected:
 	// Dimensions
 	int blockSize;
 	int cacheSize;
 	int accessDelay;
 	// Buffers
-	vector<char> instructionsBuffer;
+	vector<bool> instructionsValid;
 	int* instructions;
-	vector<char> dataBuffer;
+	vector<bool> dataValid;
 	int* data;
 	// Statistics
 	int hits;
@@ -31,4 +29,9 @@ private:
 	// Interfaces to previous & next level
 	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
+
+private:
+	// Internal buffers
+	vector<char> instructionsBuffer;
+	vector<char> dataBuffer;
 };
