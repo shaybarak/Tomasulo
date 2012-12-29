@@ -12,12 +12,12 @@ bool L1Cache::read(int address, int* value) {
 	}
 	if (address < ISA::CODE_BASE) {
 		// Use instructions buffer
-		*value = instructions[toBlockNumber(address) + address % sizeof(int)]
+		*value = instructions[toBlockNumber(address) + (address % sizeof(int))]
 		// Verify valid & tag
 		return instructionsValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
 	} else {
-		*value = data[toBlockNumber(address) + address % sizeof(int)]
+		*value = data[toBlockNumber(address) + (address % sizeof(int))]
 		// Verify valid & tag
 		return dataValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
