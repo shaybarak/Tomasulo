@@ -18,7 +18,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(NextMemoryLevel<int, int>* nextMemoryLevel, int memorySize, GPR* gpr) :
+	CPU(NextMemoryLevel* nextMemoryLevel, int memorySize, GPR* gpr) :
 		nextMemoryLevel(nextMemoryLevel),
 		memorySize(memorySize),
 		gpr(gpr),
@@ -65,7 +65,7 @@ private:
 	/** Converts PC value to index of instruction in program. */
 	int pcToInstructionIndex(int pc);
 	// Next memory level (e.g. L1 cache)
-	NextMemoryLevel<int, int>* nextMemoryLevel;
+	NextMemoryLevel* nextMemoryLevel;
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers
