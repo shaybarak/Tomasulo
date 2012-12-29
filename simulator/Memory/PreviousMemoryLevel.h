@@ -9,7 +9,7 @@
  */
 class PreviousMemoryLevel {
 public:
-	PreviousMemoryLevel(MemoryInterface<int, int>* memoryInterface)
+	PreviousMemoryLevel(MemoryInterface* memoryInterface)
 		: memoryInterface(memoryInterface) {}
 	/** Responds to data read request. */
 	void respondRead(int address, int data, int notBefore);
@@ -22,5 +22,5 @@ public:
 	// There are no write responses. Writer doesn't wait for confirmation of commit.
 
 private:
-	MemoryInterface<int, int>* memoryInterface;
+	MemoryInterface* memoryInterface;
 };
