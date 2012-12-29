@@ -26,11 +26,12 @@ bool L1Cache::read(int address, int* value) {
 
 void L1Cache::write(int address, int value) {
 	if (address < ISA::CODE_BASE) {
-		// Use instructions buffer
+		// Use instructions cache
 		instructions[toBlockNumber(address)] = value;
 		instructionsTag[address / blockSize] = toTag(address);
 		instructionsValid[address / blockSize] = true;
 	} else {
+		// Use data cache
 		data[address / sizeof(int)] = value;
 		dataTag[address / blockSize] = toTag(address);
 		dataValid[address / blockSize] = true;
