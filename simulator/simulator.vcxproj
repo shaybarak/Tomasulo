@@ -17,7 +17,7 @@
     <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\L2Cache.h" />
-    <ClInclude Include="Memory\MainMemoryStub.h" />
+    <ClInclude Include="Memory\MainMemory.h" />
     <ClInclude Include="Memory\NextMemoryLevel.h" />
     <ClInclude Include="Memory\PreviousMemoryLevel.h" />
     <ClInclude Include="Memory\TimedQueue.h" />
@@ -39,22 +39,7 @@
     <ClCompile Include="Memory\Cache.cpp" />
     <ClCompile Include="Memory\L1Cache.cpp" />
     <ClCompile Include="Memory\L2Cache.cpp" />
-    <ClCompile Include="Memory\MainMemoryStub.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</MinimalRebuild>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</BasicRuntimeChecks>
-      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
-      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
-    </ClCompile>
+    <ClCompile Include="Memory\MainMemory.cpp" />
     <ClCompile Include="Memory\NextMemoryLevel.cpp" />
     <ClCompile Include="Memory\PreviousMemoryLevel.cpp" />
     <ClCompile Include="Memory\TimedQueue.cpp" />
