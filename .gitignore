@@ -22,6 +22,7 @@ Debug
 
 # VS shit
 *.suo
+*.sln.doctstates.suo
 Debug/
 Release/
 
