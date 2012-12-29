@@ -2,14 +2,46 @@
 #include "../MIPS32/ISA.h"
 
 void L1Cache::onTick(int now) {
-	// TODO
+	int address, data;
+
+	// Get read response from L2 cache
+	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
+		write(address, value);
+		pendingReadsInternal.erase(address);
+		if (pendingReadsExternal.erase(address) > 0) {
+			// Serve incoming data to lower level
+			previousMemoryLevel->respondRead(address, data, now);
+		}
+	}
+
+	// Get read request from CPU
+	if (previousMemoryLevel->getReadRequest(&address, now)) {
+		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
+			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
+			// There is a pending read, so delay but mark this as a hit
+			hits++;
+		} else if (read(address, &data)) {
+			// Satisfied read from cache
+			hits++;
+			previousMemoryLevel->respondRead(address, data, now + accessDelay);
+		} else {
+			// Need to read from next level
+			misses++;
+			// Critical word first
+			nextMemoryLevel->requestRead(address, now + accessDelay);
+			pendingReadsExternal.insert(address);
+			// Read rest of block
+			// TODO loop around all values at sizeof(int) increments cyclically not including original address
+		}
+	}
+
+	// Get write request from CPU
+	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
+		// TODO
+	}
 }
 
 bool L1Cache::read(int address, int* value) {
-	if (pendingReads.find(address) != pendingReads.end()) {
-		// There is a pending read to this address, hence it's invalid
-		return false;
-	}
 	if (address < ISA::CODE_BASE) {
 		// Use instructions buffer
 		*value = instructions[toBlockNumber(address) + (address % sizeof(int))]
@@ -39,8 +71,6 @@ void L1Cache::write(int address, int value) {
 		dataTag[blockNumber] = tag;
 		dataValid[blockNumber] = true;
 	}
-	// If address was pending a read, no need to wait
-	pendingReads.erase(address);
 }
 
 int L1Cache::toTag(int address) {

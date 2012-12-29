@@ -16,11 +16,6 @@ void L2Cache::onTick(int now) {
 }
 
 bool L1Cache::read(int address, int* value) {
-	if (pendingReads.find(address) != pendingReads.end()) {
-		// There is a pending read to this address, hence it's invalid
-		return false;
-	}
-
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
@@ -94,8 +89,6 @@ void L1Cache::write(int address, int value) {
 		dataTag[way] = tag;
 		dataValid[way] = true;
 	}
-	// If address was pending a read, no need to wait
-	pendingReads.erase(address);
 }
 
 int L2Cache::toTag(int address) {

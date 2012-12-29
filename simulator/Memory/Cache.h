@@ -31,8 +31,10 @@ protected:
 	// Interfaces to previous & next level
 	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
-	// Memory addresses that have pending reads
-	set<int> pendingReads;
+	// Memory addresses that have pending reads internally-requested (to fill block)
+	set<int> pendingReadsInternal;
+	// Memory addresses that have pending reads externally-requested (to serve lower level)
+	set<int> pendingReadsExternal;
 
 private:
 	// Internal buffers
