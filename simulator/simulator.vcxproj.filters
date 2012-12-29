@@ -93,6 +93,12 @@
     <ClInclude Include="Memory\MainMemoryStub.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\NextMemoryLevel.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\PreviousMemoryLevel.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
@@ -138,6 +144,12 @@
       <Filter>Source Files\Clock</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MainMemoryStub.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\NextMemoryLevel.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\PreviousMemoryLevel.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
   </ItemGroup>

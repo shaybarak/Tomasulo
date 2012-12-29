@@ -15,6 +15,8 @@
     <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
     <ClInclude Include="Memory\MainMemoryStub.h" />
+    <ClInclude Include="Memory\NextMemoryLevel.h" />
+    <ClInclude Include="Memory\PreviousMemoryLevel.h" />
     <ClInclude Include="Memory\TimedQueue.h" />
     <ClInclude Include="Memory\WriteRequest.h" />
     <ClInclude Include="MIPS32\CPU.h" />
@@ -47,6 +49,8 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
     </ClCompile>
+    <ClCompile Include="Memory\NextMemoryLevel.cpp" />
+    <ClCompile Include="Memory\PreviousMemoryLevel.cpp" />
     <ClCompile Include="Memory\TimedQueue.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
     <ClCompile Include="MIPS32\GPR.cpp" />
