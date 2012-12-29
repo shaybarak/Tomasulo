@@ -44,7 +44,7 @@ void CPU::onTick(int now) {
 			return;
 		}
 		instructionReadStall = false;
-		execute(memoryOffsetToInstructionIndex(instruction));
+		execute(pcToInstructionIndex(pc));
 	}
 
 	// If not ready for next instruction
@@ -68,6 +68,7 @@ void CPU::execute(int instructionIndex) {
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
 	Instruction* instruction = instructions->at(instructionIndex);
+	int address, data;
 	switch (instruction->getOpcode()) {
 	case ISA::add:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -125,7 +126,7 @@ void CPU::execute(int instructionIndex) {
 		break;
 	case ISA::lw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		int address = (*gpr)[itype->getRs()] + itype->getImmediate();
+		address = (*gpr)[itype->getRs()] + itype->getImmediate();
 		if (!isValidMemoryAddress(address)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
 			halted = true;
@@ -138,8 +139,8 @@ void CPU::execute(int instructionIndex) {
 		break;
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		int address = (*gpr)[itype->getRs()] + itype->getImmediate();
-		int data = (*gpr)[itype->getRt()];
+		address = (*gpr)[itype->getRs()] + itype->getImmediate();
+		data = (*gpr)[itype->getRt()];
 		if (!isValidMemoryAddress(address)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
 			halted = true;
