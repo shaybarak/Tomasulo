@@ -2,10 +2,14 @@
 #include "../MIPS32/ISA.h"
 
 MainMemory::MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel) 
-	: accessDelay(accessDelay), l2BlockSize(l2BlockSize), previousMemoryLevel(previousMemoryLevel),
-	  lastReadAddress(-1), busyReadingUntil(0) {
-	buffer(ISA::RAM_SIZE);
-	words = &buffer[0];
+		: accessDelay(accessDelay), l2BlockSize(l2BlockSize), previousMemoryLevel(previousMemoryLevel),
+		  lastReadAddress(-1), busyReadingUntil(0) {
+	buffer.resize(ISA::RAM_SIZE);
+	words = (int*)&buffer[0];
+}
+
+vector<unsigned char>* MainMemory::getBuffer() { 
+	return &buffer; 
 }
 
 void MainMemory::onTick(int now) {
