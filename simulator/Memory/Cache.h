@@ -38,6 +38,12 @@ protected:
 	set<int> pendingReadsInternal;
 	// Memory addresses that have pending reads externally-requested (to serve lower level)
 	set<int> pendingReadsExternal;
+	typedef struct PendingWrite {
+		int address;
+		int data;
+	} PendingWrite;
+	// Writes that are pending due to write-allocate
+	set<PendingWrite> pendingWrites;
 
 private:
 	// Internal buffers

@@ -12,6 +12,12 @@ void L1Cache::onTick(int now) {
 			// Serve incoming data to lower level
 			previousMemoryLevel->respondRead(address, data, now);
 		}
+		pendingWrites::iterator writeAllocate = pendingWrites.find(address);
+		if (writeAllocate != pendingWrites::end()) {
+			// Was waiting for this word for write-allocate, now send write
+			nextMemoryLevel->requestWrite(*writeAllocate.address, *writeAllocate.data, now);
+			pendingWrites.erase(writeAllocate);
+		}
 	}
 
 	// Get read request from CPU
@@ -35,14 +41,44 @@ void L1Cache::onTick(int now) {
 			for (int i = 1; i <= blockSize / sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
-				pendingReadsExternal.insert(fillAddress);
+				pendingReadsInternal.insert(fillAddress);
 			}
 		}
 	}
 
 	// Get write request from CPU
 	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
-		// TODO
+		// Write-allocate so first make sure that block is present in cache
+		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
+			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
+			// There is a pending read, so delay write until read returns
+			hits++;
+			Cache::PendingWrite writeAllocate;
+			writeAllocate.address = address;
+			writeAllocate.data = data;
+			// Write critical word first
+			pendingWrites.insert(writeAllocate);
+		} else if (read(address, &data)) {
+			// Satisfied read from cache
+			hits++;
+			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
+		} else {
+			// Need to read from next level
+			misses++;
+			// Critical word first
+			nextMemoryLevel->requestRead(address, now + accessDelay);
+			// Note that the critical word is not a requested read
+			pendingReadsInternal.insert(address);
+			// Read rest of block
+			int baseOfBlock = address - (address % blockSize);
+			for (int i = 1; i <= blockSize / sizeof(int); i++) {
+				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
+				pendingReadsInternal.insert(fillAddress);
+			}
+			// Write critical word first
+			pendingWrites.insert(writeAllocate);
+		}
 	}
 }
 
