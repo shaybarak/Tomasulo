@@ -58,7 +58,7 @@ bool L2Cache::read(int address, int* value) {
 	}
 }
 
-void L1Cache::write(int address, int value) {
+void L2Cache::write(int address, int value) {
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
