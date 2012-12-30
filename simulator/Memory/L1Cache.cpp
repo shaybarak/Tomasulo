@@ -15,7 +15,10 @@ void L1Cache::onTick(int now) {
 		pendingWrites::iterator writeAllocate = pendingWrites.find(address);
 		if (writeAllocate != pendingWrites::end()) {
 			// Was waiting for this word for write-allocate, now send write
-			nextMemoryLevel->requestWrite(*writeAllocate.address, *writeAllocate.data, now);
+			address = *writeAllocate.address;
+			data = *writeAllocate.data;
+			write(address, data);
+			nextMemoryLevel->requestWrite(address, data, now);
 			pendingWrites.erase(writeAllocate);
 		}
 	}
@@ -38,7 +41,7 @@ void L1Cache::onTick(int now) {
 			pendingReadsExternal.insert(address);
 			// Read rest of block
 			int baseOfBlock = address - (address % blockSize);
-			for (int i = 1; i <= blockSize / sizeof(int); i++) {
+			for (int i = 1; i < blockSize / sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
@@ -61,6 +64,7 @@ void L1Cache::onTick(int now) {
 		} else if (read(address, &data)) {
 			// Satisfied read from cache
 			hits++;
+			write(address, data);
 			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
 		} else {
 			// Need to read from next level
