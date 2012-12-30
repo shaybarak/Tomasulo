@@ -31,7 +31,12 @@ void L1Cache::onTick(int now) {
 			nextMemoryLevel->requestRead(address, now + accessDelay);
 			pendingReadsExternal.insert(address);
 			// Read rest of block
-			// TODO loop around all values at sizeof(int) increments cyclically not including original address
+			int baseOfBlock = address - (address % blockSize);
+			for (int i = 1; i <= blockSize / sizeof(int); i++) {
+				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
+				pendingReadsExternal.insert(fillAddress);
+			}
 		}
 	}
 
