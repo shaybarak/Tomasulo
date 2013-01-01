@@ -8,8 +8,8 @@ void Clock::tick() {
 		(*it)->onTick(time);
 	}
 	// Notify observers forward-to-back (allows passing back values in the same clock cycle)
-	for (vector<Clocked*>::iterator it = observers.rbegin(); it < observers.rend(); it++) {
-		(*it)->onTick(time);
+	for (vector<Clocked*>::reverse_iterator rit = observers.rbegin(); rit < observers.rend(); rit++) {
+		(*rit)->onTick(time);
 	}
 }
 
