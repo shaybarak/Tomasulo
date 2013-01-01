@@ -6,17 +6,18 @@ void L1Cache::onTick(int now) {
 
 	// Get read response from L2 cache
 	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
-		write(address, value);
+		write(address, data);
 		pendingReadsInternal.erase(address);
 		if (pendingReadsExternal.erase(address) > 0) {
 			// Serve incoming data to lower level
 			previousMemoryLevel->respondRead(address, data, now);
 		}
-		pendingWrites::iterator writeAllocate = pendingWrites.find(address);
-		if (writeAllocate != pendingWrites::end()) {
+		
+		map<int, int>::iterator writeAllocate = pendingWrites.find(address);
+		if (writeAllocate != pendingWrites.end()) {
 			// Was waiting for this word for write-allocate, now send write
-			address = *writeAllocate.address;
-			data = *writeAllocate.data;
+			address = writeAllocate->first;
+			data = writeAllocate->second;
 			write(address, data);
 			nextMemoryLevel->requestWrite(address, data, now);
 			pendingWrites.erase(writeAllocate);
@@ -56,11 +57,8 @@ void L1Cache::onTick(int now) {
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay write until read returns
 			hits++;
-			Cache::PendingWrite writeAllocate;
-			writeAllocate.address = address;
-			writeAllocate.data = data;
 			// Write critical word first
-			pendingWrites.insert(writeAllocate);
+			pendingWrites[address] = data;
 		} else if (read(address, &data)) {
 			// Satisfied read from cache
 			hits++;
@@ -81,7 +79,7 @@ void L1Cache::onTick(int now) {
 				pendingReadsInternal.insert(fillAddress);
 			}
 			// Write critical word first
-			pendingWrites.insert(writeAllocate);
+			pendingWrites[address] = data;
 		}
 	}
 }
@@ -89,12 +87,12 @@ void L1Cache::onTick(int now) {
 bool L1Cache::read(int address, int* value) {
 	if (address < ISA::CODE_BASE) {
 		// Use instructions buffer
-		*value = instructions[toBlockNumber(address) + (address % sizeof(int))]
+		*value = instructions[toBlockNumber(address) + (address % sizeof(int))];
 		// Verify valid & tag
 		return instructionsValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
 	} else {
-		*value = data[toBlockNumber(address) + (address % sizeof(int))]
+		*value = data[toBlockNumber(address) + (address % sizeof(int))];
 		// Verify valid & tag
 		return dataValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
@@ -119,11 +117,11 @@ void L1Cache::write(int address, int value) {
 }
 
 int L1Cache::toTag(int address) {
-	address / (cacheSize / 2);
+	return address / (cacheSize / 2);
 }
 
 int L1Cache::toBlockNumber(int address) {
 	// The cache is partitioned 50%/50% between instructions and data,
 	// and is direct-mapped.
-	(address / blockSize) % ((cacheSize / 2) / blockSize);
+	return (address / blockSize) % ((cacheSize / 2) / blockSize);
 }

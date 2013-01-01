@@ -94,21 +94,21 @@ void L2Cache::write(int address, int value) {
 
 int L2Cache::toTag(int address) {
 	// Since there are two ways per block in the cache
-	address / (cacheSize / 4);
+	return address / (cacheSize / 4);
 }
 
 int L2Cache::toBlockNumber(int address) {
 	// The cache is partitioned 50%/50% between instructions and data,
 	// and is 2-way set associative.
-	(address / blockSize) % ((cacheSize / 4) / blockSize);// + ((cacheSize / 4) / blockSize * way);
+	return (address / blockSize) % ((cacheSize / 4) / blockSize);// + ((cacheSize / 4) / blockSize * way);
 }
 
 int L2Cache::toWayInstruction(int blockNumber, int way) {
 	// Ways are sequential in the instruction cache (first all of way 0, then all of way 1).
-	blockNumber + ((cacheSize / 4) / blockSize * way);
+	return blockNumber + ((cacheSize / 4) / blockSize * way);
 }
 
 int L2Cache::toWayData(int blockNumber, int way) {
 	// Ways are interleaved in the data cache (way 0, way 1, way 0, way 1...)
-	blockNumber + way;
+	return blockNumber + way;
 }
