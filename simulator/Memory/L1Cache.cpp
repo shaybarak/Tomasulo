@@ -68,12 +68,8 @@ void L1Cache::onTick(int now) {
 			// Need to read from next level
 			misses++;
 			// Critical word first
-			nextMemoryLevel->requestRead(address, now + accessDelay);
-			// Note that the critical word is not a requested read
-			pendingReadsInternal.insert(address);
-			// Read rest of block
 			int baseOfBlock = address - (address % blockSize);
-			for (int i = 1; i <= blockSize / sizeof(int); i++) {
+			for (int i = 0; i < blockSize / sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
