@@ -16,6 +16,8 @@ private:
 	int toBlockNumber(int address);
 	int toWayInstruction(int blockNumber, int way);
 	int toWayData(int blockNumber, int way);
+	bool read(int address, int* value);
+	void write(int address, int value);
 
 	vector<bool> instructionsDirty;
 	vector<bool> dataDirty;

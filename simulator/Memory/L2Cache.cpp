@@ -1,4 +1,5 @@
 #include "L2Cache.h"
+#include "../MIPS32/ISA.h"
 
 L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
@@ -96,7 +97,7 @@ int L2Cache::toTag(int address) {
 	address / (cacheSize / 4);
 }
 
-int L2Cache::toBlockNumber(int address, int way) {
+int L2Cache::toBlockNumber(int address) {
 	// The cache is partitioned 50%/50% between instructions and data,
 	// and is 2-way set associative.
 	(address / blockSize) % ((cacheSize / 4) / blockSize);// + ((cacheSize / 4) / blockSize * way);
