@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
 	GPR gpr;
 	// Initialize CPU
 	CPU cpu(&cpuToL1, ISA::RAM_SIZE, &gpr);
-	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE);
+	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE>>2);
 	Clock sysClock;
 	sysClock.addObserver(&cpu);
 	while (!cpu.isHalted()) {
