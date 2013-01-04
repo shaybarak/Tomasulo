@@ -15,7 +15,82 @@ L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 }
 
 void L2Cache::onTick(int now) {
-	// TODO
+	int address, data;
+
+	// Get read response from L2 cache
+	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
+		write(address, data);
+		pendingReadsInternal.erase(address);
+		if (pendingReadsExternal.erase(address) > 0) {
+			// Serve incoming data to lower level
+			previousMemoryLevel->respondRead(address, data, now);
+		}
+		
+		map<int, int>::iterator writeAllocate = pendingWrites.find(address);
+		if (writeAllocate != pendingWrites.end()) {
+			// Was waiting for this word for write-allocate, now send write
+			address = writeAllocate->first;
+			data = writeAllocate->second;
+			write(address, data);
+			nextMemoryLevel->requestWrite(address, data, now);
+			pendingWrites.erase(writeAllocate);
+		}
+	}
+
+	// Get read request from CPU
+	if (previousMemoryLevel->getReadRequest(&address, now)) {
+		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
+			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
+			// There is a pending read, so delay but mark this as a hit
+			hits++;
+		} else if (read(address, &data)) {
+			// Satisfied read from cache
+			hits++;
+			previousMemoryLevel->respondRead(address, data, now + accessDelay);
+		} else {
+			// Need to read from next level
+			misses++;
+			// Critical word first
+			nextMemoryLevel->requestRead(address, now + accessDelay);
+			pendingReadsExternal.insert(address);
+			// Read rest of block
+			int baseOfBlock = address - (address % blockSize);
+			for (int i = 1; i < blockSize / sizeof(int); i++) {
+				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
+				pendingReadsInternal.insert(fillAddress);
+			}
+		}
+	}
+
+	// Get write request from CPU
+	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
+		// Write-allocate so first make sure that block is present in cache
+		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
+			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
+			// There is a pending read, so delay write until read returns
+			hits++;
+			// Write critical word first
+			pendingWrites[address] = data;
+		} else if (read(address, &data)) {
+			// Satisfied read from cache
+			hits++;
+			write(address, data);
+			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
+		} else {
+			// Need to read from next level
+			misses++;
+			// Critical word first
+			int baseOfBlock = address - (address % blockSize);
+			for (int i = 0; i < blockSize / sizeof(int); i++) {
+				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
+				pendingReadsInternal.insert(fillAddress);
+			}
+			// Write critical word first
+			pendingWrites[address] = data;
+		}
+	}
 }
 
 bool L2Cache::read(int address, int* value) {

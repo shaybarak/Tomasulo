@@ -24,9 +24,9 @@ protected:
 	 */
 	virtual bool evict(int address) = 0;
 	// Maps an address to a tag
-	virtual int toTag(int address);
+	virtual int toTag(int address) = 0;
 	// Maps a memory address to a block number
-	virtual int toBlockNumber(int address);
+	virtual int toBlockNumber(int address) = 0;
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;
