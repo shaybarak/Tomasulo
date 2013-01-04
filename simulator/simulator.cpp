@@ -24,14 +24,14 @@ enum retvals {
 	BAD_CONFIG=4,	// Missing configuration value
 };
 
-bool openFile(ifstream& file, const char* filename) {
+/*bool openFile(ifstream& file, const char* filename) {
 	file.open(filename);
 	if (!file) {
 		cerr << "Error opening " << filename << endl;
 		return false;
 	}
 	return true;
-}
+}*/
 
 /*bool openFile(ofstream& file, const char* filename) {
 	file.open(filename);
@@ -42,15 +42,6 @@ bool openFile(ifstream& file, const char* filename) {
 	return true;
 }*/
 
-bool openFileRead(fstream& file, const char* filename) {
-	return openFile(file, filename, ios_base::in);
-};
-
-bool openFileWrite(fstream& file, const char* filename) {
-	return openFile(file, filename, ios_base::out);
-};
-
-
 bool openFile(fstream& file, const char* filename, ios_base::openmode openmode) {
 	file.open(filename, openmode);
 	if (!file) {
@@ -59,6 +50,14 @@ bool openFile(fstream& file, const char* filename, ios_base::openmode openmode) 
 	}
 	return true;
 }
+
+bool openFileRead(fstream& file, const char* filename) {
+	return openFile(file, filename, ios_base::in);
+};
+
+bool openFileWrite(fstream& file, const char* filename) {
+	return openFile(file, filename, ios_base::out);
+};
 
 bool readConfig(const Configuration& config, const string& key, int* value) {
 	if (!config.get(key, value)) {
