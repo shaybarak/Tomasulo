@@ -144,3 +144,15 @@ int L1Cache::toBlockNumber(int address) {
 	// and is direct-mapped.
 	return (address / blockSize) % ((cacheSize / 2) / blockSize);
 }
+
+int L1Cache::toAddress(int tag, int blockNumber, int blockOffset) {
+	return (tag * (cacheSize / 2)) + (blockNumber * blockSize) + blockOffset;
+}
+
+int* L1Cache::getInstructionPtr(int blockNumber, int blockOffset) {
+	&instructions[way + ((address % blockSize) / sizeof(int))];
+}
+
+int* L1Cache::getDataPtr(int blockNumber, int blockOffset) {
+	&data[way + ((address % blockSize) / sizeof(int))];
+}

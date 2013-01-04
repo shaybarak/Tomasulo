@@ -14,6 +14,7 @@ protected:
 	virtual bool evict(int address);
 	virtual int toTag(int address);
 	virtual int toBlockNumber(int address);
+	virtual int toAddress(int tag, int blockNumber, int blockOffset);
 
 private:
 	/**
@@ -21,7 +22,7 @@ private:
 	 * If invalid does not send a read request to the next level.
 	 *
 	 * address: byte offset
-	 * value: output
+	 * value: output - data in associated block even if not valid or tag mismatch
 	 * Returns whether valid. 
 	 */
 	bool read(int address, int* value);

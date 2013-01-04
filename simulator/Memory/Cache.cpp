@@ -15,3 +15,11 @@ Cache::Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 	dataValid.resize(dataTag.size());
 	data = (int*)&dataBuffer[0];
 }
+
+int* Cache::getInstructionPtr(int blockNumber, int blockOffset) {
+	&instructions[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
+}
+
+int* Cache::getDataPtr(int blockNumber, int blockOffset) {
+	&data[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
+}

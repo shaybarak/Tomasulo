@@ -27,6 +27,12 @@ protected:
 	virtual int toTag(int address) = 0;
 	// Maps a memory address to a block number
 	virtual int toBlockNumber(int address) = 0;
+	// Builds a memory address out of the tag, block number and block offset
+	virtual int toAddress(int tag, int blockNumber, int blockOffset) = 0;
+	// Get pointer to instruction from cache
+	int* getInstructionPtr(int blockNumber, int blockOffset);
+	// Get pointer to data from cache
+	int* getDataPtr(int blockNumber, int blockOffset);
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;
@@ -48,7 +54,7 @@ protected:
 	set<int> pendingReadsInternal;
 	// Memory addresses that have pending reads externally-requested (to serve lower level)
 	set<int> pendingReadsExternal;
-	// Writes that are pending due to write-allocate
+	// Writes that are pending due to write-allocate or write-back
 	map<int, int> pendingWrites;
 
 private:
