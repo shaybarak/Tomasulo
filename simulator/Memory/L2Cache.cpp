@@ -28,12 +28,12 @@ bool L2Cache::read(int address, int* value) {
 		int way1 = toWayInstruction(blockNumber, 1);
 		if (instructionsValid[way0] && (instructionsTag[way0] == toTag(address))) {
 			// Present in way 0
-			*value = instructions[way0 + (address % sizeof(int))];
+			*value = instructions[way0 + ((address % blockSize) / sizeof(int))];
 			instructionsWay0IsLru[blockNumber] = false;
 			return true;
 		} else if (instructionsValid[way1] && (instructionsTag[way1] == toTag(address))) {
 			// Present in way 1
-			*value = instructions[way0 + (address % sizeof(int))];
+			*value = instructions[way1 + ((address % blockSize) / sizeof(int))];
 			instructionsWay0IsLru[blockNumber] = true;
 			return true;
 		} else {
@@ -46,12 +46,12 @@ bool L2Cache::read(int address, int* value) {
 		int way1 = toWayData(blockNumber, 1);
 		if (dataValid[way0] && (dataTag[way0] == tag)) {
 			// Present in way 0
-			*value = data[way0 + (address % sizeof(int))];
+			*value = data[way0 + ((address % blockSize) / sizeof(int))];
 			dataWay0IsLru[blockNumber] = false;
 			return true;
 		} else if (dataValid[way1] && (dataTag[way1] == tag)) {
 			// Present in way 1
-			*value = data[way0 + (address % sizeof(int))];
+			*value = data[way1 + ((address % blockSize) / sizeof(int))];
 			dataWay0IsLru[blockNumber] = true;
 			return true;
 		} else {
@@ -75,7 +75,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayInstruction(blockNumber, 1);
 		}
-		instructions[way] = value;
+		instructions[way + ((address % blockSize) / sizeof(int))] = value;
 		if (instructionsTag[way] != tag) {
 			// Need to evict old block
 			evict(address);
@@ -92,7 +92,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayData(blockNumber, 1);
 		}
-		data[way] = value;
+		data[way + ((address % blockSize) / sizeof(int))] = value;
 		if (dataTag[way] != tag) {
 			// Need to evict old block
 			evict(address);

@@ -83,12 +83,12 @@ void L1Cache::onTick(int now) {
 bool L1Cache::read(int address, int* value) {
 	if (ISA::isCodeAddress(address)) {
 		// Use instructions buffer
-		*value = instructions[toBlockNumber(address) + (address % sizeof(int))];
+		*value = instructions[toBlockNumber(address) + ((address % blockSize) / sizeof(int))];
 		// Verify valid & tag
 		return instructionsValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
 	} else {
-		*value = data[toBlockNumber(address) + (address % sizeof(int))];
+		*value = data[toBlockNumber(address) + ((address % blockSize) / sizeof(int))];
 		// Verify valid & tag
 		return dataValid[toBlockNumber(address)]
 			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
@@ -101,12 +101,12 @@ void L1Cache::write(int address, int value) {
 
 	if (ISA::isCodeAddress(address)) {
 		// Use instructions cache
-		instructions[blockNumber] = value;
+		instructions[blockNumber + ((address % blockSize) / sizeof(int))] = value;
 		instructionsTag[blockNumber] = tag;
 		instructionsValid[blockNumber] = true;
 	} else {
 		// Use data cache
-		data[blockNumber] = value;
+		data[blockNumber + ((address % blockSize) / sizeof(int))] = value;
 		dataTag[blockNumber] = tag;
 		dataValid[blockNumber] = true;
 	}
