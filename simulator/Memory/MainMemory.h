@@ -4,6 +4,7 @@
 #include "MemoryInterface.h"
 #include "NextMemoryLevel.h"
 #include "PreviousMemoryLevel.h"
+#include "../Clock/Clocked.h"
 using namespace std;
 
 class MainMemory : public Clocked {
