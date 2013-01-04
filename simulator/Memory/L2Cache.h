@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cache.h"
+#include "L1Cache.h"
 #include "../Clock/Clocked.h"
 
 class L2Cache : public Cache, public Clocked {

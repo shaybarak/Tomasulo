@@ -4,7 +4,7 @@
 L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
 		L1Cache* l1Cache)
-		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel)
+		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel),
 		  l1Cache(l1Cache) {
 	// Also initialize dirty bits
 	instructionsDirty.resize(instructionsValid.size());
@@ -59,7 +59,7 @@ void L2Cache::onTick(int now) {
 			}
 			// Read rest of block
 			int baseOfBlock = address - (address % blockSize);
-			for (int i = 1; i < blockSize / sizeof(int); i++) {
+			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				addressToEvict = 
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
@@ -205,7 +205,7 @@ bool L2Cache::evict(int address) {
 			instructionsValid[way0] = false;
 			evicted = true;
 		} else if (instructionsTag[way1] == tag) {
-			isntructionsValid[way1] = false;
+			instructionsValid[way1] = false;
 			evicted = true;
 		}
 	} else {

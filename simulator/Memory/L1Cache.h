@@ -10,6 +10,9 @@ public:
 		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel) {}
 	virtual void onTick(int now);
 
+	//L2Cache willons use protected functions of L1Cahce and vice versa
+	friend class L2Cache;
+
 protected:
 	virtual bool evict(int address);
 	virtual int toTag(int address);
