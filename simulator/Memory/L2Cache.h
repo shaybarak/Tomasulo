@@ -16,10 +16,6 @@ protected:
 	virtual int toBlockNumber(int address);
 
 private:
-	// Maps an address to a tag
-	int toTag(int address);
-	// Maps a memory address to a block number and way (way is 0 or 1)
-	int toBlockNumber(int address);
 	int toWayInstruction(int blockNumber, int way);
 	int toWayData(int blockNumber, int way);
 	bool read(int address, int* value);
