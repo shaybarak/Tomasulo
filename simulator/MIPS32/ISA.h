@@ -8,6 +8,8 @@ using namespace std;
  */
 class ISA {
 public:
+	// Returns whether the address is for code
+	static bool isCodeAddress(int address);
 	enum Opcode {
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};

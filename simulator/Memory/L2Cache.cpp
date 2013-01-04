@@ -20,7 +20,7 @@ bool L2Cache::read(int address, int* value) {
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
-	if (address < ISA::CODE_BASE) {
+	if (ISA::isCodeAddress(address)) {
 		// Use instructions buffer
 		int way0 = toWayInstruction(blockNumber, 0);
 		int way1 = toWayInstruction(blockNumber, 1);
@@ -63,7 +63,7 @@ void L2Cache::write(int address, int value) {
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
-	if (address < ISA::CODE_BASE) {
+	if (ISA::isCodeAddress(address)) {
 		// Use instructions cache
 		int way;
 		if (instructionsWay0IsLru[blockNumber]) {
