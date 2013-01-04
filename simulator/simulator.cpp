@@ -183,6 +183,7 @@ int main(int argc, char** argv) {
 	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE>>2);
 	Clock sysClock;
 	sysClock.addObserver(&cpu);
+	sysClock.addObserver(&ram);
 	while (!cpu.isHalted()) {
 		sysClock.tick();
 	}
