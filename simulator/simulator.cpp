@@ -24,24 +24,6 @@ enum retvals {
 	BAD_CONFIG=4,	// Missing configuration value
 };
 
-/*bool openFile(ifstream& file, const char* filename) {
-	file.open(filename);
-	if (!file) {
-		cerr << "Error opening " << filename << endl;
-		return false;
-	}
-	return true;
-}*/
-
-/*bool openFile(ofstream& file, const char* filename) {
-	file.open(filename);
-	if (!file) {
-		cerr << "Error opening " << filename << endl;
-		return false;
-	}
-	return true;
-}*/
-
 bool openFile(fstream& file, const char* filename, ios_base::openmode openmode) {
 	file.open(filename, openmode);
 	if (!file) {
