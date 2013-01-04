@@ -17,11 +17,11 @@
 using namespace std;
 
 enum retvals {
-	SUCCESS,	// Alles gut!
-	BAD_USAGE,	// Invalid cmdline invocation
-	FIO_ERROR,	// File I/O error
-	BAD_INPUT,	// Bad formatting in one or more input files
-	BAD_CONFIG,	// Missing configuration value
+	SUCCESS=0,	// Alles gut!
+	BAD_USAGE=1,	// Invalid cmdline invocation
+	FIO_ERROR=2,	// File I/O error
+	BAD_INPUT=3,	// Bad formatting in one or more input files
+	BAD_CONFIG=4,	// Missing configuration value
 };
 
 bool openFile(ifstream& file, const char* filename) {
@@ -33,17 +33,26 @@ bool openFile(ifstream& file, const char* filename) {
 	return true;
 }
 
-bool openFile(ofstream& file, const char* filename) {
+/*bool openFile(ofstream& file, const char* filename) {
 	file.open(filename);
 	if (!file) {
 		cerr << "Error opening " << filename << endl;
 		return false;
 	}
 	return true;
-}
+}*/
 
-bool openFile(fstream& file, const char* filename) {
-	file.open(filename);
+bool openFileRead(fstream& file, const char* filename) {
+	return openFile(file, filename, ios_base::in);
+};
+
+bool openFileWrite(fstream& file, const char* filename) {
+	return openFile(file, filename, ios_base::out);
+};
+
+
+bool openFile(fstream& file, const char* filename, ios_base::openmode openmode) {
+	file.open(filename, openmode);
 	if (!file) {
 		cerr << "Error opening " << filename << endl;
 		return false;
@@ -100,12 +109,12 @@ int main(int argc, char** argv) {
 	fstream cmd_file, config_file, regs_dump, mem_dump, mem_init, 
 			time_txt, committed_txt, hitrate, L1i, L1d, L2i, L2d;
 	
-	if (!openFile(cmd_file, argv[1]) || !openFile(config_file, argv[2]) ||
-		!openFile(mem_init, argv[3]) || !openFile(regs_dump, argv[4]) ||
-		!openFile(mem_dump, argv[5]) || !openFile(time_txt, argv[6]) ||
-		!openFile(committed_txt, argv[7]) || !openFile(hitrate, argv[8]) ||
-		!openFile(L1i, argv[9]) || !openFile(L1d, argv[10]) ||
-		!openFile(L2i, argv[11]) || !openFile(L2d, argv[12])) {
+	if (!openFileRead(cmd_file, argv[1]) || !openFileRead(config_file, argv[2]) ||
+		!openFileRead(mem_init, argv[3]) || !openFileWrite(regs_dump, argv[4]) ||
+		!openFileWrite(mem_dump, argv[5]) || !openFileWrite(time_txt, argv[6]) ||
+		!openFileWrite(committed_txt, argv[7]) || !openFileWrite(hitrate, argv[8]) ||
+		!openFileWrite(L1i, argv[9]) || !openFileWrite(L1d, argv[10]) ||
+		!openFileWrite(L2i, argv[11]) || !openFileWrite(L2d, argv[12])) {
 		return FIO_ERROR;
 	}
 
