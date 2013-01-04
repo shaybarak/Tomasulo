@@ -10,6 +10,9 @@ public:
 		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel) {}
 	virtual void onTick(int now);
 
+protected:
+	virtual bool evict(int address);
+
 private:
 	/**
 	 * Reads a memory word from cache.

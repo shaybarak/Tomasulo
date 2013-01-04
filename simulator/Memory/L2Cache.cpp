@@ -2,8 +2,10 @@
 #include "../MIPS32/ISA.h"
 
 L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
-		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel) {
+		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
+		L1Cache* l1Cache)
+		: Cache(buffer, blockSize, cacheSize, accessDelay, previousMemoryLevel, nextMemoryLevel)
+		  l1Cache(l1Cache) {
 	// Also initialize dirty bits
 	instructionsDirty.resize(instructionsValid.size());
 	dataDirty.resize(dataValid.size());
@@ -90,6 +92,45 @@ void L2Cache::write(int address, int value) {
 		dataTag[way] = tag;
 		dataValid[way] = true;
 	}
+}
+
+bool L2Cache::evict(int address) {
+	int blockNumber = toBlockNumber(address);
+	int tag = toTag(address);
+	bool evicted = false;
+
+	if (ISA::isCodeAddress(address)) {
+		// Evict from instructions cache if present
+		int way0 = toWayInstruction(blockNumber, 0);
+		int way1 = toWayInstruction(blockNumber, 1);
+		// Look for a match in both ways
+		if (instructionsTag[way0] == tag) {
+			instructionsValid[way0] = false;
+			evicted = true;
+		} else if (instructionsTag[way1] == tag) {
+			isntructionsValid[way1] = false;
+			evicted = true;
+		}
+	} else {
+		// Evict from data cache if present
+		int way0 = toWayData(blockNumber, 0);
+		int way1 = toWayData(blockNumber, 1);
+		// Look for a match in both ways
+		if (dataTag[way0] == tag) {
+			dataValid[way0] = false;
+			evicted = true;
+		} else if (dataTag[way1] == tag) {
+			dataValid[way1] = false;
+			evicted = true;
+		}
+	}
+
+	// Also tell L1 cache to evict if present (since it is inclusive in L2)
+	if (l1Cache != NULL) {
+		l1Cache->evict(address);
+	}
+
+	return evicted;
 }
 
 int L2Cache::toTag(int address) {

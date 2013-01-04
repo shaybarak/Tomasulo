@@ -18,6 +18,11 @@ public:
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
 protected:
+	/**
+	 * Evicts from cache by memory address.
+	 * Returns whether address was present in the cache and was evicted.
+	 */
+	virtual bool evict(int address) = 0;
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;

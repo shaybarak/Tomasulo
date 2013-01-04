@@ -6,8 +6,12 @@
 class L2Cache : public Cache, public Clocked {
 public:
 	L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
+		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
+		L1Cache* l1Cache);
 	virtual void onTick(int now);
+
+protected:
+	virtual bool evict(int address);
 
 private:
 	// Maps an address to a tag
@@ -23,4 +27,7 @@ private:
 	vector<bool> dataDirty;
 	vector<bool> instructionsWay0IsLru;
 	vector<bool> dataWay0IsLru;
+
+	// Associated L1 cache
+	L1Cache* l1Cache;
 };

@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
 	// Initialize L2
 	vector<char> l2Buffer(l2_cache_size);
 	L2Cache l2Cache((int*)&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
-		&l2ToL1, &l2ToMainmemory);
+		&l2ToL1, &l2ToMainmemory, &l1Cache);
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to CPU
 	MainMemory ram(mem_access_delay, l2_block_size, &l1ToCpu);
