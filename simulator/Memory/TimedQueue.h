@@ -30,9 +30,13 @@ void TimedQueue<T>::push(const T& element, int notBefore) {
 
 template <typename T>
 bool TimedQueue<T>::pop(T* element, int notAfter) {
+	if (q.empty()) {
+		return false;
+	}
 	struct TimedQueue::element elem = q.front();
 	if (elem.notBefore <= notAfter) {
 		*element = elem.value;
+		q.pop();
 		return true;
 	} else {
 		return false;
