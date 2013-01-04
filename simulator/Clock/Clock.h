@@ -11,7 +11,10 @@ public:
 	Clock() : time(0) {}
 	// Initializes clock with a given start time
 	Clock(int time) : time(time) {}
-	// Register a new clocked component
+	/**
+	 * Register a new clocked component.
+	 * Clocked components must be registered in the order that they are chained (client first).
+	 */
 	void addObserver(Clocked* clocked);
 	// Generate a clock tick and notify all clocked components
 	void tick();
