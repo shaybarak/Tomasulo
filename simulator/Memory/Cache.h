@@ -19,10 +19,14 @@ public:
 
 protected:
 	/**
-	 * Evicts from cache by memory address.
+	 * Evicts a block from cache by address.
 	 * Returns whether address was present in the cache and was evicted.
 	 */
 	virtual bool evict(int address) = 0;
+	// Maps an address to a tag
+	virtual int toTag(int address);
+	// Maps a memory address to a block number
+	virtual int toBlockNumber(int address);
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;

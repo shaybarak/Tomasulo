@@ -96,7 +96,6 @@ bool L1Cache::read(int address, int* value) {
 }
 
 void L1Cache::write(int address, int value) {
-	evict(address);
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
@@ -111,28 +110,6 @@ void L1Cache::write(int address, int value) {
 		dataTag[blockNumber] = tag;
 		dataValid[blockNumber] = true;
 	}
-}
-
-bool L1Cache::evict(int address) {
-	int blockNumber = toBlockNumber(address);
-	int tag = toTag(address);
-	bool evicted = false;
-
-	if (ISA::isCodeAddress(address)) {
-		// Evict from instructions cache if present
-		if (instructionsTag[blockNumber] == tag) {
-			evicted = instructionsValid[blockNumber];
-			instructionsValid[blockNumber] = false;
-		}
-	} else {
-		// Evict from data cache if present
-		if (dataTag[blockNumber] == tag) {
-			evicted = dataValid[blockNumber];
-			dataValid[blockNumber] = false;
-		}
-	}
-
-	return evicted;
 }
 
 int L1Cache::toTag(int address) {

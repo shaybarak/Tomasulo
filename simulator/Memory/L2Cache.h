@@ -11,7 +11,8 @@ public:
 	virtual void onTick(int now);
 
 protected:
-	virtual bool evict(int address);
+	virtual int toTag(int address);
+	virtual int toBlockNumber(int address);
 
 private:
 	// Maps an address to a tag

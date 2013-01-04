@@ -62,7 +62,6 @@ bool L2Cache::read(int address, int* value) {
 }
 
 void L2Cache::write(int address, int value) {
-	evict(address);
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
@@ -77,6 +76,10 @@ void L2Cache::write(int address, int value) {
 			way = toWayInstruction(blockNumber, 1);
 		}
 		instructions[way] = value;
+		if (instructionsTag[way] != tag) {
+			// Need to evict old block
+			evict(address);
+		}
 		instructionsTag[way] = tag;
 		instructionsValid[way] = true;
 	} else {
@@ -90,6 +93,10 @@ void L2Cache::write(int address, int value) {
 			way = toWayData(blockNumber, 1);
 		}
 		data[way] = value;
+		if (dataTag[way] != tag) {
+			// Need to evict old block
+			evict(address);
+		}
 		dataTag[way] = tag;
 		dataValid[way] = true;
 	}

@@ -11,7 +11,8 @@ public:
 	virtual void onTick(int now);
 
 protected:
-	virtual bool evict(int address);
+	virtual int toTag(int address);
+	virtual int toBlockNumber(int address);
 
 private:
 	/**
@@ -32,9 +33,4 @@ private:
 	 * value: input
 	 */
 	void write(int address, int value);
-
-	// Maps an address to a tag
-	int toTag(int address);
-	// Maps a memory address to a block number
-	int toBlockNumber(int address);
 };
