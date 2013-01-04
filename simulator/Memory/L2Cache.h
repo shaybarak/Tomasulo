@@ -14,11 +14,30 @@ protected:
 	virtual bool evict(int address);
 	virtual int toTag(int address);
 	virtual int toBlockNumber(int address);
+	virtual int toAddress(int tag, int blockNumber, int blockOffset);
 
 private:
 	int toWayInstruction(int blockNumber, int way);
 	int toWayData(int blockNumber, int way);
-	bool read(int address, int* value);
+	/**
+	 * Reads a memory word from cache.
+	 * If invalid does not send a read request to the next level.
+	 *
+	 * address: byte offset
+	 * value: output - data read if valid or data present in associated LRU way
+	 *        (to evict when read from next level returns)
+	 * addressToEvict: address of data present in associated LRU way if needs evicting
+	 *                 or negative otherwise
+	 * Returns whether valid. 
+	 */
+	bool read(int address, int* value, int* addressToEvict);
+	/**
+	 * Writes a memory word to cache.
+	 * Does not send a write request to the next level.
+	 *
+	 * address: byte offset
+	 * value: input
+	 */
 	void write(int address, int value);
 
 	vector<bool> instructionsDirty;

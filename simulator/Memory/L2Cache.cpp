@@ -15,7 +15,7 @@ L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 }
 
 void L2Cache::onTick(int now) {
-	int address, data;
+	int address, data, addressToEvict;
 
 	// Get read response from L2 cache
 	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
@@ -26,14 +26,14 @@ void L2Cache::onTick(int now) {
 			previousMemoryLevel->respondRead(address, data, now);
 		}
 		
-		map<int, int>::iterator writeAllocate = pendingWrites.find(address);
-		if (writeAllocate != pendingWrites.end()) {
+		map<int, int>::iterator writeBack = pendingWrites.find(address);
+		if (writeBack != pendingWrites.end()) {
 			// Was waiting for this word for write-allocate, now send write
-			address = writeAllocate->first;
-			data = writeAllocate->second;
+			address = writeBack->first;
+			data = writeBack->second;
 			write(address, data);
 			nextMemoryLevel->requestWrite(address, data, now);
-			pendingWrites.erase(writeAllocate);
+			pendingWrites.erase(writeBack);
 		}
 	}
 
@@ -43,7 +43,7 @@ void L2Cache::onTick(int now) {
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay but mark this as a hit
 			hits++;
-		} else if (read(address, &data)) {
+		} else if (read(address, &data, &addressToEvict)) {
 			// Satisfied read from cache
 			hits++;
 			previousMemoryLevel->respondRead(address, data, now + accessDelay);
@@ -53,47 +53,35 @@ void L2Cache::onTick(int now) {
 			// Critical word first
 			nextMemoryLevel->requestRead(address, now + accessDelay);
 			pendingReadsExternal.insert(address);
+			if (addressToEvict >= 0) {
+				// Remember to write-back when read returns
+				pendingWrites[addressToEvict] = data;
+			}
 			// Read rest of block
 			int baseOfBlock = address - (address % blockSize);
 			for (int i = 1; i < blockSize / sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				addressToEvict = 
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
+				read(fillAddress, &data, &addressToEvict);
+				if (addressToEvict >= 0) {
+					pendingWrites[addressToEvict] = data;
+				}
 			}
 		}
 	}
 
-	// Get write request from CPU
+	// Get write request from L1 cache
 	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
-		// Write-allocate so first make sure that block is present in cache
-		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
-			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
-			// There is a pending read, so delay write until read returns
-			hits++;
-			// Write critical word first
-			pendingWrites[address] = data;
-		} else if (read(address, &data)) {
-			// Satisfied read from cache
-			hits++;
-			write(address, data);
-			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
-		} else {
-			// Need to read from next level
-			misses++;
-			// Critical word first
-			int baseOfBlock = address - (address % blockSize);
-			for (int i = 0; i < blockSize / sizeof(int); i++) {
-				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
-				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
-				pendingReadsInternal.insert(fillAddress);
-			}
-			// Write critical word first
-			pendingWrites[address] = data;
-		}
+		write(address, data);
+		// TODO not actually done, need to write-back if eviction is required
+		// Consider changing interface to detect conflict separately
+		// (will also simplify reads considerably)
 	}
 }
 
-bool L2Cache::read(int address, int* value) {
+bool L2Cache::read(int address, int* value, int* addressToEvict) {
 	int blockNumber = toBlockNumber(address);
 	int tag = toTag(address);
 
@@ -103,16 +91,29 @@ bool L2Cache::read(int address, int* value) {
 		int way1 = toWayInstruction(blockNumber, 1);
 		if (instructionsValid[way0] && (instructionsTag[way0] == toTag(address))) {
 			// Present in way 0
-			*value = instructions[way0 + ((address % blockSize) / sizeof(int))];
+			*value = *getInstructionsPtr(way0, address % blockSize);
 			instructionsWay0IsLru[blockNumber] = false;
 			return true;
 		} else if (instructionsValid[way1] && (instructionsTag[way1] == toTag(address))) {
 			// Present in way 1
-			*value = instructions[way1 + ((address % blockSize) / sizeof(int))];
+			*value = *getInstructionsPtr(way1, address % blockSize);
 			instructionsWay0IsLru[blockNumber] = true;
 			return true;
 		} else {
 			// Not present
+			// Return value in LRU way (will be written back to next level on eviction)
+			int lruWay;
+			if (instructionsWay0IsLru[blockNumber]) {
+				lruWay = way0;
+			} else {
+				lruWay = way1;
+			}
+			*value = *getInstructionsPtr(lruWay, address % blockSize);
+			if (instructionsValid[lruWay]) {
+				*addressToEvict = toAddress(instructionsTag[lruWay], blockNumber, address % blockSize);
+			} else {
+				*addressToEvict = -1;
+			}
 			return false;
 		}
 	} else {
@@ -121,16 +122,29 @@ bool L2Cache::read(int address, int* value) {
 		int way1 = toWayData(blockNumber, 1);
 		if (dataValid[way0] && (dataTag[way0] == tag)) {
 			// Present in way 0
-			*value = data[way0 + ((address % blockSize) / sizeof(int))];
+			*value = *getDataPtr(way0, address % blockSize);
 			dataWay0IsLru[blockNumber] = false;
 			return true;
 		} else if (dataValid[way1] && (dataTag[way1] == tag)) {
 			// Present in way 1
-			*value = data[way1 + ((address % blockSize) / sizeof(int))];
+			*value = *getDataPtr(way1, address % blockSize);
 			dataWay0IsLru[blockNumber] = true;
 			return true;
 		} else {
 			// Not present
+			// Return value in LRU way (will be written back to next level on eviction)
+			int lruWay;
+			if (dataWay0IsLru[blockNumber]) {
+				lruWay = way0;
+			} else {
+				lruWay = way1;
+			}
+			*value = *getDataPtr(lruWay, address % blockSize);
+			if (dataValid[lruWay]) {
+				*addressToEvict = toAddress(dataTag[lruWay], blockNumber, address % blockSize);
+			} else {
+				*addressToEvict = -1;
+			}
 			return false;
 		}
 	}
@@ -150,7 +164,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayInstruction(blockNumber, 1);
 		}
-		instructions[way + ((address % blockSize) / sizeof(int))] = value;
+		*toInstructionsPtr(way, address % blockSize) = value;
 		if (instructionsTag[way] != tag) {
 			// Need to evict old block
 			evict(address);
@@ -167,7 +181,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayData(blockNumber, 1);
 		}
-		data[way + ((address % blockSize) / sizeof(int))] = value;
+		*toDataPtr(way, address % blockSize) = value;
 		if (dataTag[way] != tag) {
 			// Need to evict old block
 			evict(address);
@@ -225,6 +239,10 @@ int L2Cache::toBlockNumber(int address) {
 	// The cache is partitioned 50%/50% between instructions and data,
 	// and is 2-way set associative.
 	return (address / blockSize) % ((cacheSize / 4) / blockSize);// + ((cacheSize / 4) / blockSize * way);
+}
+
+int L2Cache::toAddress(int tag, int blockNumber, int blockOffset) {
+	return (tag * (cacheSize / 4)) + (blockNumber * blockSize) + blockOffset;
 }
 
 int L2Cache::toWayInstruction(int blockNumber, int way) {
