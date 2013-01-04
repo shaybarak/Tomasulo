@@ -6,7 +6,7 @@
 #include "PreviousMemoryLevel.h"
 using namespace std;
 
-class MainMemory {
+class MainMemory : public Clocked {
 public:
 	MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel);
 	// WARNING: exposes non-const pointer to data member
