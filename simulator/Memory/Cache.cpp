@@ -17,9 +17,9 @@ Cache::Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 }
 
 int* Cache::getInstructionPtr(int blockNumber, int blockOffset) {
-	&instructions[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
+	return &instructions[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
 }
 
 int* Cache::getDataPtr(int blockNumber, int blockOffset) {
-	&data[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
+	return &data[(blockNumber * blockSize / sizeof(int)) + (blockOffset / sizeof(int))];
 }
