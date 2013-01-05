@@ -34,20 +34,22 @@ protected:
 	 * addressOut: conflicting address (if returned conflicting)
 	 */
 	virtual outcome isPresent(int addressIn, int* addressOut) = 0;
+	
 	/**
 	 * Reads from cache.
-	 * addressIn: memory address to read from.
-	 * dataOut: memory value read from cache.
-	 * May read uninitialized data, users should precede with a call to isPresent.
+	 * address: memory address to read from.
+	 * May return uninitialized data, users should precede with a call to isPresent.
 	 */
-	virtual void read(int addressIn, int* dataOut) = 0;
+	virtual int read(int address) = 0;
+	
 	/**
 	 * Writes to cache.
-	 * addressIn: memory address to write to.
-	 * dataIn: memory value to write.
+	 * address: memory address to write to.
+	 * data: memory value to write.
 	 * May overwrite previous data, users should precede with a call to isPresent.
 	 */
-	virtual void write(int addressIn, int dataIn) = 0;
+	virtual void write(int address, int data) = 0;
+	
 	/**
 	 * Evicts a block from cache by address.
 	 * If address was not present in the cache, does nothing.
@@ -61,12 +63,16 @@ protected:
 	// Returns tag of address
 	int toTag(int address);
 	// Builds a memory address out of the tag, index and offset
-	int toAddress(int tag, int index, int offset);	
+	int toAddress(int tag, int index, int offset);
+	// Maps to instructions cache block space
+	int toInstructionsBlock(int index, int way);
+	// Maps to data cache block space
+	int toDataBlock(int index, int way);
 	
 	// Returns pointer to instruction from cache
-	int* getInstructionPtr(int tag, int index, int way, int offset);
+	int* getInstructionPtr(int index, int way, int offset);
 	// Returns pointer to data from cache
-	int* getDataPtr(int tag, int index, int way, int offset);
+	int* getDataPtr(int index, int way, int offset);
 	
 	// Dimensions in bytes
 	int blockSize;
