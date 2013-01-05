@@ -90,12 +90,12 @@ bool L2Cache::read(int address, int* value, int* addressToEvict) {
 		int way1 = toWayInstruction(blockNumber, 1);
 		if (instructionsValid[way0] && (instructionsTag[way0] == toTag(address))) {
 			// Present in way 0
-			*value = *getInstructionsPtr(way0, address % blockSize);
+			*value = *getInstructionPtr(way0, address % blockSize);
 			instructionsWay0IsLru[blockNumber] = false;
 			return true;
 		} else if (instructionsValid[way1] && (instructionsTag[way1] == toTag(address))) {
 			// Present in way 1
-			*value = *getInstructionsPtr(way1, address % blockSize);
+			*value = *getInstructionPtr(way1, address % blockSize);
 			instructionsWay0IsLru[blockNumber] = true;
 			return true;
 		} else {
@@ -107,7 +107,7 @@ bool L2Cache::read(int address, int* value, int* addressToEvict) {
 			} else {
 				lruWay = way1;
 			}
-			*value = *getInstructionsPtr(lruWay, address % blockSize);
+			*value = *getInstructionPtr(lruWay, address % blockSize);
 			if (instructionsValid[lruWay]) {
 				*addressToEvict = toAddress(instructionsTag[lruWay], blockNumber, address % blockSize);
 			} else {
@@ -163,7 +163,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayInstruction(blockNumber, 1);
 		}
-		*toInstructionsPtr(way, address % blockSize) = value;
+		*getInstructionPtr(way, address % blockSize) = value;
 		if (instructionsTag[way] != tag) {
 			// Need to evict old block
 			evict(address);
@@ -180,7 +180,7 @@ void L2Cache::write(int address, int value) {
 			// Way 1 is the LRU
 			way = toWayData(blockNumber, 1);
 		}
-		*toDataPtr(way, address % blockSize) = value;
+		*getDataPtr(way, address % blockSize) = value;
 		if (dataTag[way] != tag) {
 			// Need to evict old block
 			evict(address);
