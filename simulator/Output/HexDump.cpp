@@ -4,7 +4,6 @@ using namespace std;
 
 // Shortcut for outputting a byte as two-digit 0-padded hexadecimal
 #define HEX(x) hex << setw(2) << setfill('0') << (int)x
-#define HEXS(x) 1
 
 bool HexDump::load(vector<unsigned char>& buffer, FILE* in) {
 	while (!feof(in)) {
