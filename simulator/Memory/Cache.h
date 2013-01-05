@@ -9,7 +9,7 @@ using namespace std;
 
 class Cache {
 public:
-	Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
+	Cache(int* buffer, int blockSize, int cacheSize, int ways, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
 	const vector<unsigned char>* getInstructionsBuffer() const { return &instructionsBuffer; }
 	const vector<unsigned char>* getDataBuffer() const { return &dataBuffer; }
@@ -17,26 +17,63 @@ public:
 	int getMissCount() const { return misses; }
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
+	enum outcome {
+		PRESENT,	// Address is present in cache
+		CONFLICT,	// Cache has memory block from other address(es) in respective mapping
+		INVALID,	// Cache is invalid in respective mapping
+	}
+
 protected:
 	/**
-	 * Evicts a block from cache by address.
-	 * Returns whether address was present in the cache and was evicted.
+	 * Returns whether:
+	 * - A memory address is present in the cache
+	 * - It's conflicting with another block
+	 * - The mapping is invalid.
+	 *
+	 * addressIn: address to check
+	 * addressOut: conflicting address (if returned conflicting)
 	 */
-	virtual bool evict(int address) = 0;
-	// Maps an address to a tag
-	virtual int toTag(int address) = 0;
-	// Maps a memory address to a block number
-	virtual int toBlockNumber(int address) = 0;
-	// Builds a memory address out of the tag, block number and block offset
-	virtual int toAddress(int tag, int blockNumber, int blockOffset) = 0;
-	// Get pointer to instruction from cache
-	int* getInstructionPtr(int blockNumber, int blockOffset);
-	// Get pointer to data from cache
-	int* getDataPtr(int blockNumber, int blockOffset);
+	virtual outcome isPresent(int addressIn, int* addressOut) = 0;
+	/**
+	 * Reads from cache.
+	 * addressIn: memory address to read from.
+	 * dataOut: memory value read from cache.
+	 * May read uninitialized data, users should precede with a call to isPresent.
+	 */
+	virtual void read(int addressIn, int* dataOut) = 0;
+	/**
+	 * Writes to cache.
+	 * addressIn: memory address to write to.
+	 * dataIn: memory value to write.
+	 * May overwrite previous data, users should precede with a call to isPresent.
+	 */
+	virtual void write(int addressIn, int dataIn) = 0;
+	/**
+	 * Evicts a block from cache by address.
+	 * If address was not present in the cache, does nothing.
+	 */
+	virtual void evict(int address) = 0;
+	
+	// Returns block offset of address
+	int toOffset(int address);
+	// Returns index of address
+	int toIndex(int address);
+	// Returns tag of address
+	int toTag(int address);
+	// Builds a memory address out of the tag, index and offset
+	int toAddress(int tag, int index, int offset);	
+	
+	// Returns pointer to instruction from cache
+	int* getInstructionPtr(int tag, int index, int way, int offset);
+	// Returns pointer to data from cache
+	int* getDataPtr(int tag, int index, int way, int offset);
+	
 	// Dimensions in bytes
 	int blockSize;
 	int cacheSize;
+	int ways;
 	int accessDelay;
+	
 	// Buffers
 	int* instructions;
 	vector<int> instructionsTag;
@@ -44,12 +81,15 @@ protected:
 	int* data;
 	vector<int> dataTag;
 	vector<bool> dataValid;
+	
 	// Statistics
 	int hits;
 	int misses;
+	
 	// Interfaces to previous & next level
 	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
+	
 	// Memory addresses that have pending reads internally-requested (to fill block)
 	set<int> pendingReadsInternal;
 	// Memory addresses that have pending reads externally-requested (to serve lower level)
