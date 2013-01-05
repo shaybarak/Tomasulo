@@ -42,7 +42,7 @@ void L1Cache::onTick(int now) {
 			pendingReadsExternal.insert(address);
 			// Read rest of block
 			int baseOfBlock = address - (address % blockSize);
-			for (int i = 1; i < blockSize / sizeof(int); i++) {
+			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
@@ -69,7 +69,7 @@ void L1Cache::onTick(int now) {
 			misses++;
 			// Critical word first
 			int baseOfBlock = address - (address % blockSize);
-			for (int i = 0; i < blockSize / sizeof(int); i++) {
+			for (int i = 0; i < blockSize / (int)sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
