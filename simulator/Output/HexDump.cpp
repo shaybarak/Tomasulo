@@ -1,5 +1,8 @@
 #include "HexDump.h"
+#include <iomanip>
 using namespace std;
+
+#define HEX2D(x) setw(2) << setfill('0') << (int)base[x]
 
 bool HexDump::load(vector<unsigned char>& buffer, FILE* in) {
 	while (!feof(in)) {
@@ -21,7 +24,7 @@ bool HexDump::load(vector<unsigned char>& buffer, FILE* in) {
 
 bool HexDump::store(const vector<unsigned char>& buffer, FILE* out) {
 	// 8 bytes per line
-	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[buffer.size()] - 8; base += 8) {
+	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[0] + buffer.size() - 8; base += 8) {
 		if (fprintf(out, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
 			        base[0], base[1], base[2], base[3],
 					base[4], base[5], base[6], base[7]) < 0) {
@@ -47,14 +50,12 @@ bool HexDump::load(vector<unsigned char>& buffer, fstream& in) {
 	return true;
 }
 
-
 bool HexDump::store(const vector<unsigned char>& buffer, fstream& out) {
 	// 8 bytes per line
-	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[buffer.size()] - 8; base += 8) {
-		out.width(2);
-		out << hex <<	(int)base[0] << " " << (int)base[1] << " " << (int)base[2] << " " <<
-						(int)base[3] << " " << (int)base[4] << " " << (int)base[5] << " " << 
-						(int)base[6] << " " << (int)base[7] << endl;
+	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[0] + buffer.size() - 8; base += 8) {
+		out << hex << HEX2D(0) << HEX2D(1) << HEX2D(2) << HEX2D(3) 
+					<< HEX2D(4) << HEX2D(5) << HEX2D(6) << HEX2D(7) << endl;
+
 		if (out.fail()) {
 			return false;
 		}
