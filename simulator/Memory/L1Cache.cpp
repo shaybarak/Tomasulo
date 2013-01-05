@@ -141,30 +141,6 @@ void L1Cache::write(int address, int data) {
 	}
 }
 
-<<<<<<< HEAD
-
-int L1Cache::toTag(int address) {
-	return address / (cacheSize / 2);
-}
-
-int L1Cache::toBlockNumber(int address) {
-	// The cache is partitioned 50%/50% between instructions and data,
-	// and is direct-mapped.
-	return (address / blockSize) % ((cacheSize / 2) / blockSize);
-}
-
-int L1Cache::toAddress(int tag, int blockNumber, int blockOffset) {
-	return (tag * (cacheSize / 2)) + (blockNumber * blockSize) + blockOffset;
-}
-
-//int* L1Cache::getInstructionPtr(int blockNumber, int blockOffset) {
-//	&instructions[way + ((address % blockSize) / sizeof(int))];
-//}
-//
-//int* L1Cache::getDataPtr(int blockNumber, int blockOffset) {
-//	&data[way + ((address % blockSize) / sizeof(int))];
-//}
-=======
 void L1Cache::evict(int address) {
 	if (ISA::isCodeAddress(address)) {
 		// Invalidate in instructions cache
@@ -174,4 +150,3 @@ void L1Cache::evict(int address) {
 		dataValid[index] = false;
 	}
 }
->>>>>>> Working on leveraging new Cache base class in L1Cache
