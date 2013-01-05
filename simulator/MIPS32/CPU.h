@@ -28,7 +28,9 @@ public:
 		instructions(NULL),		
 		instructionReadStall(false),
 		dataReadStall(false),
-		halted(false) {}
+		halted(false), 
+		timeStalledOnMemory(0),
+		memoryReadsCount(0){}
 	/**
 	 * Loads a program.
 	 * instructions: a program represented as a series of instructions
