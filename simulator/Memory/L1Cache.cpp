@@ -41,9 +41,9 @@ void L1Cache::onTick(int now) {
 			nextMemoryLevel->requestRead(address, now + accessDelay);
 			pendingReadsExternal.insert(address);
 			// Read rest of block
-			int baseOfBlock = address - (address % blockSize);
+			int baseOfBlock = address - toBlockOffset(address);
 			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				int fillAddress = baseOfBlock + toBlockOffset(address + i * sizeof(int));
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
 			}
@@ -68,9 +68,9 @@ void L1Cache::onTick(int now) {
 			// Need to read from next level
 			misses++;
 			// Critical word first
-			int baseOfBlock = address - (address % blockSize);
+			int baseOfBlock = address - toBlockOffset(address);
 			for (int i = 0; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+				int fillAddress = baseOfBlock + toBlockOffset(address + i * sizeof(int));
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
 			}
@@ -80,60 +80,68 @@ void L1Cache::onTick(int now) {
 	}
 }
 
-bool L1Cache::read(int address, int* value) {
+outcome L1Cache::isPresent(int addressIn, int* addressOut) {
+	int index = toIndex(addressIn);
+	int tag = toTag(addressIn);
 	if (ISA::isCodeAddress(address)) {
-		// Use instructions buffer
-		*value = instructions[toBlockNumber(address) + ((address % blockSize) / sizeof(int))];
-		// Verify valid & tag
-		return instructionsValid[toBlockNumber(address)]
-			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
-	} else {
-		*value = data[toBlockNumber(address) + ((address % blockSize) / sizeof(int))];
-		// Verify valid & tag
-		return dataValid[toBlockNumber(address)]
-			&& (instructionsTag[toBlockNumber(address)] == toTag(address));
-	}
-}
-
-void L1Cache::write(int address, int value) {
-	int blockNumber = toBlockNumber(address);
-	int tag = toTag(address);
-
-	if (ISA::isCodeAddress(address)) {
-		// Use instructions cache
-		instructions[blockNumber + ((address % blockSize) / sizeof(int))] = value;
-		instructionsTag[blockNumber] = tag;
-		instructionsValid[blockNumber] = true;
-	} else {
-		// Use data cache
-		data[blockNumber + ((address % blockSize) / sizeof(int))] = value;
-		dataTag[blockNumber] = tag;
-		dataValid[blockNumber] = true;
-	}
-}
-
-bool L1Cache::evict(int address) {
-	int blockNumber = toBlockNumber(address);
-	int tag = toTag(address);
-	bool evicted = false;
-
-	if (ISA::isCodeAddress(address)) {
-		// Evict from instructions cache if present
-		if (instructionsTag[blockNumber] == tag) {
-			evicted = instructionsValid[blockNumber];
-			instructionsValid[blockNumber] = false;
+		// Check instructions cache
+		if (!instructionsValid[index]) {
+			// Mapped to invalid block
+			return INVALID;
+		}
+		if (instructionsTag[index] == tag) {
+			// Mapped to block with matching tag
+			return PRESENT;
+		} else {
+			// Mapped to block with mismatching tag
+			return CONFLICT;
 		}
 	} else {
-		// Evict from data cache if present
-		if (dataTag[blockNumber] == tag) {
-			evicted = dataValid[blockNumber];
-			dataValid[blockNumber] = false;
+		// Check data cache
+		if (!dataValid[index]) {
+			// Mapped to invalid block
+			return INVALID;
+		}
+		if (dataTag[index] == tag) {
+			// Mapped to block with matching tag
+			return PRESENT;
+		} else {
+			// Mapped to block with mismatching tag
+			return CONFLICT;
 		}
 	}
-
-	return evicted;
 }
 
+int L1Cache::read(int address) {
+	int index = toIndex(addressIn);
+	int offset = toOffset(addressIn);
+	if (ISA::isCodeAddress(address)) {
+		// Read from instructions cache
+		return *getInstructionPtr(index, 0, offset);
+	} else {
+		// Read from data cache
+		return *getDataPtr(index, 0, offset);
+	}
+}
+
+void L1Cache::write(int address, int data) {
+	int tag = toTag(addressIn);
+	int index = toIndex(addressIn);
+	int offset = toOffset(addressIn);
+	if (ISA::isCodeAddress(address)) {
+		// Write to instructions cache
+		*getInstructionPtr(index, 0, offset) = data;
+		instructionsValid[index] = true;
+		instructionsTag[index] = tag;
+	} else {
+		// Write to data cache
+		*getDataPtr(index, 0, offset) = data;
+		dataValid[index] = true;
+		dataTag[index] = tag;
+	}
+}
+
+<<<<<<< HEAD
 
 int L1Cache::toTag(int address) {
 	return address / (cacheSize / 2);
@@ -156,3 +164,14 @@ int L1Cache::toAddress(int tag, int blockNumber, int blockOffset) {
 //int* L1Cache::getDataPtr(int blockNumber, int blockOffset) {
 //	&data[way + ((address % blockSize) / sizeof(int))];
 //}
+=======
+void L1Cache::evict(int address) {
+	if (ISA::isCodeAddress(address)) {
+		// Invalidate in instructions cache
+		instructionsValid[index] = false;
+	} else {
+		// Invalidate in data cache
+		dataValid[index] = false;
+	}
+}
+>>>>>>> Working on leveraging new Cache base class in L1Cache
