@@ -93,8 +93,6 @@ void CPU::execute(int instructionIndex) {
 		if ((*gpr)[rtype->getRt()] == 0) {
 			cerr << "CPU exception: division by zero!" << endl;
 			halted = true;
-			pc--;
-			instructionsCommitted--;
 			break;
 		}
 		(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] / (*gpr)[rtype->getRt()];
@@ -111,6 +109,7 @@ void CPU::execute(int instructionIndex) {
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] + itype->getImmediate();
 		pc++;
+		instructionsCommitted++;
 		break;
 	case ISA::subi:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
@@ -189,8 +188,6 @@ void CPU::execute(int instructionIndex) {
 void CPU::execute(int instructionIndex, int data) {
 	ITypeInstruction* itype = NULL;
 	Instruction* instruction = instructions->at(pc - instructionsBase);
-	pc++;
-	instructionsCommitted++;
 	// Note: switch only implements lw because other instruction types are not expected
 	switch (instruction->getOpcode()) {
 	case ISA::lw:
