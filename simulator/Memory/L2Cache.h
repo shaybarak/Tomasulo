@@ -18,6 +18,8 @@ protected:
 	virtual int toAddress(int tag, int blockNumber, int blockOffset);
 
 private:
+	static int WAYS = 2;
+
 	int toWayInstruction(int blockNumber, int way);
 	int toWayData(int blockNumber, int way);
 	/**
