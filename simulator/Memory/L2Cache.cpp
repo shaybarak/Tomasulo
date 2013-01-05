@@ -61,7 +61,6 @@ void L2Cache::onTick(int now) {
 			int baseOfBlock = address - (address % blockSize);
 			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
 				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
-				addressToEvict = 
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
 				read(fillAddress, &data, &addressToEvict);
