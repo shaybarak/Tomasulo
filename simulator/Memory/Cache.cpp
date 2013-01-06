@@ -18,6 +18,13 @@ Cache::Cache(int* buffer, int blockSize, int cacheSize, int ways, int accessDela
 	data = (int*)&dataBuffer[0];
 }
 
+/**
+ * Address:
+ * +----------------+-------+--------+
+ * | Tag            | Index | Offset |
+ * +----------------+-------+--------+
+ */
+
 int Cache::toOffset(int address) {
 	return address % blockSize;
 }
