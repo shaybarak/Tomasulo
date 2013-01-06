@@ -14,6 +14,7 @@ public:
 	friend class L2Cache;
 
 protected:
+	typedef Cache::outcome outcome;
 	virtual outcome isPresent(int addressIn, int* addressOut);
 	virtual void read(int addressIn, int* dataOut);
 	virtual void write(int addressIn, int dataIn);
