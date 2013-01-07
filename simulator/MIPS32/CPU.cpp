@@ -13,6 +13,7 @@ void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, 
 
 void CPU::onTick(int now) {
 	this->now = now;
+	cycles++;
 	// Don't execute if halted
 	if (halted) {
 		return;
@@ -23,7 +24,6 @@ void CPU::onTick(int now) {
 		int data;
 		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
 			// Read did not return yet
-			timeStalledOnMemory++;
 			return;
 		}
 		dataReadStall = false;
@@ -34,7 +34,6 @@ void CPU::onTick(int now) {
 		int instruction;
 		if (!nextMemoryLevel->getReadResponse(&address, &instruction, now)) {
 			// Read did not return yet
-			timeStalledOnMemory++;
 			return;
 		}
 		// Verify that instruction was read correctly
@@ -59,7 +58,7 @@ void CPU::onTick(int now) {
 	}
 	// Read next instruction
 	nextMemoryLevel->requestRead(pcToMemoryOffset(pc), now);
-	memoryReadsCount++;
+	memoryAccessCount++;
 	instructionReadStall = true;
 }
 
@@ -132,7 +131,7 @@ void CPU::execute(int instructionIndex) {
 			break;
 		}
 		nextMemoryLevel->requestRead(address, now);
-		memoryReadsCount++;
+		memoryAccessCount++;
 		// Note: stalled, don't advance PC and don't count instruction as committed
 		dataReadStall = true;
 		break;
@@ -146,7 +145,7 @@ void CPU::execute(int instructionIndex) {
 			break;
 		}
 		nextMemoryLevel->requestWrite(address, data, now);
-		memoryReadsCount++;
+		memoryAccessCount++;
 		// TODO do write operations stall?
 		pc++;
 		instructionsCommitted++;
