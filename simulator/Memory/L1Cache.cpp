@@ -57,7 +57,6 @@ void L1Cache::onTick(int now) {
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay write until read returns
 			hits++;
-			// Write critical word first
 			pendingWrites[address] = data;
 		} else if (read(address, &data)) {
 			// Satisfied read from cache
