@@ -42,19 +42,35 @@ int Cache::toAddress(int tag, int index, int offset) {
 }
 
 int Cache::toInstructionsBlock(int index, int way) {
+	// Instructions are buffered way 0 first, then way 1 etc'
 	return way * instructions.size() / ways + index;
 }
 
+int Cache::toInstructionsBlock(int index) {
+	return Cache::toInstructionsBlock(index, 0);
+}
+
 int Cache::toDataBlock(int index, int way) {
+	// Data is buffered such that multiple ways are interleaved per index
 	return index * ways + way;
+}
+
+int Cache::toDataBlock(int index) {
+	return Cache::toDataBlock(index, 0);
 }
 	
 int* Cache::getInstructionPtr(int index, int way, int offset) {
-	// Instructions are buffered way 0 first, then way 1
 	return &instructions[(toInstructionsBlock(index, way) * blockSize + offset) / sizeof(int)];
 }
 
+int* Cache::getInstructionPtr(int index, int offset) {
+	return Cache::getInstructionPtr(index, 0, offset);
+}
+
 int* Cache::getDataPtr(int index, int way, int offset) {
-	// Data is buffered such that way 0 and way 1 are interleaved per index
 	return &data[(toDataBlock(index, way) * blockSize + offset) / sizeof(int)];
+}
+
+int* Cache::getDataPtr(int index, int offset) {
+	return Cache::getDataPtr(index, 0, offset);
 }
