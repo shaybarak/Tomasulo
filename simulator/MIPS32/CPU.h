@@ -23,7 +23,6 @@ public:
 		memorySize(memorySize),
 		gpr(gpr),
 		now(0),
-		cycles(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
 		instructions(NULL),		
@@ -42,7 +41,7 @@ public:
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const { return instructionsCommitted; }
 	// Returns the Average Memory Access Time
-	double getAmat() const { return (double)cycles / memoryAccessCount; }
+	double getAmat() const { return (double)now / memoryAccessCount; }
 	// Returns whether the CPU has halted due to a halt instruction or an exception
 	bool isHalted() const { return halted; }
 
@@ -74,8 +73,6 @@ private:
 	GPR* gpr;
 	// Current cycle
 	int now;
-	// Clock cycles processed
-	int cycles;
 	// Count of instructions committed
 	int instructionsCommitted;
 	// Count of memory reads requested

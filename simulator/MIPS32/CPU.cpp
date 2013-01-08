@@ -12,12 +12,11 @@ void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, 
 }
 
 void CPU::onTick(int now) {
-	this->now = now;
-	cycles++;
 	// Don't execute if halted
 	if (halted) {
 		return;
 	}
+	this->now = now;
 
 	if (dataReadStall) {  // Stalled on data read
 		int address;
