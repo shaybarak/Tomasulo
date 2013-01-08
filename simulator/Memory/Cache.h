@@ -71,8 +71,10 @@ protected:
 	
 	// Returns pointer to instruction from cache
 	int* getInstructionPtr(int index, int way, int offset);
+	int* getInstructionPtr(int index, int offset);  // Assumes way == 0
 	// Returns pointer to data from cache
 	int* getDataPtr(int index, int way, int offset);
+	int* getDataPtr(int index, int offset);  // Assumes way == 0
 	
 	// Dimensions in bytes
 	int blockSize;

@@ -2,7 +2,7 @@
 #include "../MIPS32/ISA.h"
 
 void L1Cache::onTick(int now) {
-	int address, data;
+	int address, data, addressOut;
 
 	// Get read response from L2 cache
 	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
@@ -30,8 +30,9 @@ void L1Cache::onTick(int now) {
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay but mark this as a hit
 			hits++;
-		} else if (read(address, &data)) {
-			// Satisfied read from cache
+		} else if (isPresent(address, &addressOut) == PRESENT) {
+			// Can satisfy read from cache
+			read(address, &data);
 			hits++;
 			previousMemoryLevel->respondRead(address, data, now + accessDelay);
 		} else {
@@ -41,9 +42,9 @@ void L1Cache::onTick(int now) {
 			nextMemoryLevel->requestRead(address, now + accessDelay);
 			pendingReadsExternal.insert(address);
 			// Read rest of block
-			int baseOfBlock = address - toBlockOffset(address);
+			int baseOfBlock = address - toOffset(address);
 			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + toBlockOffset(address + i * sizeof(int));
+				int fillAddress = baseOfBlock + toOffset(address + i * sizeof(int));
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
 			}
@@ -58,18 +59,18 @@ void L1Cache::onTick(int now) {
 			// There is a pending read, so delay write until read returns
 			hits++;
 			pendingWrites[address] = data;
-		} else if (read(address, &data)) {
-			// Satisfied read from cache
+		} else if (isPresent(address, &addressOut) == PRESENT) {
+			// No need to write-allocate
 			hits++;
 			write(address, data);
 			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
 		} else {
-			// Need to read from next level
+			// Need to read from next level for write-allocate
 			misses++;
 			// Critical word first
-			int baseOfBlock = address - toBlockOffset(address);
+			int baseOfBlock = address - toOffset(address);
 			for (int i = 0; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + toBlockOffset(address + i * sizeof(int));
+				int fillAddress = baseOfBlock + toOffset(address + i * sizeof(int));
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
 			}
@@ -79,10 +80,10 @@ void L1Cache::onTick(int now) {
 	}
 }
 
-outcome L1Cache::isPresent(int addressIn, int* addressOut) {
+L1Cache::outcome L1Cache::isPresent(int addressIn, int* addressOut) {
 	int index = toIndex(addressIn);
 	int tag = toTag(addressIn);
-	if (ISA::isCodeAddress(address)) {
+	if (ISA::isCodeAddress(addressIn)) {
 		// Check instructions cache
 		if (!instructionsValid[index]) {
 			// Mapped to invalid block
@@ -112,8 +113,8 @@ outcome L1Cache::isPresent(int addressIn, int* addressOut) {
 }
 
 int L1Cache::read(int address) {
-	int index = toIndex(addressIn);
-	int offset = toOffset(addressIn);
+	int index = toIndex(address);
+	int offset = toOffset(address);
 	if (ISA::isCodeAddress(address)) {
 		// Read from instructions cache
 		return *getInstructionPtr(index, offset);
@@ -124,9 +125,9 @@ int L1Cache::read(int address) {
 }
 
 void L1Cache::write(int address, int data) {
-	int tag = toTag(addressIn);
-	int index = toIndex(addressIn);
-	int offset = toOffset(addressIn);
+	int tag = toTag(address);
+	int index = toIndex(address);
+	int offset = toOffset(address);
 	if (ISA::isCodeAddress(address)) {
 		// Write to instructions cache
 		*getInstructionPtr(index, offset) = data;
@@ -141,6 +142,7 @@ void L1Cache::write(int address, int data) {
 }
 
 void L1Cache::evict(int address) {
+	int index = toIndex(address);
 	if (ISA::isCodeAddress(address)) {
 		// Invalidate in instructions cache
 		instructionsValid[index] = false;
