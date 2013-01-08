@@ -43,7 +43,7 @@ int Cache::toAddress(int tag, int index, int offset) {
 
 int Cache::toInstructionsBlock(int index, int way) {
 	// Instructions are buffered way 0 first, then way 1 etc'
-	return way * instructions.size() / ways + index;
+	return way * instructionsBuffer.size() / ways + index;
 }
 
 int Cache::toInstructionsBlock(int index) {
