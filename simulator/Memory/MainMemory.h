@@ -10,7 +10,7 @@ using namespace std;
 class MainMemory : public Clocked {
 public:
 	MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel);
-	// WARNING: exposes non-const pointer to data member
+	// Design flaw: exposes non-const pointer to data member
 	vector<unsigned char>* getBuffer();
 	virtual void onTick(int now);
 	int read(int offset);
