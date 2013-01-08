@@ -55,7 +55,7 @@ bool HexDump::store(const vector<unsigned char>& buffer, fstream& out) {
 	// 8 bytes per line
 	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[0] + buffer.size() - 8; base += 8) {
 		out << HEX(base[0]) << " " << HEX(base[1]) << " " << HEX(base[2]) << " " << HEX(base[3]) << " "
-		       HEX(base[4]) << " " << HEX(base[5]) << " " << HEX(base[6]) << " " << HEX(base[7]) << endl;
+		    << HEX(base[4]) << " " << HEX(base[5]) << " " << HEX(base[6]) << " " << HEX(base[7]) << endl;
 		if (out.fail()) {
 			return false;
 		}
