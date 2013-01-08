@@ -124,18 +124,18 @@ int L1Cache::read(int address) {
 	}
 }
 
-void L1Cache::write(int address, int data) {
+void L1Cache::write(int address, int value) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
 	if (ISA::isCodeAddress(address)) {
 		// Write to instructions cache
-		*getInstructionPtr(index, offset) = data;
+		*getInstructionPtr(index, offset) = value;
 		instructionsValid[index] = true;
 		instructionsTag[index] = tag;
 	} else {
 		// Write to data cache
-		*getDataPtr(index, offset) = data;
+		*getDataPtr(index, offset) = value;
 		dataValid[index] = true;
 		dataTag[index] = tag;
 	}

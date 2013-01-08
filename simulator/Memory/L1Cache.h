@@ -17,7 +17,7 @@ protected:
 	typedef Cache::outcome outcome;
 	virtual outcome isPresent(int addressIn, int* addressOut);
 	virtual int read(int address);
-	virtual void write(int address, int data);
+	virtual void write(int address, int value);
 	virtual void evict(int address);
 
 private:
