@@ -21,7 +21,7 @@ public:
 		PRESENT,	// Address is present in cache
 		CONFLICT,	// Cache has memory block from other address(es) in respective mapping
 		INVALID,	// Cache is invalid in respective mapping
-	}
+	};
 
 protected:
 	/**

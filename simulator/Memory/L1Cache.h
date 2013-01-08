@@ -21,5 +21,5 @@ protected:
 	virtual void evict(int address);
 
 private:
-	static int WAYS = 1;
+	static const int WAYS = 1;
 };

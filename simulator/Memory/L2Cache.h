@@ -19,7 +19,7 @@ protected:
 	virtual void evict(int address);
 
 private:
-	static int WAYS = 2;
+	static const int WAYS = 2;
 
 	vector<bool> instructionsDirty;
 	vector<bool> dataDirty;
