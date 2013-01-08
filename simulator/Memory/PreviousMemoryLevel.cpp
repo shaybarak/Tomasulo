@@ -1,13 +1,17 @@
 #include "PreviousMemoryLevel.h"
 
-void PreviousMemoryLevel::respondRead(int address, int data, int notBefore) {
-	memoryInterface->respondRead(address, data, notBefore);
-}
-
 bool PreviousMemoryLevel::getReadRequest(int* address, int notBefore) {
 	return memoryInterface->getReadRequest(address, notBefore);
 }
 
-bool PreviousMemoryLevel::getWriteRequest(int* address, int* data, int notBefore) {
-	return memoryInterface->getWriteRequest(address, *data, notBefore);
+void PreviousMemoryLevel::respondRead(int address, int value, int notBefore) {
+	memoryInterface->respondRead(address, value, notBefore);
+}
+
+bool PreviousMemoryLevel::getWriteRequest(int* address, int* value, int notBefore) {
+	return memoryInterface->getWriteRequest(address, *value, notBefore);
+}
+
+void PreviousMemoryLevel::respondWrite(int address, int notBefore) {
+	memoryInterface->respondWrite(address, notBefore);
 }

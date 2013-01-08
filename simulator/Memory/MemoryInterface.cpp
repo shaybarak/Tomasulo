@@ -1,43 +1,51 @@
 #include "MemoryInterface.h"
 
-void MemoryInterface::requestRead(int address, int now) {
-	readRequests.push(address, now);
+void MemoryInterface::requestRead(int address, int notBefore) {
+	readRequests.push(address, notBefore);
 }
 
-void MemoryInterface::respondRead(int address, int data, int now) {
+void MemoryInterface::respondRead(int address, int value, int notBefore) {
 	ReadResponse response;
 	response.address = address;
-	response.data = data;
-	readResponses.push(response, now);
+	response.value = value;
+	readResponses.push(response, notBefore);
 }
 
-bool MemoryInterface::getReadRequest(int* address, int now) {
-	return readRequests.pop(address, now);
+bool MemoryInterface::getReadRequest(int* address, int notBefore) {
+	return readRequests.pop(address, notBefore);
 }
 
-bool MemoryInterface::getReadResponse(int* address, int& data, int now) {
+bool MemoryInterface::getReadResponse(int* address, int value, int notBefore) {
 	ReadResponse response;
-	if (readResponses.pop(&response, now)) {
+	if (readResponses.pop(&response, notBefore)) {
 		*address = response.address;
-		data = response.data;
+		value = response.value;
 		return true;
 	}
 	return false;
 }
 
-void MemoryInterface::requestWrite(int address, int data, int now) {
+void MemoryInterface::requestWrite(int address, int value, int notBefore) {
 	WriteRequest request;
 	request.address = address;
-	request.data = data;
-	writeRequests.push(request, now);
+	request.value = value;
+	writeRequests.push(request, notBefore);
 }
 
-bool MemoryInterface::getWriteRequest(int* address, int& data, int now) {
+void MemoryInterface::respondWrite(int address, int notBefore) {
+	writeResponses.push(address, notBefore);
+}
+
+bool MemoryInterface::getWriteRequest(int* address, int value, int notBefore) {
 	WriteRequest request;
-	if (writeRequests.pop(&request, now)) {
+	if (writeRequests.pop(&request, notBefore)) {
 		*address = request.address;
-		data = request.data;
+		value = request.value;
 		return true;
 	}
 	return false;
+}
+
+bool MemoryInterface::getWriteResponse(int* address, int notBefore) {
+	return writeResponses.pop(address, notBefore);
 }

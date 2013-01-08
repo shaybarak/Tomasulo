@@ -9,17 +9,24 @@
  */
 class NextMemoryLevel {
 public:
+
 	NextMemoryLevel(MemoryInterface* memoryInterface)
 		: memoryInterface(memoryInterface) {}
-	/** Requests to read data from the next memory level. */
+	
+	/** Requests to read from the next memory level. */
 	void requestRead(int address, int notBefore);
+	
 	/**
 	 * Reads the next value read from the next memory level if it's available.
 	 * Returns whether value was read.
 	 */
-	bool getReadResponse(int* address, int* data, int notBefore);
+	bool getReadResponse(int* address, int* value, int notBefore);
+	
 	/** Registers a write request to the next memory level. */
-	void requestWrite(int address, int data, int notBefore);
+	void requestWrite(int address, int value, int notBefore);
+	
+	/** Reads acknowledgement for write request. */
+	bool getWriteResponse(int* address, int notBefore);
 
 private:
 	MemoryInterface* memoryInterface;
