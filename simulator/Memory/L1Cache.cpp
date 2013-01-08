@@ -32,7 +32,7 @@ void L1Cache::onTick(int now) {
 			hits++;
 		} else if (isPresent(address, &addressOut) == PRESENT) {
 			// Can satisfy read from cache
-			read(address, &data);
+			data = read(address);
 			hits++;
 			previousMemoryLevel->respondRead(address, data, now + accessDelay);
 		} else {

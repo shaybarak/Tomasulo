@@ -38,7 +38,7 @@ int Cache::toTag(int address) {
 }
 
 int Cache::toAddress(int tag, int index, int offset) {
-	(tag * (cacheSize / ways)) + (index * blockSize) + offset;
+	return (tag * (cacheSize / ways)) + (index * blockSize) + offset;
 }
 
 int Cache::toInstructionsBlock(int index, int way) {

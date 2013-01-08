@@ -66,8 +66,10 @@ protected:
 	int toAddress(int tag, int index, int offset);
 	// Maps to instructions cache block space
 	int toInstructionsBlock(int index, int way);
+	int toInstructionsBlock(int index);  // Assumes way == 0
 	// Maps to data cache block space
 	int toDataBlock(int index, int way);
+	int toDataBlock(int index);  // Assumes way == 0
 	
 	// Returns pointer to instruction from cache
 	int* getInstructionPtr(int index, int way, int offset);
