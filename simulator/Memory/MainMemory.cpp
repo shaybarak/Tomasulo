@@ -20,7 +20,7 @@ void MainMemory::onTickUp(int now) {
 	if (!masterValid) {
 		return;
 	}
-	if (openedRow == getAddressRow(address)) {
+	if (openedRow == toRow(address)) {
 		delayCountDown = 1;
 	} else {
 		delayCountDown = accessDelay;
