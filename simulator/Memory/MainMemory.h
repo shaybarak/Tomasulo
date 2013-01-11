@@ -13,13 +13,9 @@ public:
 	MainMemory(int accessDelay, int rowSize);
 	// Design flaw: exposes non-const pointer to data member
 	vector<unsigned char>* getBuffer();
-<<<<<<< HEAD
-	virtual void onTickUp(int now);
-=======
 	// For reading signals from L2 cache
 	virtual void onTickUp(int now);
 	// For sending signals to L2 cache
->>>>>>> Fixes to clocking
 	virtual void onTickDown(int now);
 
 private:
