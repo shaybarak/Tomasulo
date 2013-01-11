@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class Cache {
+class Cache : public MasterSlaveInterface {
 public:
 	Cache(int blockSize, int cacheSize, int ways, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
