@@ -36,21 +36,6 @@ protected:
 	virtual outcome isPresent(int addressIn, int* addressOut) = 0;
 	
 	/**
-	 * Reads from cache.
-	 * address: memory address to read from.
-	 * May return uninitialized data, users should precede with a call to isPresent.
-	 */
-	virtual int read(int address) = 0;
-	
-	/**
-	 * Writes to cache.
-	 * address: memory address to write to.
-	 * data: memory value to write.
-	 * May overwrite previous data, users should precede with a call to isPresent.
-	 */
-	virtual void write(int address, int data) = 0;
-	
-	/**
 	 * Evicts a block from cache by address.
 	 * If address was not present in the cache, does nothing.
 	 */
