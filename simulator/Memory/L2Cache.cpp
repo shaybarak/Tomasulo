@@ -1,5 +1,6 @@
 #include "L2Cache.h"
 #include "../MIPS32/ISA.h"
+#include <assert.h>
 
 L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
@@ -17,12 +18,12 @@ L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 void L2Cache::onTick(int now) {
 	int address, data, addressToEvict;
 
-	// Get read response from L2 cache
+	// Get read response from main memory
 	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
 		write(address, data);
 		pendingReadsInternal.erase(address);
 		if (pendingReadsExternal.erase(address) > 0) {
-			// Serve incoming data to lower level
+			// Serve incoming data to lower level as well
 			previousMemoryLevel->respondRead(address, data, now);
 		}
 		
@@ -80,144 +81,192 @@ void L2Cache::onTick(int now) {
 	}
 }
 
-bool L2Cache::read(int address, int* value, int* addressToEvict) {
-	int blockNumber = toBlockNumber(address);
+L2Cache::outcome L2Cache::isPresent(int addressIn, int* addressOut) {
+	int index = toIndex(addressIn);
+	int tag = toTag(addressIn);
+	if (ISA::isCodeAddress(addressIn)) {
+		// Check instructions cache
+		int blockWay0 = toInstructionsBlock(index, 0);
+		int blockWay1 = toInstructionsBlock(index, 1);
+		if ((instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) ||
+			(instructionsValid[blockWay1] && (instructionsTag[blockWay1] == tag))) {
+			// Mapped to block with matching tag
+			return PRESENT;
+		}
+		if (!instructionsValid[blockWay0] || !instructionsValid[blockWay1]) {
+			// Mapped to at least one invalid block
+			return INVALID;
+		}
+		// Mapped to valid blocks with mismatching tag
+		return CONFLICT;
+	} else {
+		// Check data cache
+		int blockWay0 = toDataBlock(index, 0);
+		int blockWay1 = toDataBlock(index, 1);
+		if ((dataValid[blockWay0] && (dataTag[blockWay0] == tag)) ||
+			(dataValid[blockWay1] && (dataTag[blockWay1] == tag))) {
+			// Mapped to block with matching tag
+			return PRESENT;
+		}
+		if (!dataValid[blockWay0] || !dataValid[blockWay1]) {
+			// Mapped to at least one invalid block
+			return INVALID;
+		}
+		// Mapped to valid blocks with mismatching tag
+		return CONFLICT;
+	}
+}
+
+int L2Cache::read(int address) {
+	int index = toIndex(address);
 	int tag = toTag(address);
+	int offset = toOffset(address);
 
 	if (ISA::isCodeAddress(address)) {
 		// Use instructions buffer
-		int way0 = toWayInstruction(blockNumber, 0);
-		int way1 = toWayInstruction(blockNumber, 1);
-		if (instructionsValid[way0] && (instructionsTag[way0] == toTag(address))) {
+		int blockWay0 = toInstructionsBlock(index, 0);
+		int blockWay1 = toInstructionsBlock(index, 1);
+		if (instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) {
 			// Present in way 0
-			*value = *getInstructionPtr(way0, address % blockSize);
-			instructionsWay0IsLru[blockNumber] = false;
-			return true;
-		} else if (instructionsValid[way1] && (instructionsTag[way1] == toTag(address))) {
-			// Present in way 1
-			*value = *getInstructionPtr(way1, address % blockSize);
-			instructionsWay0IsLru[blockNumber] = true;
-			return true;
+			instructionsWay0IsLru[index] = false;
+			return *getInstructionPtr(index, 0, offset);
 		} else {
-			// Not present
-			// Return value in LRU way (will be written back to next level on eviction)
-			int lruWay;
-			if (instructionsWay0IsLru[blockNumber]) {
-				lruWay = way0;
-			} else {
-				lruWay = way1;
-			}
-			*value = *getInstructionPtr(lruWay, address % blockSize);
-			if (instructionsValid[lruWay]) {
-				*addressToEvict = toAddress(instructionsTag[lruWay], blockNumber, address % blockSize);
-			} else {
-				*addressToEvict = -1;
-			}
-			return false;
+			assert(instructionsValid[blockWay1])
+			assert(instructionsTag[blockWay1] == tag);
+			// Assume present in way 1
+			instructionsWay0IsLru[index] = true;
+			return *getInstructionPtr(index, 1, offset);
 		}
 	} else {
 		// Use data buffer
-		int way0 = toWayData(blockNumber, 0);
-		int way1 = toWayData(blockNumber, 1);
-		if (dataValid[way0] && (dataTag[way0] == tag)) {
+		int blockWay0 = toDataBlock(index, 0);
+		int blockWay1 = toDataBlock(index, 1);
+		if (dataValid[blockWay0] && (dataTag[blockWay0] == tag)) {
 			// Present in way 0
-			*value = *getDataPtr(way0, address % blockSize);
-			dataWay0IsLru[blockNumber] = false;
-			return true;
-		} else if (dataValid[way1] && (dataTag[way1] == tag)) {
-			// Present in way 1
-			*value = *getDataPtr(way1, address % blockSize);
-			dataWay0IsLru[blockNumber] = true;
-			return true;
+			dataWay0IsLru[index] = false;
+			return *getDataPtr(index, 0, offset);
 		} else {
-			// Not present
-			// Return value in LRU way (will be written back to next level on eviction)
-			int lruWay;
-			if (dataWay0IsLru[blockNumber]) {
-				lruWay = way0;
-			} else {
-				lruWay = way1;
-			}
-			*value = *getDataPtr(lruWay, address % blockSize);
-			if (dataValid[lruWay]) {
-				*addressToEvict = toAddress(dataTag[lruWay], blockNumber, address % blockSize);
-			} else {
-				*addressToEvict = -1;
-			}
-			return false;
+			assert(dataValid[blockWay1] && (dataTag[blockWay1] == tag));
+			// Assume present in way 1
+			dataWay0IsLru[index] = true;
+			return *getDataPtr(index, 1, offset);
 		}
 	}
 }
 
-void L2Cache::write(int address, int value) {
-	int blockNumber = toBlockNumber(address);
+void L2Cache::write(int address, int value, L2Cache::outcome expected_outcome) {
+	int index = toIndex(address);
 	int tag = toTag(address);
+	int offset = toOffset(address);
 
-	if (ISA::isCodeAddress(address)) {
-		// Use instructions cache
-		int way;
-		if (instructionsWay0IsLru[blockNumber]) {
-			// Way 0 is the LRU
-			way = toWayInstruction(blockNumber, 0);
+	switch (expected_outcome) {
+	case PRESENT:
+		if (ISA::isCodeAddress(address)) {
+			// Update block in instructions cache
+			int blockWay0; = toInstructionsBlock(index, 0);
+			int blockWay1; = toInstructionsBlock(index, 1);
+			if (instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) {
+				*getInstructionsPtr(index, 0, offset) = value;
+				instructionsWay0IsLru[index] = false;
+				return;
+			} else {
+				assert(instructionsValid[blockWay1]);
+				assert(instructionsTag[blockWay1] == tag);
+				// Assume block is present in other way
+				*getInstructionsPtr(index, 1, offset) = value;
+				instructionsWay0IsLru[index] = true;
+				return;
+			}
 		} else {
-			// Way 1 is the LRU
-			way = toWayInstruction(blockNumber, 1);
+			// Update block in data cache
+			int blockWay0; = toDataBlock(index, 0);
+			int blockWay1; = toDataBlock(index, 1);
+			if (dataValid[blockWay0] && (dataTag[blockWay0] == tag)) {
+				*getDataPtr(index, 0, offset) = value;
+				dataWay0IsLru[index] = false;
+				return;
+			} else {
+				assert(dataValid[blockWay1]);
+				assert(dataTag[blockWay1] == tag);
+				// Assume block is present in other way
+				*getDataPtr(index, 1, offset) = value;
+				dataWay0IsLru[index] = true;
+				return;
+			}
 		}
-		*getInstructionPtr(way, address % blockSize) = value;
-		if (instructionsTag[way] != tag) {
-			// Need to evict old block
-			evict(address);
-		}
-		instructionsTag[way] = tag;
-		instructionsValid[way] = true;
-	} else {
-		// Use data cache
-		int way;
-		if (dataWay0IsLru[blockNumber]) {
-			// Way 0 is the LRU
-			way = toWayData(blockNumber, 0);
+	case CONFLICT:
+		if (ISA::isCodeAddress(address)) {
+			// Overwrite LRU block in instructions cache
+			int wayLru;
+			int blockWayLru;
+			if (instructionsWay0IsLru[index]) {
+				wayLru = 0;
+				blockWayLru = toInstructionsBlock(index, 0);
+				instructionsWay0IsLru[index] = false;
+			} else {
+				wayLru = 1;
+				blockWayLru = toInstructionsBlock(index, 1);
+				instructionsWay0IsLru[index] = true;
+			}
+			*getInstructionsPtr(index, wayLru, offset) = value;
+			instructionsValid[blockWayLru] = true;
+			instructionsTag[blockWayLru] = tag;
+			return;
 		} else {
-			// Way 1 is the LRU
-			way = toWayData(blockNumber, 1);
+			// Overwrite LRU block in data cache
+			int wayLru;
+			int blockWayLru;
+			if (instructionsWay0IsLru[index]) {
+				wayLru = 0;
+				blockWayLru = toDataBlock(index, 0);
+				instructionsWay0IsLru[index] = false;
+			} else {
+				wayLru = 1;
+				blockWayLru = toDataBlock(index, 1);
+				instructionsWay0IsLru[index] = true;
+			}
+			*getDataPtr(index, wayLru, offset) = value;
+			dataValid[blockWayLru] = true;
+			dataTag[blockWayLru] = tag;
+			return;
 		}
-		*getDataPtr(way, address % blockSize) = value;
-		if (dataTag[way] != tag) {
-			// Need to evict old block
-			evict(address);
-		}
-		dataTag[way] = tag;
-		dataValid[way] = true;
+	case INVALID:
+		// This is impossible since L1 is inclusive in L2 and L1 performs write-allocate
+		assert(false);
+		break;
+	default:
+		assert(false);
+		break;
 	}
 }
 
-bool L2Cache::evict(int address) {
-	int blockNumber = toBlockNumber(address);
+void L2Cache::evict(int address) {
+	int index = toIndex(address);
 	int tag = toTag(address);
-	bool evicted = false;
 
 	if (ISA::isCodeAddress(address)) {
-		// Evict from instructions cache if present
-		int way0 = toWayInstruction(blockNumber, 0);
-		int way1 = toWayInstruction(blockNumber, 1);
-		// Look for a match in both ways
-		if (instructionsTag[way0] == tag) {
-			instructionsValid[way0] = false;
-			evicted = true;
-		} else if (instructionsTag[way1] == tag) {
-			instructionsValid[way1] = false;
-			evicted = true;
+		// Evict from instructions cache
+		int blockWay0 = toWayInstruction(index, 0);
+		int blockWay1 = toWayInstruction(index, 1);
+		if (instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) {
+			instructionsValid[blockWay0] = false;
+		} else {
+			assert(instructionsValid[blockWay1])
+			assert(instructionsTag[blockWay1] == tag);
+			// Assume eviction from the other way
+			instructionsValid[blockWay1] = false;
 		}
 	} else {
-		// Evict from data cache if present
-		int way0 = toWayData(blockNumber, 0);
-		int way1 = toWayData(blockNumber, 1);
-		// Look for a match in both ways
-		if (dataTag[way0] == tag) {
-			dataValid[way0] = false;
-			evicted = true;
-		} else if (dataTag[way1] == tag) {
-			dataValid[way1] = false;
-			evicted = true;
+		// Evict from data cache
+		int blockWay0 = toWayData(index, 0);
+		int blockWay1 = toWayData(index, 1);
+		if (dataValid[blockWay0] && (dataTag[blockWay0] == tag)) {
+			dataValid[blockWay0] = false;
+		} else {
+			assert(dataValid[blockWay1])
+			assert(dataTag[blockWay1] == tag);
+			// Assume eviction from the other way
+			dataValid[blockWay1] = false;
 		}
 	}
 
@@ -225,8 +274,6 @@ bool L2Cache::evict(int address) {
 	if (l1Cache != NULL) {
 		l1Cache->evict(address);
 	}
-
-	return evicted;
 }
 
 int L2Cache::toTag(int address) {

@@ -14,9 +14,24 @@ public:
 protected:
 	typedef Cache::outcome outcome;
 	virtual outcome isPresent(int addressIn, int* addressOut);
-	virtual int read(int address);
-	virtual void write(int address, int data);
 	virtual void evict(int address);
+
+private:
+	/**
+	 * Reads from cache.
+	 * address: memory address to read from.
+	 * May return uninitialized data, users should precede with a call to isPresent.
+	 */
+	int read(int address);
+
+	/**
+	 * Writes to cache.
+	 * address: memory address to write to.
+	 * data: memory value to write.
+	 * expected_outcome: obtained from isPresent, used to determine write policy.
+	 * May overwrite previous data, users should precede with a call to isPresent.
+	 */
+	void write(int address, int data, outcome expected_outcome);
 
 private:
 	static const int WAYS = 2;
