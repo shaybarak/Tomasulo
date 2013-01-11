@@ -99,9 +99,6 @@
     <ClInclude Include="Memory\L1Cache.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\L2Cache.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Memory\Cache.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
@@ -165,9 +162,6 @@
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\L1Cache.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\L2Cache.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MainMemory.cpp">

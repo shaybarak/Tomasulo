@@ -160,8 +160,10 @@ int main(int argc, char** argv) {
 		&l1ToCpu, &l1ToL2);
 	// Initialize L2
 	vector<char> l2Buffer(l2_cache_size);
-	L2Cache l2Cache((int*)&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
-		&l2ToL1, &l2ToMainmemory, &l1Cache);
+
+	//TODO uncomment out
+	/*L2Cache l2Cache((int*)&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
+		&l2ToL1, &l2ToMainmemory, &l1Cache);*/
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to L1
 	MainMemory ram(mem_access_delay, l2_block_size, &l2ToL1);
@@ -206,8 +208,10 @@ int main(int argc, char** argv) {
 	// Write memory dumps
 	if (!HexDump::store(*l1Cache.getInstructionsBuffer(), L1i) ||
 		!HexDump::store(*l1Cache.getDataBuffer(), L1d) ||
-		!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
-		!HexDump::store(*l2Cache.getDataBuffer(), L2d) ||
+		
+		//TODO uncomment out
+		//!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
+		//!HexDump::store(*l2Cache.getDataBuffer(), L2d) ||
 		!HexDump::store(*ram.getBuffer(), mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
