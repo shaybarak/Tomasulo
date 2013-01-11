@@ -82,9 +82,12 @@ protected:
 	PreviousMemoryLevel* previousMemoryLevel;
 	NextMemoryLevel* nextMemoryLevel;
 	
-	// Memory addresses that have pending reads internally-requested (to fill block)
+	// Memory addresses that have pending reads internally-requested (to fill block).
+	// If an incoming request matches any of these addresses it is considered a hit,
+	// despite the fact that the value at the address is not currently present in the cache.
 	set<int> pendingReadsInternal;
-	// Memory addresses that have pending reads externally-requested (to serve lower level)
+	// Memory addresses that have pending reads externally-requested (to serve lower level).
+	// When these pending read operations return, the result will be sent to the lower level.
 	set<int> pendingReadsExternal;
 	// Writes that are pending due to write-allocate or write-back
 	map<int, int> pendingWrites;
