@@ -65,18 +65,15 @@ protected:
 	// Builds a memory address out of the tag, index and offset
 	int toAddress(int tag, int index, int offset);
 	// Maps to instructions cache block space
-	int toInstructionsBlock(int index, int way);
-	int toInstructionsBlock(int index);  // Assumes way == 0
+	int toInstructionsBlock(int index, int way = 0);
 	// Maps to data cache block space
-	int toDataBlock(int index, int way);
-	int toDataBlock(int index);  // Assumes way == 0
+	int toDataBlock(int index, int way = 0);
 	
 	// Returns pointer to instruction from cache
-	int* getInstructionPtr(int index, int way, int offset);
-	int* getInstructionPtr(int index, int offset);  // Assumes way == 0
-	// Returns pointer to data from cache
-	int* getDataPtr(int index, int way, int offset);
-	int* getDataPtr(int index, int offset);  // Assumes way == 0
+	int* getInstructionPtr(int index, int offset, int way = 0);
+	
+	 //Returns pointer to data from cache
+	int* getDataPtr(int index, int offset, int way = 0);
 	
 	// Dimensions in bytes
 	int blockSize;

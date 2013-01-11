@@ -51,31 +51,15 @@ int Cache::toInstructionsBlock(int index, int way) {
 	return way * instructionsBuffer.size() / ways + index;
 }
 
-int Cache::toInstructionsBlock(int index) {
-	return Cache::toInstructionsBlock(index, 0);
-}
-
 int Cache::toDataBlock(int index, int way) {
 	// Data is buffered such that multiple ways are interleaved per index
 	return index * ways + way;
 }
-
-int Cache::toDataBlock(int index) {
-	return Cache::toDataBlock(index, 0);
-}
 	
-int* Cache::getInstructionPtr(int index, int way, int offset) {
+int* Cache::getInstructionPtr(int index, int offset, int way) {
 	return &instructions[(toInstructionsBlock(index, way) * blockSize + offset) / sizeof(int)];
 }
 
-int* Cache::getInstructionPtr(int index, int offset) {
-	return Cache::getInstructionPtr(index, 0, offset);
-}
-
-int* Cache::getDataPtr(int index, int way, int offset) {
+int* Cache::getDataPtr(int index, int offset, int way) {
 	return &data[(toDataBlock(index, way) * blockSize + offset) / sizeof(int)];
-}
-
-int* Cache::getDataPtr(int index, int offset) {
-	return Cache::getDataPtr(index, 0, offset);
 }
