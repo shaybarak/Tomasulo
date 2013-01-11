@@ -155,15 +155,11 @@ int main(int argc, char** argv) {
 	PreviousMemoryLevel mainMemoryToL2(&l2MainMemory);
 
 	// Initialize L1
-	vector<char> l1Buffer(l1_cache_size);
-	L1Cache l1Cache((int*)&l1Buffer[0], l1_block_size, l1_cache_size, l1_access_delay,
-		&l1ToCpu, &l1ToL2);
+	L1Cache l1Cache(l1_block_size, l1_cache_size, l1_access_delay, &l1ToCpu, &l1ToL2);
 	// Initialize L2
-	vector<char> l2Buffer(l2_cache_size);
 
 	//TODO uncomment out
-	/*L2Cache l2Cache((int*)&l2Buffer[0], l2_block_size, l2_cache_size, l2_access_delay,
-		&l2ToL1, &l2ToMainmemory, &l1Cache);*/
+	/*L2Cache l2Cache(l2_block_size, l2_cache_size, l2_access_delay, &l2ToL1, &l2ToMainmemory, &l1Cache);*/
 	// Initialize main memory
 	// TODO connect MainMemory to L2, not directly to L1
 	MainMemory ram(mem_access_delay, l2_block_size, &l2ToL1);

@@ -1,8 +1,8 @@
 #include "Cache.h"
 
-Cache::Cache(int* buffer, int blockSize, int cacheSize, int ways, int accessDelay,
+Cache::Cache(int blockSize, int cacheSize, int ways, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
-		: data(buffer), blockSize(blockSize), cacheSize(cacheSize), ways(ways), accessDelay(accessDelay),
+		: blockSize(blockSize), cacheSize(cacheSize), ways(ways), accessDelay(accessDelay),
 		  previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel),
 		  hits(0), misses(0) {
 	// Split cache buffer 50%-50% between instructions and data

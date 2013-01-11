@@ -2,10 +2,10 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
-L2Cache::L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
+L2Cache::L2Cache(int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
 		L1Cache* l1Cache)
-		: Cache(buffer, blockSize, cacheSize, WAYS, accessDelay, previousMemoryLevel, nextMemoryLevel),
+		: Cache(blockSize, cacheSize, WAYS, accessDelay, previousMemoryLevel, nextMemoryLevel),
 		  l1Cache(l1Cache) {
 	// Also initialize dirty bits
 	instructionsDirty.resize(instructionsValid.size());

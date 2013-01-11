@@ -6,7 +6,7 @@
 
 class L2Cache : public Cache, public Clocked {
 public:
-	L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
+	L2Cache(int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
 		L1Cache* l1Cache);
 	// For reading signals from L1 cache and sending signals to RAM
