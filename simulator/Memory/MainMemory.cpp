@@ -6,6 +6,7 @@ MainMemory::MainMemory(int accessDelay, int rowSize)
 		  lastReadAddress(-1), busyReadingUntil(0) {
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
+	slaveReady = true;
 }
 
 vector<unsigned char>* MainMemory::getBuffer() { 
@@ -13,43 +14,67 @@ vector<unsigned char>* MainMemory::getBuffer() {
 }
 
 void MainMemory::onTickUp(int now) {
-	//read inputs
-
-	//set delay:
-
-		//if read/write request is on opened row - read/write one bus size;
-		//else, set delayitme == accessDelay;
-	//
+	if (!slaveReady) {
+		return;
+	}
+	if (!masterValid) {
+		return;
+	}
+	if (openedRow == getAddressRow(address)) {
+		delayCountDown = 1;
+	} else {
+		delayCountDown = accessDelay;
+	}
+	slaveReady = false;
+	slaveValid = false;
 }
 
 void MainMemory::onTickDown(int now) {
-	//if rownumber is open return immediately.
-	//-1 to the delay;
-}
-
-void MainMemory::onTick(int now) {
-	int address, data;
-	
-	// Serve read request
-	if ((now >= busyReadingUntil) && previousMemoryLevel->getReadRequest(&address, now)) {
-		// Simulate delay
-		int delay;
-		if (address / rowSize == lastReadAddress / rowSize) {
-			// Sequential read
-			delay = 1;
+	delayCountDown--;
+	if (!slaveReady) {
+		return;
+	}
+	if (delayCountDown == 0) {
+		if (writeEnable) {
+			words[address / sizeof(int)] = data;
+			slaveValid = true;
 		} else {
-			// Non-sequential read
-			delay = accessDelay;
+			data = words[address / sizeof(int)];
+			slaveReady = true;
 		}
-
-		previousMemoryLevel->respondRead(address, words[address / sizeof(int)], now + delay);
-		busyReadingUntil = now + delay;
-		lastReadAddress = address;
-	}
-	
-	// Serve write request
-	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
-		// Assume no write delay
-		words[address / sizeof(int)] = data;
+	} else {
+		slaveReady = false;
+		slaveValid = false;
 	}
 }
+
+int MainMemory::getAddressRow(int address) {
+	return address / rowSize;
+}
+
+//void MainMemory::onTick(int now) {
+//	int address, data;
+//	
+//	// Serve read request
+//	if ((now >= busyReadingUntil) && previousMemoryLevel->getReadRequest(&address, now)) {
+//		// Simulate delay
+//		int delay;
+//		if (address / rowSize == lastReadAddress / rowSize) {
+//			// Sequential read
+//			delay = 1;
+//		} else {
+//			// Non-sequential read
+//			delay = accessDelay;
+//		}
+//
+//		previousMemoryLevel->respondRead(address, words[address / sizeof(int)], now + delay);
+//		busyReadingUntil = now + delay;
+//		lastReadAddress = address;
+//	}
+//	
+//	// Serve write request
+//	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
+//		// Assume no write delay
+//		words[address / sizeof(int)] = data;
+//	}
+//}
