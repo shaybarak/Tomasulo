@@ -20,33 +20,67 @@ void L2Cache::onTick(int now) {
 
 	// Get read response from main memory
 	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
-		write(address, data);
 		pendingReadsInternal.erase(address);
 		if (pendingReadsExternal.erase(address) > 0) {
 			// Serve incoming data to lower level as well
 			previousMemoryLevel->respondRead(address, data, now);
 		}
-		
-		map<int, int>::iterator writeBack = pendingWrites.find(address);
-		if (writeBack != pendingWrites.end()) {
-			// Was waiting for this word for write-allocate, now send write
-			address = writeBack->first;
-			data = writeBack->second;
-			write(address, data);
-			nextMemoryLevel->requestWrite(address, data, now);
-			pendingWrites.erase(writeBack);
+
+		// Is this read response going to force eviction?
+		outcome readOutcome = isPresent(address, &addressOut);
+		switch (readOutcome) {
+		PRESENT:
+			// Filling a block brought from RAM (eviction has already occurred)
+			map<int, int>::iterator writeBack = pendingWrites.find(address);
+			// Perform write-back of overwritten value if necessary
+			if (writeBack != pendingWrites.end()) {
+				// Was waiting for this word for write-allocate, now send write
+				address = writeBack->first;
+				data = writeBack->second;
+				write(address, data);
+				nextMemoryLevel->requestWrite(address, data, now);
+				pendingWrites.erase(writeBack);
+			}
+			write(address, data, PRESENT);
+			break;
+		INVALID:
+			// First read from a block that was previously invalid
+			write(address, data, INVALID);
+			break;
+		CONFLICT:
+			// Critical word returned, met cache conflict
+			if (isDirty(address)) {
+				int oldData = read(addressOut);
+				nextMemoryLevel->requestWrite(addressOut, oldData, now);
+			}
+			// Evict previous block contents
+			evict(address);
+			// Write critical word
+			write(address, data, CONFLICT);
+			break;
+		default:
+			assert(false);
+			break;
 		}
 	}
 
-	// Get read request from CPU
+	// Get write response from main memory
+	else if (nextMemoryLevel->getWriteResponse(&address, now)) {
+		// Do nothing (due to write-back policy)
+	}
+
+	// Get read request from L1 cache
 	if (previousMemoryLevel->getReadRequest(&address, now)) {
 		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay but mark this as a hit
 			hits++;
-		} else if (read(address, &data, &addressToEvict)) {
-			// Satisfied read from cache
+			pendingReadsExternal.insert(address);
+			// Do nothing (result will be sent back to L1 when the pending read returns)
+		} else if (isPresent(address, &addressOut) == PRESENT) {
+			// Can satisfy read from cache
 			hits++;
+			data = read(address);
 			previousMemoryLevel->respondRead(address, data, now + accessDelay);
 		} else {
 			// Need to read from next level
@@ -54,30 +88,31 @@ void L2Cache::onTick(int now) {
 			// Critical word first
 			nextMemoryLevel->requestRead(address, now + accessDelay);
 			pendingReadsExternal.insert(address);
-			if (addressToEvict >= 0) {
-				// Remember to write-back when read returns
-				pendingWrites[addressToEvict] = data;
-			}
-			// Read rest of block
-			int baseOfBlock = address - (address % blockSize);
-			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + ((address + i * sizeof(int)) % blockSize);
+			// Then critical L1 block
+			int l1BlockSize = l1Cache->blockSize;
+			int baseOfL1Block = address - (address % l1BlockSize);
+			for (int i = 1; i < l1BlockSize / (int)sizeof(int); i++) {
+				int fillAddress = baseOfL1Block + ((address + i * sizeof(int)) % l1BlockSize);
 				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
 				pendingReadsInternal.insert(fillAddress);
-				read(fillAddress, &data, &addressToEvict);
-				if (addressToEvict >= 0) {
-					pendingWrites[addressToEvict] = data;
-				}
+				data = read(fillAddress);
+			}
+			// Then rest of L2 block
+			int baseOfL2Block = address - toOffset(address);
+			for (int i = 1 + (l1BlockSize / (int)sizeof(int)); i < (blockSize / (int)sizeof(int)); i++) {
+				int fillAddress = baseOfL2Block + ((address + i * sizeof(int)) % blockSize);
+				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
+				pendingReadsInternal.insert(fillAddress);
+				data = read(fillAddress);
 			}
 		}
 	}
 
 	// Get write request from L1 cache
-	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
+	else if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
 		write(address, data);
 		// TODO not actually done, need to write-back if eviction is required
-		// Consider changing interface to detect conflict separately
-		// (will also simplify reads considerably)
+		// Also need to update dirty bit
 	}
 }
 
@@ -240,6 +275,36 @@ void L2Cache::write(int address, int value, L2Cache::outcome expected_outcome) {
 	}
 }
 
+bool L2Cache::isDirty(int address) {
+	int index = toIndex(address);
+
+	if (ISA::isCodeAddress(address)) {
+		// Check instructions cache
+		int blockWay0 = toWayInstruction(index, 0);
+		int blockWay1 = toWayInstruction(index, 1);
+		if (instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) {
+			return instructionsDirty[blockWay0];
+		} else {
+			assert(instructionsValid[blockWay1]);
+			assert(instructionsTag[blockWay1] == tag);
+			// Assume present in way 1
+			return instructionsDirty[blockWay1];
+		}
+	} else {
+		// Check data cache
+		int blockWay0 = toWayData(index, 0);
+		int blockWay1 = toWayData(index, 1);
+		if (dataValid[blockWay0] && (dataTag[blockWay0] == tag)) {
+			return dataDirty[blockWay0];
+		} else {
+			assert(dataValid[blockWay1]);
+			assert(dataTag[blockWay1] == tag);
+			// Assume present in way 1
+			return dataDirty[blockWay1];
+		}
+	}
+}
+
 void L2Cache::evict(int address) {
 	int index = toIndex(address);
 	int tag = toTag(address);
@@ -271,9 +336,7 @@ void L2Cache::evict(int address) {
 	}
 
 	// Also tell L1 cache to evict if present (since it is inclusive in L2)
-	if (l1Cache != NULL) {
-		l1Cache->evict(address);
-	}
+	l1Cache->evict(address);
 }
 
 int L2Cache::toTag(int address) {

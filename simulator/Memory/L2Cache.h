@@ -33,6 +33,12 @@ private:
 	 */
 	void write(int address, int data, outcome expected_outcome);
 
+	/**
+	 * Checks whether a block at an address is dirty and should be written back.
+	 * Assumes that block is present, users should precede with a call to isPresent.
+	 */
+	bool isDirty(int address);
+
 private:
 	static const int WAYS = 2;
 
