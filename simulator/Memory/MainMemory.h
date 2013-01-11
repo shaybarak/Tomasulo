@@ -12,6 +12,7 @@ class MainMemory : public Clocked, public MasterSlaveInterface {
 public:
 	MainMemory(int accessDelay, int rowSize);
 	// Design flaw: exposes non-const pointer to data member
+	// (required for loading memory initialization)
 	vector<unsigned char>* getBuffer();
 	// For reading signals from L2 cache
 	virtual void onTickUp(int now);
