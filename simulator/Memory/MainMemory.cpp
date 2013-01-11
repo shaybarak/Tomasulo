@@ -34,17 +34,19 @@ void MainMemory::onTickDown(int now) {
 	if (!slaveReady) {
 		return;
 	}
-	if (delayCountDown == 0) {
-		if (writeEnable) {
-			words[address / sizeof(int)] = data;
-			slaveValid = true;
-		} else {
-			data = words[address / sizeof(int)];
-			slaveReady = true;
-		}
-	} else {
+
+	if (delayCountDown != 0) {
 		slaveReady = false;
 		slaveValid = false;
+		return;
+	}
+
+	if (writeEnable) {
+		words[address / sizeof(int)] = data;
+		slaveValid = true;
+	} else {
+		data = words[address / sizeof(int)];
+		slaveReady = true;
 	}
 }
 
