@@ -27,6 +27,7 @@ int testRam() {
 
 	// Test first read
 	ram.address = 4;
+	ram.masterReady = true;
 	ram.writeEnable = false;
 	ram.masterValid = true;
 	for (int i = 1; i < RAM_DELAY; i++) {
