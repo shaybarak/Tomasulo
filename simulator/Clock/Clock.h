@@ -13,7 +13,7 @@ public:
 	Clock(int time) : time(time) {}
 	/**
 	 * Register a new clocked component.
-	 * Clocked components must be registered in the order that they are chained (client first).
+	 * Clocked components must be registered in the order that they are chained (master before slave).
 	 */
 	void addObserver(Clocked* clocked);
 	// Generate a clock tick and notify all clocked components
