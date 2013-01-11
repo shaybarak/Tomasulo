@@ -9,7 +9,7 @@ void PreviousMemoryLevel::respondRead(int address, int value, int notBefore) {
 }
 
 bool PreviousMemoryLevel::getWriteRequest(int* address, int* value, int notBefore) {
-	return memoryInterface->getWriteRequest(address, *value, notBefore);
+	return memoryInterface->getWriteRequest(address, value, notBefore);
 }
 
 void PreviousMemoryLevel::respondWrite(int address, int notBefore) {

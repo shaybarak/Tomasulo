@@ -5,7 +5,7 @@ void NextMemoryLevel::requestRead(int address, int notBefore) {
 }
 
 bool NextMemoryLevel::getReadResponse(int* address, int* value, int notBefore) {
-	return memoryInterface->getReadResponse(address, *value, notBefore);
+	return memoryInterface->getReadResponse(address, value, notBefore);
 }
 
 void NextMemoryLevel::requestWrite(int address, int value, int notBefore) {

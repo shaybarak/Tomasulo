@@ -15,11 +15,11 @@ bool MemoryInterface::getReadRequest(int* address, int notBefore) {
 	return readRequests.pop(address, notBefore);
 }
 
-bool MemoryInterface::getReadResponse(int* address, int value, int notBefore) {
+bool MemoryInterface::getReadResponse(int* address, int* value, int notBefore) {
 	ReadResponse response;
 	if (readResponses.pop(&response, notBefore)) {
 		*address = response.address;
-		value = response.value;
+		*value = response.value;
 		return true;
 	}
 	return false;
@@ -36,11 +36,11 @@ void MemoryInterface::respondWrite(int address, int notBefore) {
 	writeResponses.push(address, notBefore);
 }
 
-bool MemoryInterface::getWriteRequest(int* address, int value, int notBefore) {
+bool MemoryInterface::getWriteRequest(int* address, int* value, int notBefore) {
 	WriteRequest request;
 	if (writeRequests.pop(&request, notBefore)) {
 		*address = request.address;
-		value = request.value;
+		*value = request.value;
 		return true;
 	}
 	return false;

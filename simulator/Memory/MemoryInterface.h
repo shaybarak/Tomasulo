@@ -25,7 +25,7 @@ public:
 	 * Reads the next value read from the next memory level if it's available.
 	 * Returns whether value was read.
 	 */
-	bool getReadResponse(int* address, int value, int notBefore);
+	bool getReadResponse(int* address, int* value, int notBefore);
 	
 	/** Registers a write request to the next memory level. */
 	void requestWrite(int address, int value, int notBefore);
@@ -37,7 +37,7 @@ public:
 	 * Reads the next write requested by the previous level if it's available.
 	 * Returns whether request was received.
 	 */
-	bool getWriteRequest(int* address, int value, int notBefore);
+	bool getWriteRequest(int* address, int* value, int notBefore);
 
 	/**
 	 * Reads the next write confirmation by the next level if it's available.
