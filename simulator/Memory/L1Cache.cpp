@@ -23,6 +23,11 @@ void L1Cache::onTick(int now) {
 			pendingWrites.erase(writeAllocate);
 		}
 	}
+	
+	// Get write response from L2 cache
+	else if (nextMemoryLevel->getWriteResponse(&address, now)) {
+		// TODO
+	}
 
 	// Get read request from CPU
 	if (previousMemoryLevel->getReadRequest(&address, now)) {
@@ -52,7 +57,7 @@ void L1Cache::onTick(int now) {
 	}
 
 	// Get write request from CPU
-	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
+	else if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
 		// Write-allocate so first make sure that block is present in cache
 		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
