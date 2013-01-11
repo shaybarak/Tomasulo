@@ -91,4 +91,8 @@ private:
 	bool instructionReadStall;
 	// Whether stalled on reading data from memory
 	bool dataReadStall;
+	//counter for stalled memory time
+	int timeStalledOnMemory;
+	//counter for memory reads count
+	int memoryReadsCount;
 };
