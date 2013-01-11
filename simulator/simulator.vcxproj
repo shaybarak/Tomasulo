@@ -15,6 +15,7 @@
     <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
     <ClInclude Include="Memory\Cache.h" />
+    <ClInclude Include="Memory\MasterSlaveInterface.h" />
     <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\MainMemory.h" />
     <ClInclude Include="Memory\MemoryInterface.h" />

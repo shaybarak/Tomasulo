@@ -108,6 +108,9 @@
     <ClInclude Include="Memory\MemoryInterface.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\MasterSlaveInterface.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">

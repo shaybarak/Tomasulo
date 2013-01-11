@@ -11,4 +11,4 @@ public:
 	bool slaveValid;
 	bool masterValid;
 	bool writeEnable;
-}
+};
