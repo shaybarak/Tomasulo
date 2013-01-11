@@ -8,7 +8,8 @@ public:
 	L1Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
 		: Cache(buffer, blockSize, cacheSize, WAYS, accessDelay, previousMemoryLevel, nextMemoryLevel) {}
-	virtual void onTick(int now);
+	virtual void onTickDown(int now);
+	virtual void onTickUp(int now);
 
 	// L2Cache is allowed private access to L1Cache
 	friend class L2Cache;

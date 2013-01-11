@@ -9,7 +9,8 @@ public:
 	L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
 		L1Cache* l1Cache);
-	virtual void onTick(int now);
+	virtual void onTickDown(int now);
+	virtual void onTickUp(int now);
 
 protected:
 	typedef Cache::outcome outcome;
