@@ -29,7 +29,7 @@ private:
 	// Busy reading until this time
 	int busyReadingUntil;
 	
-	int getAddressRow(int address);
+	int toRow(int address);
 
 	int read(int offset);
 	void write(int offset, int value);

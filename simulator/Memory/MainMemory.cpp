@@ -48,33 +48,6 @@ void MainMemory::onTickDown(int now) {
 	}
 }
 
-int MainMemory::getAddressRow(int address) {
+int MainMemory::toRow(int address) {
 	return address / rowSize;
 }
-
-//void MainMemory::onTick(int now) {
-//	int address, data;
-//	
-//	// Serve read request
-//	if ((now >= busyReadingUntil) && previousMemoryLevel->getReadRequest(&address, now)) {
-//		// Simulate delay
-//		int delay;
-//		if (address / rowSize == lastReadAddress / rowSize) {
-//			// Sequential read
-//			delay = 1;
-//		} else {
-//			// Non-sequential read
-//			delay = accessDelay;
-//		}
-//
-//		previousMemoryLevel->respondRead(address, words[address / sizeof(int)], now + delay);
-//		busyReadingUntil = now + delay;
-//		lastReadAddress = address;
-//	}
-//	
-//	// Serve write request
-//	if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
-//		// Assume no write delay
-//		words[address / sizeof(int)] = data;
-//	}
-//}
