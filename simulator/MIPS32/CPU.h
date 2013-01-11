@@ -3,7 +3,7 @@
 #include "Instruction.h"
 #include "GPR.h"
 #include "../Clock/Clocked.h"
-#include "../Memory/NextMemoryLevel.h"
+#include "../Memory/MasterSlaveInterface.h"
 #include <vector>
 using namespace std;
 
@@ -18,10 +18,10 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(NextMemoryLevel* nextMemoryLevel, int memorySize, GPR* gpr) :
-		nextMemoryLevel(nextMemoryLevel),
+	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pMasterSlaveInterface) :
 		memorySize(memorySize),
 		gpr(gpr),
+		pMasterSlaveInterface(pMasterSlaveInterface),
 		now(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
@@ -38,8 +38,9 @@ public:
 	 * pc: value of Program Counter at start of execution
 	 */
 	void loadProgram(vector<Instruction*>* instructions, int instructionsBase, int pc);
-	// Clock tick handler
-	virtual void onTick(int now);
+	// Clock tick handlers
+	virtual void onTickUp(int now);
+	virtual void onTickDown(int now);
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const { return instructionsCommitted; }
 	// Returns the Average Memory Access Time
@@ -67,8 +68,6 @@ private:
 	int pcToMemoryOffset(int pc);
 	/** Converts PC value to index of instruction in program. */
 	int pcToInstructionIndex(int pc);
-	// Next memory level (e.g. L1 cache)
-	NextMemoryLevel* nextMemoryLevel;
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers
@@ -95,4 +94,6 @@ private:
 	int timeStalledOnMemory;
 	//counter for memory reads count
 	int memoryReadsCount;
+
+	MasterSlaveInterface* pMasterSlaveInterface;
 };

@@ -11,6 +11,38 @@ void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, 
 	halted = false;
 }
 
+void CPU::onTickUp(int now) {
+
+	//on tick up:
+	//if ready, exectue.
+	//if stalled on data, continue waiting
+	//if stalled on instruction, continue waiting.
+
+	if (halted) {
+		return;
+	}
+	this->now = now;
+	if (dataReadStall) { // stalled on data read
+		return; 
+	}
+	if (instructionReadStall) { // Stalled on instruction read
+		return;
+	}
+	int data;
+	execute(pcToInstructionIndex(pc), data);
+
+}
+
+void CPU::onTickDown(int now) {
+	//read next instruction
+	if (!pMasterSlaveInterface->slaveValid) {
+		return;
+	}
+	if (instructionReadStall) {
+		int instruction = 
+	}
+}
+
 void CPU::onTick(int now) {
 	// Don't execute if halted
 	if (halted) {
