@@ -5,25 +5,26 @@
 #include "NextMemoryLevel.h"
 #include "PreviousMemoryLevel.h"
 #include "../Clock/Clocked.h"
+#include "MasterSlaveInterface.h"
 using namespace std;
 
-class MainMemory : public Clocked {
+class MainMemory : public Clocked, public MasterSlaveInterface {
 public:
-	MainMemory(int accessDelay, int l2BlockSize, PreviousMemoryLevel* previousMemoryLevel);
+	MainMemory(int accessDelay, int rowSize);
 	// Design flaw: exposes non-const pointer to data member
 	vector<unsigned char>* getBuffer();
 	virtual void onTick(int now);
-	int read(int offset);
-	void write(int offset, int value);
 
 private:
 	vector<unsigned char> buffer;
 	int* words;
 	int accessDelay;
-	int l2BlockSize;
+	int rowSize;
 	// For identifying sequential access
 	int lastReadAddress;
 	// Busy reading until this time
 	int busyReadingUntil;
-	PreviousMemoryLevel* previousMemoryLevel;
+	
+	int read(int offset);
+	void write(int offset, int value);
 };
