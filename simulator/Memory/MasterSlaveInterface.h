@@ -4,8 +4,6 @@ class MasterSlaveInterface {
 public:
 	int address;
 	int data;
-	bool slaveBusy;
-	bool masterBusy;
 	bool slaveReady;
 	bool masterReady;
 	bool slaveValid;
