@@ -35,6 +35,8 @@ void L1Cache::onTick(int now) {
 			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
 			// There is a pending read, so delay but mark this as a hit
 			hits++;
+			pendingReadsExternal.insert(address);
+			// Do nothing (result will be sent back to L1 when the pending read returns)
 		} else if (isPresent(address, &addressOut) == PRESENT) {
 			// Can satisfy read from cache
 			data = read(address);

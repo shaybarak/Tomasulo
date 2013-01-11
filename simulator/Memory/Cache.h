@@ -89,7 +89,7 @@ protected:
 	// Memory addresses that have pending reads externally-requested (to serve lower level).
 	// When these pending read operations return, the result will be sent to the lower level.
 	set<int> pendingReadsExternal;
-	// Writes that are pending due to write-allocate or write-back
+	// Writes that are pending due to write-allocate
 	map<int, int> pendingWrites;
 
 private:
