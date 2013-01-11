@@ -2,9 +2,8 @@
 
 class MasterSlaveInterface {
 public:
-	
-	MasterSlaveInterface(): slaveReady(true), slaveValid(false), masterReady(false), 
-			masterValid(false), writeEnable(false){}
+	MasterSlaveInterface() : slaveReady(true), slaveValid(false),
+		masterReady(false), masterValid(false), writeEnable(false) {}
 
 	int address;
 	int data;
