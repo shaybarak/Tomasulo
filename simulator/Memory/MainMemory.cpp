@@ -19,7 +19,7 @@ void MainMemory::onTick(int now) {
 	if ((now >= busyReadingUntil) && previousMemoryLevel->getReadRequest(&address, now)) {
 		// Simulate delay
 		int delay;
-		if (address % l2BlockSize == lastReadAddress % l2BlockSize) {
+		if (address / l2BlockSize == lastReadAddress / l2BlockSize) {
 			// Sequential read
 			delay = 1;
 		} else {
