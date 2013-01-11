@@ -167,10 +167,10 @@
     <ClCompile Include="Memory\L1Cache.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\MainMemory.cpp">
+    <ClCompile Include="Memory\MemoryInterface.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\MemoryInterface.cpp">
+    <ClCompile Include="Memory\MainMemory.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
   </ItemGroup>

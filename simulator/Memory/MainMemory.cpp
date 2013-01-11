@@ -7,6 +7,7 @@ MainMemory::MainMemory(int accessDelay, int rowSize)
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
 	slaveReady = true;
+	slaveValid = false;
 }
 
 vector<unsigned char>* MainMemory::getBuffer() { 
@@ -31,7 +32,7 @@ void MainMemory::onTickUp(int now) {
 
 void MainMemory::onTickDown(int now) {
 	delayCountDown--;
-	if (!slaveReady) {
+	if (!masterReady) {
 		return;
 	}
 	if (delayCountDown != 0) {
@@ -39,6 +40,7 @@ void MainMemory::onTickDown(int now) {
 		slaveValid = false;
 		return;
 	}
+	openedRow = toRow(address);
 	if (writeEnable) {
 		words[address / sizeof(int)] = data;
 		slaveReady = true;

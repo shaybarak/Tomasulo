@@ -9,4 +9,6 @@ public:
 	bool slaveValid;
 	bool masterValid;
 	bool writeEnable;
+
+	//writeEnable + slaveReady => write was succefully committed
 };
