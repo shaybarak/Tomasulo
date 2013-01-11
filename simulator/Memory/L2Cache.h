@@ -9,8 +9,10 @@ public:
 	L2Cache(int* buffer, int blockSize, int cacheSize, int accessDelay,
 		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
 		L1Cache* l1Cache);
-	virtual void onTickDown(int now);
+	// For reading signals from L1 cache and sending signals to RAM
 	virtual void onTickUp(int now);
+	// For reading signals from RAM and sending signals to L1 cache
+	virtual void onTickDown(int now);
 
 protected:
 	typedef Cache::outcome outcome;
