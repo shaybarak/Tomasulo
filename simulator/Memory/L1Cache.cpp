@@ -102,7 +102,7 @@ void L1Cache::onTickDown(int now) {
 		break;
 	case WAIT_WA:
 		write(pL2Slave->address, pL2Slave->data);
-		if (p2Slave->slaveReady) {
+		if (pL2Slave->slaveReady) {
 			// Done filling
 			pL2Slave->masterValid = false;
 			pCpuMaster->slaveReady = true;
@@ -134,7 +134,7 @@ void L1Cache::write(int address, int value) {
 	int offset = toOffset(address);
 	*getWordPtr(index, offset) = value;
 	valid[index] = true;
-	tag[index] = tag;
+	tags[index] = tag;
 	if (l2Cache != NULL) {
 		l2Cache->write(address, value);
 	}
