@@ -25,6 +25,11 @@ void L1Cache::onTickUp(int now) {
 		break;
 	
 	case READ_MISS:
+		// Read miss - bring entire L1 block from L2
+		if (!pL2Slave->slaveReady) {
+			// Wait for L2 to become ready
+			break;
+		}
 		// Request critical word first
 		pL2Slave->address = pCpuMaster->address;
 		pL2Slave->writeEnable = false;
@@ -38,7 +43,10 @@ void L1Cache::onTickUp(int now) {
 	
 	case WRITE_MISS:
 		// Write allocate: first bring entire L1 block from L2
-		assert(pL2Slave->slaveReady);
+		if (!pL2Slave->slaveReady) {
+			// Wait for L2 to become ready
+			break;
+		}
 		// Start reading at base of block
 		pL2Slave->address = pCpuMaster->address - toOffset(pCpuMaster->address);
 		pL2Slave->writeEnable = false;
