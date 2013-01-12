@@ -3,6 +3,7 @@
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
+#include <assert.h>
 
 void CPU::loadProgram(vector<Instruction*>* instructions, int pc) {
 	this->instructions = instructions;
@@ -31,9 +32,10 @@ void CPU::onTickUp(int now) {
 	case HALT:
 		break;
 	default:
-		cerr << "CPU reached illegal state: " << (state) << "!" << endl;
+		// Unknown state
 		state = HALT;
-		break; 
+		assert(false);
+		break;
 	}
 }
 
@@ -45,12 +47,15 @@ void CPU::onTickDown(int now) {
 		if (!pL1InstSlave->slaveValid) {
 			break;
 		}
+		pL1InstSlave->masterValid = false;
 		execute(pL1InstSlave->data);
 		break;
 	case LW:
 		if (!pL1DataSlave->slaveReady) {
-			cerr << "CPU exception: cannot be in LW state on tick down!" << endl;
+			// Unexpected state: LW on tickDown
 			state = HALT;
+			assert(false);
+			break;
 		}
 		break;
 	case LW_STALL:
@@ -58,21 +63,25 @@ void CPU::onTickDown(int now) {
 			break;
 		}
 		continueExecuteLw();
+		pL1DataSlave->masterValid = false;
 		state = READY;
 		break;
 	case SW_STALL:
 		if (pL1DataSlave->slaveReady) {
 			requestWrite(nextSwAddress, nextSwData);
 			continueExecuteSw();
+			pL1DataSlave->masterValid = false;
 			state = READY;
-		}		
+		}
 		break;
 	case HALT:
 		break;
 	default:
-		cerr << "CPU reached illegal state: " << (state) << "!" << endl;
+		default:
+		// Unknown state
 		state = HALT;
-		break; 
+		assert(false);
+		break;
 	}
 }
 
