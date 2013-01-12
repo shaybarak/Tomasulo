@@ -47,14 +47,41 @@ void L2Cache::onTickDown(int now) {
 	}
 }
 
-bool L2Cache::isHit(int address) {
+bool L2Cache::isPresentInWay(int address, int way) {
+	int tag = toTag(address);
+	int index = toIndex(address);
+	int block = toBlock(index, way);
+	return (valid[block] && (tags[block] == tag));
+}
 
+bool L2Cache::isHit(int address) {
+	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
 }
 
 int L2Cache::read(int address) {
-
+	int tag = toTag(address);
+	int index = toIndex(address);
+	int offset = toOffset(address);
+	if (isPresentInWay(address, 0)) {
+		way0IsLru[index] = false;
+		return *getWordPtr(index, offset, 0);
+	} else {
+		way0IsLru[index] = true;
+		return *getWordPtr(index, offset, 1);
+	}
 }
 
 void L2Cache::write(int address, int value) {
-
+	int tag = toTag(address);
+	int index = toIndex(address);
+	int offset = toOffset(address);
+	if (isPresentInWay(address, 0)) {
+		way0IsLru[index] = false;
+		dirty[toBlock(index, 0)] = true;
+		*getWordPtr(index, offset, 0) = value;
+	} else {
+		way0IsLru[index] = true;
+		dirty[toBlock(index, 1)] = true;
+		*getWordPtr(index, offset, 1) = value;
+	}
 }

@@ -18,6 +18,8 @@ protected:
 	virtual bool invalidate(int address) { return false; }  // Not implemented in L2
 
 private:
+	// Returns whether address is present in a given way
+	bool isPresentInWay(int address, int way);
 	// Returns whether address is a hit
 	bool isHit(int address);
 
