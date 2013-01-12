@@ -29,8 +29,8 @@ void MainMemory::onTickUp(int now) {
 }
 
 void MainMemory::onTickDown(int now) {
-	delayCountDown--;
-	if (delayCountDown > 0) {
+	delay--;
+	if (delay > 0) {
 		return;
 	}
 	openRow = toRow(pL2Master->address);

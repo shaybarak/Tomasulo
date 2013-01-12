@@ -221,7 +221,7 @@ int L2Cache::findVacancy(int address) {
 	} else if (!valid[toBlock(index, 1)]) {
 		return 1;
 	} else {
-		-1;
+		return -1;
 	}
 }
 
