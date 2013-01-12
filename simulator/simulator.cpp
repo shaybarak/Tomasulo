@@ -99,7 +99,7 @@ int main(int argc, char** argv) {
 
 	// Read inputs
 	//////////////
-	Labeler labeler();
+	Labeler labeler;
 	// First pass on code: find and process labels
 	while (cmd_file) {
 		string line;
