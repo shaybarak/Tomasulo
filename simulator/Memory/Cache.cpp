@@ -26,8 +26,6 @@ int Cache::toIndex(int address) {
 	// Divide address by block size to trim offset part.
 	// Compute modulus of how many possible indices there are.
 	// For each index we consume a block times how many ways there are per entry.
-	// This is consumed out of the entire cache buffer, which is split 50%/50%
-	// between instructions and data, hence the division by 2.
 	return (address / blockSize) % (cacheSize / (blockSize * ways));
 }
 
