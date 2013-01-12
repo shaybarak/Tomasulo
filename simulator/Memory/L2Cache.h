@@ -19,7 +19,6 @@ public:
 
 protected:
 	typedef Cache::outcome outcome;
-	virtual outcome isPresent(int addressIn, int* addressOut);
 	virtual void evict(int address);
 
 private:

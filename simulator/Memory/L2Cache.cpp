@@ -140,41 +140,6 @@ void L2Cache::onTick(int now) {
 	}
 }
 
-L2Cache::outcome L2Cache::isPresent(int addressIn, int* addressOut) {
-	int index = toIndex(addressIn);
-	int tag = toTag(addressIn);
-	if (ISA::isCodeAddress(addressIn)) {
-		// Check instructions cache
-		int blockWay0 = toInstructionsBlock(index, 0);
-		int blockWay1 = toInstructionsBlock(index, 1);
-		if ((instructionsValid[blockWay0] && (instructionsTag[blockWay0] == tag)) ||
-			(instructionsValid[blockWay1] && (instructionsTag[blockWay1] == tag))) {
-			// Mapped to block with matching tag
-			return PRESENT;
-		}
-		if (!instructionsValid[blockWay0] || !instructionsValid[blockWay1]) {
-			// Mapped to at least one invalid block
-			return INVALID;
-		}
-		// Mapped to valid blocks with mismatching tag
-		return CONFLICT;
-	} else {
-		// Check data cache
-		int blockWay0 = toDataBlock(index, 0);
-		int blockWay1 = toDataBlock(index, 1);
-		if ((dataValid[blockWay0] && (dataTag[blockWay0] == tag)) ||
-			(dataValid[blockWay1] && (dataTag[blockWay1] == tag))) {
-			// Mapped to block with matching tag
-			return PRESENT;
-		}
-		if (!dataValid[blockWay0] || !dataValid[blockWay1]) {
-			// Mapped to at least one invalid block
-			return INVALID;
-		}
-		// Mapped to valid blocks with mismatching tag
-		return CONFLICT;
-	}
-}
 
 int L2Cache::read(int address) {
 	int index = toIndex(address);
