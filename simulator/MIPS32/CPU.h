@@ -50,7 +50,7 @@ public:
 	bool isHalted() const { return state == HALT; }
 
 private:
-	enum CpuState {
+	enum State {
 		READY,		//initial state, and after execution
 		INST_STALL,	//stalled on instruction read from L1
 		LW,			//after reading lw instrcution
@@ -117,5 +117,5 @@ private:
 	MasterSlaveInterface* pL1DataSlave;
 	MasterSlaveInterface* pL1InstSlave;
 	//CPU internal state
-	CpuState state;
+	State state;
 };
