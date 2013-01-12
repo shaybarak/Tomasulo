@@ -208,15 +208,13 @@ void CPU::execute(int instructionIndex) {
 void CPU::requestReadInst() {
 	pL1InstSlave->writeEnable = false;
 	pL1InstSlave->masterValid = true;
-	pL1InstSlave->masterReady = true;
 	pL1InstSlave->address = pcToMemoryOffset(pc);
 	memoryAccessCount++;
 }
 
 void CPU::requestReadData(int address) {
 	pL1DataSlave->writeEnable = false;
-	pL1DataSlave->masterValid = false;
-	pL1DataSlave->masterReady = true;
+	pL1DataSlave->masterValid = true;
 	pL1DataSlave->address = address;
 	memoryAccessCount++;
 }
@@ -224,7 +222,6 @@ void CPU::requestReadData(int address) {
 void CPU::requestWrite(int address, int data) {
 	pL1DataSlave->writeEnable = true;
 	pL1DataSlave->masterValid = true;
-	pL1DataSlave->masterReady = true;
 	pL1DataSlave->address = address;
 	pL1DataSlave->data = data;
 	memoryAccessCount++;
