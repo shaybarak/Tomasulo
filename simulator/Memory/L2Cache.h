@@ -5,7 +5,7 @@
 
 class L2Cache : public Cache, public Clocked {
 public:
-	L2Cache(int blockSize, int cacheSize, int accessDelay,
+	L2Cache(int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
 		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave,
 		Cache* l1Cache);
 	// For reading signals from L1 cache and sending signals to RAM
@@ -20,8 +20,12 @@ protected:
 private:
 	// Returns whether address is present in a given way
 	bool isPresentInWay(int address, int way);
+	
 	// Returns whether address is a hit
 	bool isHit(int address);
+	
+	// Returns vacant way (0 or 1) for address if exists or -1 otherwise
+	int findVacancy(int address);
 
 	/**
 	 * Checks whether a block at an address is dirty and should be written back.
@@ -36,6 +40,17 @@ private:
 	 */
 	int read(int address);
 
+	/**
+	 * Writes to cache.
+	 * address: memory address to write to.
+	 * value: value to write.
+	 * way: destination way to write to.
+	 */
+	void write(int address, int value, int way);
+
+	// Generates the next address in cyclic order
+	int nextAddress(int address, int blockSize);
+
 	MasterSlaveInterface* pL1Master;
 	MasterSlaveInterface* pRamSlave;
 
@@ -49,13 +64,24 @@ private:
 		READY,					//ready to serve
 		ACCESSING,				//trying to access a word inside the cache
 		SERVE_REST_L1_BLOCK,	//sending rest of l1 block, after critical word
-		WAIT_CWF,				//waiting for main memory to return CriticalWordFirst
-		READ_REST_L1_BLOCK,		//reading rest of l1 block from main memory
-		WRITE_TO_RAM,			//write l2 blck to ram, when write-back policy enforces
+		READ_L1_BLOCK_FROM_RAM,	//reading rest of l1 block from main memory
 		READ_REST_L2_BLOCK,		//reading rest of l2 block from memory
+		WRITE_BACK,				//write l2 blck to ram, when write-back policy enforces
 	};
 	State state;
 
 	vector<bool> dirty;
 	vector<bool> way0IsLru;
+
+	// Size of L1 block in bytes
+	int l1BlockSize;
+
+	// Words left until end of block
+	int wordsLeft;
+
+	// Copy of address for cyclic read/write
+	int address;
+
+	// Way to write into (kept between state transitions on read from RAM)
+	int destinationWay;
 };
