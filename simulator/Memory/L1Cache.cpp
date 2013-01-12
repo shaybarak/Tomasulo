@@ -116,38 +116,6 @@ void L1Cache::onTickDown(int now) {
 	}
 }
 
-L1Cache::outcome L1Cache::isPresent(int addressIn, int* addressOut) {
-	int index = toIndex(addressIn);
-	int tag = toTag(addressIn);
-	if (ISA::isCodeAddress(addressIn)) {
-		// Check instructions cache
-		if (!instructionsValid[index]) {
-			// Mapped to invalid block
-			return INVALID;
-		}
-		if (instructionsTag[index] == tag) {
-			// Mapped to block with matching tag
-			return PRESENT;
-		} else {
-			// Mapped to block with mismatching tag
-			return CONFLICT;
-		}
-	} else {
-		// Check data cache
-		if (!dataValid[index]) {
-			// Mapped to invalid block
-			return INVALID;
-		}
-		if (dataTag[index] == tag) {
-			// Mapped to block with matching tag
-			return PRESENT;
-		} else {
-			// Mapped to block with mismatching tag
-			return CONFLICT;
-		}
-	}
-}
-
 bool L1Cache::isHit(int address) {
 	int index = toIndex(address);
 	int tag = toTag(address);
