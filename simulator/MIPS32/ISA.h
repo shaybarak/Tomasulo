@@ -13,6 +13,10 @@ public:
 	enum Opcode {
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};
+
+	enum memoryType {
+		INST, DATA,
+	}
 	// Convert opcode by name to enum value
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	// Count of registers in ISA
