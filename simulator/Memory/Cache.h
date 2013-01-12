@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class Cache : public MasterSlaveInterface {
+class Cache {
 public:
 	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 0);
 	const vector<unsigned char>* getInstructionsBuffer() const { return &instructionsBuffer; }
