@@ -57,16 +57,15 @@ void L1Cache::onTickDown(int now) {
 		if (delay > 0) {
 			break;
 		}
-		int address = pCpuMaster->address;
-		if (isHit(address)) {
+		if (isHit(pCpuMaster->address)) {
 			// Hit
 			hits++;
 			if (!pCpuMaster->writeEnable) {
 				// Return cached data on read hit
-				pCpuMaster->data = read(address);
+				pCpuMaster->data = read(pCpuMaster->address);
 			} else {
 				// Commit write on write hit
-				write(address, pCpuMaster->data);
+				write(pCpuMaster->address, pCpuMaster->data);
 			}
 			pCpuMaster->slaveValid = true;
 			pCpuMaster->slaveReady = true;
