@@ -84,12 +84,6 @@
     <ClInclude Include="Clock\Clocked.h">
       <Filter>Header Files\Clock</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\TimedQueue.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\WriteRequest.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Memory\MainMemory.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
@@ -143,14 +137,8 @@
     <ClCompile Include="simulator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\TimedQueue.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="Clock\Clock.cpp">
       <Filter>Source Files\Clock</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\MemoryInterface.cpp">
-      <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MainMemory.cpp">
       <Filter>Source Files\Memory</Filter>

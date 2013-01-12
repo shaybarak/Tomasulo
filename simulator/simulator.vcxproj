@@ -19,8 +19,6 @@
     <ClInclude Include="Memory\L2Cache.h" />
     <ClInclude Include="Memory\MasterSlaveInterface.h" />
     <ClInclude Include="Memory\MainMemory.h" />
-    <ClInclude Include="Memory\TimedQueue.h" />
-    <ClInclude Include="Memory\WriteRequest.h" />
     <ClInclude Include="MIPS32\CPU.h" />
     <ClInclude Include="MIPS32\GPR.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
@@ -39,8 +37,6 @@
     <ClCompile Include="Memory\L1Cache.cpp" />
     <ClCompile Include="Memory\L2Cache.cpp" />
     <ClCompile Include="Memory\MainMemory.cpp" />
-    <ClCompile Include="Memory\MemoryInterface.cpp" />
-    <ClCompile Include="Memory\TimedQueue.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
     <ClCompile Include="MIPS32\GPR.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
