@@ -161,8 +161,8 @@ int main(int argc, char** argv) {
 	//L2Cache	L2InstCache(mem_access_delay, l2_block_size, &l1L2InstInterface);
 	//L2Cache	L2DataCache(mem_access_delay, l2_block_size, &l1L2DataInterface);
 	
-	MainMemory ramInst(mem_access_delay, l2_block_size, &l2RamInstInterface);
-	MainMemory ramData(mem_access_delay, l2_block_size, &l2RamDataInterface);
+	MainMemory ramInst(mem_access_delay, l2_block_size, &l2RamInstInterface, ISA::INST);
+	MainMemory ramData(mem_access_delay, l2_block_size, &l2RamDataInterface, ISA::DATA);
 	
 	// Read memory initialization
 	if (!HexDump::load(*ramData.getBuffer(), mem_init)) {

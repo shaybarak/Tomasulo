@@ -1,13 +1,14 @@
 #pragma once
 
 #include <vector>
+#include "../MIPS32/ISA.h"
 #include "../Clock/Clocked.h"
 #include "MasterSlaveInterface.h"
 using namespace std;
 
 class MainMemory : public Clocked {
 public:
-	MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
+	MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master, ISA::MemoryType memoryType);
 	// Design flaw: exposes non-const pointer to data member
 	// (required for loading memory initialization)
 	vector<unsigned char>* getBuffer();
@@ -20,6 +21,10 @@ public:
 	MasterSlaveInterface* pL2Master;
 
 private:
+	
+	//defines if cahce is data/instrcutions
+	ISA::MemoryType memoryType;
+
 	vector<unsigned char> buffer;
 	int* words;
 	int accessDelay;

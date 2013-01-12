@@ -14,7 +14,7 @@ public:
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};
 
-	enum memoryType {
+	enum MemoryType {
 		INST, DATA,
 	};
 	// Convert opcode by name to enum value

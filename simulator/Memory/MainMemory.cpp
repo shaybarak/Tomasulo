@@ -1,8 +1,8 @@
 #include "MainMemory.h"
 #include "../MIPS32/ISA.h"
 
-MainMemory::MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master)
-	: accessDelay(accessDelay), rowSize(rowSize), pL2Master(pL2Master),
+MainMemory::MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master, ISA::MemoryType memoryType)
+	: accessDelay(accessDelay), rowSize(rowSize), pL2Master(pL2Master), memoryType(memoryType),
 		  lastReadAddress(-1), busyReadingUntil(0) {
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
