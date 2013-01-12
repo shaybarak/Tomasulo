@@ -18,10 +18,11 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pMasterSlaveInterface) :
+	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pInstInterface, MasterSlaveInterface* pDataInterface) :
 		memorySize(memorySize),
 		gpr(gpr),
-		pL1Slave(pMasterSlaveInterface),
+		pL1DataSlave(pInstInterface),
+		pL1InstSlave(pDataInterface),
 		state(READY),
 		now(0),
 		instructionsCommitted(0),
@@ -78,7 +79,7 @@ private:
 	/** Converts PC value to index of instruction in program. */
 	int pcToInstructionIndex(int pc);
 	/** set memory interface signals for reading instrcution **/
-	void requestReadInstruction();
+	void requestReadInst();
 	/** set memory interface signals for reading data **/
 	void requestReadData(int address);
 	/** set memory interface signals for writing instrcution **/
@@ -117,8 +118,9 @@ private:
 	int nextSwAddress;
 	//Next data to write
 	int nextSwData;
-	//Interface for communicating with L1
-	MasterSlaveInterface* pL1Slave;
+	//Interfaces for communicating with L1 caches
+	MasterSlaveInterface* pL1DataSlave;
+	MasterSlaveInterface* pL1InstSlave;
 	//CPU internal state
 	CpuState state;
 };
