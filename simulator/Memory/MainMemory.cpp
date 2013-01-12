@@ -3,7 +3,7 @@
 
 MainMemory::MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master, ISA::MemoryType memoryType)
 	: accessDelay(accessDelay), rowSize(rowSize), pL2Master(pL2Master), memoryType(memoryType),
-		  lastReadAddress(-1), busyReadingUntil(0) {
+		  lastReadAddress(-1), openedRow(-1), busyReadingUntil(0) {
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
 }
@@ -32,7 +32,8 @@ void MainMemory::onTickDown(int now) {
 	if (!pL2Master->masterReady) {
 		return;
 	}
-	if (--delayCountDown > 0) {
+	delayCountDown--;
+	if (delayCountDown > 0) {
 		return;
 	}
 	openedRow = toRow(pL2Master->address);
