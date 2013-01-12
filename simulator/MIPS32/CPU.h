@@ -23,7 +23,7 @@ public:
 		gpr(gpr),
 		pL1DataSlave(pInstInterface),
 		pL1InstSlave(pDataInterface),
-		state(HALTED),
+		state(HALT),
 		now(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
