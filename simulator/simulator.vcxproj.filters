@@ -96,6 +96,12 @@
     <ClInclude Include="Memory\MasterSlaveInterface.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\L2Cache.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\Cache.h">
+      <Filter>Header Files\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
@@ -144,6 +150,12 @@
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MainMemory.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\L2Cache.cpp">
+      <Filter>Source Files\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\Cache.cpp">
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
   </ItemGroup>
