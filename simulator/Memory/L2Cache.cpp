@@ -2,17 +2,44 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
-L2Cache::L2Cache(int blockSize, int cacheSize, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel,
-		L1Cache* l1Cache)
-		: Cache(blockSize, cacheSize, WAYS, accessDelay, previousMemoryLevel, nextMemoryLevel),
-		  l1Cache(l1Cache) {
+L2Cache::L2Cache(int blockSize, int cacheSize, int accessDelay, 
+		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave, L1Cache* l1Cache)		
+		: Cache(blockSize, cacheSize, WAYS, accessDelay), 
+		l1Cache(l1Cache), state(READY), delayCountDown(accessDelay){
 	// Also initialize dirty bits
 	instructionsDirty.resize(instructionsValid.size());
 	dataDirty.resize(dataValid.size());
 	// Also initialize LRU bits (2 ways per block)
 	instructionsWay0IsLru.resize(instructionsValid.size() / 2);
 	dataWay0IsLru.resize(dataValid.size() / 2);
+}
+
+void L2Cache::onTickUp(int now) {
+	switch(state) {
+	case READY:
+		if (!pL1Master->masterValid) {
+			break;
+		}
+		// Got request from CPU
+		delayCountDown = accessDelay;
+		pL1Master->slaveReady = false;
+		pL1Master->slaveValid = false;
+		// Accessing internal buffer
+		state = ACCESSING;
+		break;
+	case ACCESSING:
+		// Blocked on internal buffers
+		break;
+	case SERVE_REST_L1_BLOCK:
+		break;
+	case WAIT_CWF:
+	case WRITE_TO_RAM:
+		//TODO
+	case READ_REST_OF_BLOCK:
+		//TODO
+	default:
+		
+	}
 }
 
 void L2Cache::onTick(int now) {
