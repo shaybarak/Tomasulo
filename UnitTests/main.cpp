@@ -111,7 +111,7 @@ int testL1Cache() {
 	if (!assertTrue(l1.slaveValid == false, __LINE__, "L1 cache should not output valid signals at startup")) return FAILURE;
 
 	// Test first read (expecting miss)
-	l1.address = ISA::CODE_BASE + sizeof(int) * 2;
+	l1.address = sizeof(int) * 2;
 	l1.writeEnable = false;
 	l1.masterValid = true;
 	l1.onTickUp();
@@ -122,7 +122,7 @@ int testL1Cache() {
 	if (!assertTrue(l1.slaveReady == true, __LINE__, "L1 cache should be ready for write")) return FAILURE;
 	if (!assertTrue(l1.slaveValid == false, __LINE__, "L1 cache should not output valid signals during read miss")) return FAILURE;
 	if (!assertTrue(mockL2.masterValid == true, __LINE__, "L1 cache should request read from L2")) return FAILURE;
-	if (!assertTrue(mockL2.address == ISA::CODE_BASE + sizeof(int) * 2, __LINE__, "L1 cache should request read from L2")) return FAILURE;
+	if (!assertTrue(mockL2.address == sizeof(int) * 2, __LINE__, "L1 cache should request read from L2")) return FAILURE;
 	if (!assertTrue(mockL2.writeEnable == false, __LINE__, "L1 cache should request read from L2")) return FAILURE;
 	mockL2.slaveReady = false;  // Because we'll be streaming the rest of the block
 	mockL2.slaveValid = false;
@@ -142,56 +142,56 @@ int testL1Cache() {
 	l1.onTickDown();
 	if (!assertTrue(l1.slaveReady == true, __LINE__, "L1 cache should be ready for write")) return FAILURE;
 	if (!assertTrue(l1.slaveValid == true, __LINE__, "L1 cache should have valid output forwarded from L2 cache (critical word first)")) return FAILURE;
-	if (!assertTrue(l1.address == ISA::CODE_BASE + sizeof(int) * 2, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
+	if (!assertTrue(l1.address == sizeof(int) * 2, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
 	if (!assertTrue(l1.data == 42, __LINE__, "L1 cache should forward correct value from L2 cache")) return FAILURE;
 
 	// Now CPU reads next instruction, expect hit since it is streamed from L2
-	l1.address = ISA::CODE_BASE + sizeof(int) * 3;
+	l1.address = sizeof(int) * 3;
 	l1.writeEnable = false;
 	l1.masterValid = true;
 	l1.onTickUp();
 	// L1 doesn't request read because L2 is not ready
 	if (!assertTrue(mockL2.masterValid == false, __LINE__, "L1 cache shouldn't read from L2 while L2 is busy")) return FAILURE;
-	mockL2.address = ISA::CODE_BASE + sizeof(int) * 3;
+	mockL2.address = sizeof(int) * 3;
 	mockL2.data = 17;
 	mockL2.slaveValid = true;
 	mockL2.slaveReady = false;
 	l1.onTickDown();
 	if (!assertTrue(l1.slaveReady == true, __LINE__, "L1 cache should be ready for write")) return FAILURE;
 	if (!assertTrue(l1.slaveValid == true, __LINE__, "L1 cache should have valid output forwarded from L2 cache")) return FAILURE;
-	if (!assertTrue(l1.address == ISA::CODE_BASE + sizeof(int) * 3, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
+	if (!assertTrue(l1.address == sizeof(int) * 3, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
 	if (!assertTrue(l1.data == 17, __LINE__, "L1 cache should forward correct value from L2 cache")) return FAILURE;
 	
 	// Now CPU reads next instruction which is not yet in cache but from the same block (stalling one extra cycle)
-	l1.address = ISA::CODE_BASE + sizeof(int);
+	l1.address = sizeof(int);
 	l1.writeEnable = false;
 	l1.masterValid = true;
 	l1.onTickUp();
 	if !assertTrue(mockL2.masterValid == true, __LINE__, "L1 cache shouldn't read from L2 while L2 is busy")) return FAILURE;
-	mockL2.address = ISA::CODE_BASE;
+	mockL2.address = ;
 	mockL2.data = 18;
 	mockL2.slaveValid = true;
 	mockL2.slaveReady = false;
 	l1.onTickDown();
 	if (!assertTrue(l1.slaveValid == false, __LINE__, "L1 cache should be stalled on L2 cache")) return FAILURE;
 	l1.onTickUp();
-	mockL2.address = ISA::CODE_BASE + sizeof(int);
+	mockL2.address = sizeof(int);
 	mockL2.data = 19;
 	mockL2.slaveValid = true;
 	mockL2.slaveReady = true;  // Finished streaming L1 block from L2 cache
 	l1.onTickDown();
 	if (!assertTrue(l1.slaveValid == true, __LINE__, "L1 cache should have valid output forwarded from L2 cache")) return FAILURE;
-	if (!assertTrue(l1.address == ISA::CODE_BASE + sizeof(int), __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
+	if (!assertTrue(l1.address == sizeof(int), __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
 	if (!assertTrue(l1.data == 19, __LINE__, "L1 cache should forward correct value from L2 cache")) return FAILURE;
 
 	// Now CPU requests a cached instruction
-	l1.address = ISA::CODE_BASE;
+	l1.address = 0;
 	l1.writeEnable = false;
 	l1.masterValid = true;
 	l1.onTickUp();
 	l1.onTickDown();
 	if (!assertTrue(l1.slaveValid == true, __LINE__, "L1 cache should have valid output from its cache")) return FAILURE;
-	if (!assertTrue(l1.address == ISA::CODE_BASE, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
+	if (!assertTrue(l1.address == 0, __LINE__, "L1 cache should maintain address on read response")) return FAILURE;
 	if (!assertTrue(l1.data == 18, __LINE__, "L1 cache should return correct value")) return FAILURE;
 
 	// Now write some data
