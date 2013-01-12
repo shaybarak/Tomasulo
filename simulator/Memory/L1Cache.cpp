@@ -1,89 +1,95 @@
 #include "L1Cache.h"
 #include "../MIPS32/ISA.h"
+#include <assert.h>
 
-void L1Cache::onTick(int now) {
-	int address, data, addressOut;
-
-	// Get read response from L2 cache
-	if (nextMemoryLevel->getReadResponse(&address, &data, now)) {
-		write(address, data);
-		pendingReadsInternal.erase(address);
-		if (pendingReadsExternal.erase(address) > 0) {
-			// Serve incoming data to lower level
-			previousMemoryLevel->respondRead(address, data, now);
+void L1Cache::onTickUp(int now) {
+	switch (state) {
+	case READY:
+		if (!pCpuMaster->masterValid) {
+			break;
 		}
-		
-		map<int, int>::iterator writeAllocate = pendingWrites.find(address);
-		if (writeAllocate != pendingWrites.end()) {
-			// Was waiting for this word for write-allocate, now send write
-			address = writeAllocate->first;
-			data = writeAllocate->second;
-			write(address, data);
-			nextMemoryLevel->requestWrite(address, data, now);
-			pendingWrites.erase(writeAllocate);
-		}
+		// Got request from CPU
+		delay = accessDelay;
+		pCpuMaster->slaveReady = false;
+		pCpuMaster->slaveValid = false;
+		// Accessing internal buffer
+		state = ACCESSING;
+		break;
+	case ACCESSING:
+		// Blocked on internal buffers
+		break;
+	case READ_MISS:
+		assert(pL2Slave->slaveReady);
+		// Request critical word first
+		pL2Slave->address = pCpuMaster->address;
+		pL2Slave->writeEnable = false;
+		pL2Slave->masterValid = true;
+		state = WAIT_CWF;
+		break;
+	case WAIT_CWF:
+		// Blocked on L2 cache
+		break;
+	case WAIT_REST:
+		break;
+	case WRITE_MISS:
+		break;
+	case WAIT_WA:
+		break;
 	}
-	
-	// Get write response from L2 cache
-	else if (nextMemoryLevel->getWriteResponse(&address, now)) {
-		// TODO
-	}
+}
 
-	// Get read request from CPU
-	if (previousMemoryLevel->getReadRequest(&address, now)) {
-		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
-			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
-			// There is a pending read, so delay but mark this as a hit
+void L1Cache::onTickDown(int now) {
+	switch (state) {
+	case READY:
+		// Nothing to do
+		break;
+	case ACCESSING:
+		delay--;
+		if (delay > 0) {
+			break;
+		}
+		int address = pCpuMaster->address;
+		if (isHit(address)) {
+			// Hit
 			hits++;
-			pendingReadsExternal.insert(address);
-			// Do nothing (result will be sent back to L1 when the pending read returns)
-		} else if (isPresent(address, &addressOut) == PRESENT) {
-			// Can satisfy read from cache
-			data = read(address);
-			hits++;
-			previousMemoryLevel->respondRead(address, data, now + accessDelay);
+			if (!pCpuMaster->writeEnable) {
+				// Return cached data on read hit
+				pCpuMaster->data = read(address);
+			} else {
+				// Commit write on write hit
+				write(address, pCpuMaster->data);
+			}
+			pCpuMaster->slaveValid = true;
+			pCpuMaster->slaveReady = true;
+			state = READY;
 		} else {
-			// Need to read from next level
+			// Miss
 			misses++;
-			// Critical word first
-			nextMemoryLevel->requestRead(address, now + accessDelay);
-			pendingReadsExternal.insert(address);
-			// Read rest of block
-			int baseOfBlock = address - toOffset(address);
-			for (int i = 1; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + toOffset(address + i * sizeof(int));
-				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
-				pendingReadsInternal.insert(fillAddress);
+			if (!pCpuMaster->writeEnable) {
+				state = READ_MISS;
+			} else {
+				state = WRITE_MISS;
 			}
 		}
-	}
-
-	// Get write request from CPU
-	else if (previousMemoryLevel->getWriteRequest(&address, &data, now)) {
-		// Write-allocate so first make sure that block is present in cache
-		if ((pendingReadsInternal.find(address) != pendingReadsInternal.end()) ||
-			(pendingReadsExternal.find(address) != pendingReadsExternal.end())) {
-			// There is a pending read, so delay write until read returns
-			hits++;
-			pendingWrites[address] = data;
-		} else if (isPresent(address, &addressOut) == PRESENT) {
-			// No need to write-allocate
-			hits++;
-			write(address, data);
-			nextMemoryLevel->requestWrite(address, data, now + accessDelay);
-		} else {
-			// Need to read from next level for write-allocate
-			misses++;
-			// Critical word first
-			int baseOfBlock = address - toOffset(address);
-			for (int i = 0; i < blockSize / (int)sizeof(int); i++) {
-				int fillAddress = baseOfBlock + toOffset(address + i * sizeof(int));
-				nextMemoryLevel->requestRead(fillAddress, now + accessDelay + i);
-				pendingReadsInternal.insert(fillAddress);
-			}
-			// Write critical word first
-			pendingWrites[address] = data;
+		break;
+	case READ_MISS:
+		// Unexpected state
+		assert(false);
+		break;
+	case WAIT_CWF:
+		if (!pL2Slave->slaveValid) {
+			// Still blocking on L2
+			break;
 		}
+		// Early restart
+		pCpuMaster->data = 
+		break;
+	case WAIT_REST:
+		break;
+	case WRITE_MISS:
+		break;
+	case WAIT_WA:
+		break;
 	}
 }
 
@@ -119,42 +125,32 @@ L1Cache::outcome L1Cache::isPresent(int addressIn, int* addressOut) {
 	}
 }
 
+bool L1Cache::isHit(int address) {
+	int index = toIndex(address);
+	int tag = toTag(address);
+	return (valid[index] && (tags[index] == tag));
+}
+
 int L1Cache::read(int address) {
 	int index = toIndex(address);
 	int offset = toOffset(address);
-	if (ISA::isCodeAddress(address)) {
-		// Read from instructions cache
-		return *getInstructionPtr(index, offset);
-	} else {
-		// Read from data cache
-		return *getDataPtr(index, offset);
-	}
+	return *getWordPtr(index, offset);
 }
 
 void L1Cache::write(int address, int value) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
-	if (ISA::isCodeAddress(address)) {
-		// Write to instructions cache
-		*getInstructionPtr(index, offset) = value;
-		instructionsValid[index] = true;
-		instructionsTag[index] = tag;
-	} else {
-		// Write to data cache
-		*getDataPtr(index, offset) = value;
-		dataValid[index] = true;
-		dataTag[index] = tag;
-	}
+	*getWordPtr(index, offset) = value;
+	valid[index] = true;
+	tag[index] = tag;
+	l2Cache->write(address, value);
 }
 
-void L1Cache::evict(int address) {
-	int index = toIndex(address);
-	if (ISA::isCodeAddress(address)) {
-		// Invalidate in instructions cache
-		instructionsValid[index] = false;
-	} else {
-		// Invalidate in data cache
-		dataValid[index] = false;
+bool L1Cache::invalidate(int address) {
+	if (isHit(address)) {
+		valid[toIndex(address)] = false;
+		return true;
 	}
+	return false;
 }
