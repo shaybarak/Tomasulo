@@ -15,7 +15,7 @@ public:
 
 	// L1Cache is allowed private access to L2Cache
 	// (since L1 is inclusive in L2, L1 must have intimate knowledge of L2)
-	friend class L2Cache;
+	friend class L1Cache;
 
 protected:
 	typedef Cache::outcome outcome;
