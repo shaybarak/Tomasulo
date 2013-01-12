@@ -23,21 +23,22 @@ enum retvals {
 	BAD_CONFIG=4,	// Missing configuration value
 };
 
-bool openFile(fstream& file, const char* filename, ios_base::openmode openmode) {
-	file.open(filename, openmode);
+bool openFileRead(fstream& file, const char* filename) {
+	file.open(filename, ios_base::in);
 	if (!file) {
 		cerr << "Error opening " << filename << endl;
 		return false;
 	}
 	return true;
-}
-
-bool openFileRead(fstream& file, const char* filename) {
-	return openFile(file, filename, ios_base::in);
 };
 
 bool openFileWrite(fstream& file, const char* filename) {
-	return openFile(file, filename, ios_base::out);
+	file.open(filename, ios_base::out);
+	if (!file) {
+		cerr << "Error opening " << filename << endl;
+		return false;
+	}
+	return true;
 };
 
 bool readConfig(const Configuration& config, const string& key, int* value) {
@@ -49,8 +50,8 @@ bool readConfig(const Configuration& config, const string& key, int* value) {
 }
 
 // Add instructions to memory
-void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program, int base) {
-	int* codePtr = (int*)&memory[base];
+void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program) {
+	int* codePtr = (int*)&memory[0];
 	for (unsigned int i = 0; i < program.size(); i++) {
 		codePtr[i] = i;
 	}
@@ -61,8 +62,6 @@ void trimMemory(vector<unsigned char>& memory) {
 	if (memory.empty()) {
 		return;
 	}
-	// Trim code (not expected in dump)
-	memory.resize(ISA::CODE_BASE);
 	// Find last non-zero byte
 	unsigned char* byte;
 	for (byte = &memory[memory.size() - 1]; byte >= &memory[0]; byte--) {
