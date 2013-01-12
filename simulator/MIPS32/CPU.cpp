@@ -12,93 +12,112 @@ void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, 
 }
 
 void CPU::onTickUp(int now) {
-
-	//on tick up:
-	//if ready, exectue.
-	//if stalled on data, continue waiting
-	//if stalled on instruction, continue waiting.
-
-	if (halted) {
-		return;
+	switch (state) {
+	case READY:
+		requestReadInstruction();
+		memoryAccessCount++;
+		state = INST_STALL;
+		break;
+	case INST_STALL:
+		break;
+	case LW:
+		requestReadData(nextLwAddress);
+		memoryAccessCount++;
+		state = LW_STALL;
+		break;
+	case LW_STALL:
+		break;
+	case SW:
+		if (pL1Slave->slaveReady) {
+			requestWrite(nextSwAddress, nextSwData);
+			memoryAccessCount++;
+			state = SW_STALL;
+		}
+		break;
+	case SW_STALL:
+		break;
+	case HALT:
+		break;
+	default:
+		cerr << "CPU reached illegal state: " << (state) << "!" << endl;
+		state = HALT;
+		break; 
 	}
-	this->now = now;
-	if (dataReadStall) { // stalled on data read
-		return; 
-	}
-	if (instructionReadStall) { // Stalled on instruction read
-		return;
-	}
-	int data;
-	execute(pcToInstructionIndex(pc), data);
-
 }
 
 void CPU::onTickDown(int now) {
-	//read next instruction
-	if (!pMasterSlaveInterface->slaveValid) {
-		return;
-	}
-	if (instructionReadStall) {
-		int instruction = 
+	switch (state) {
+	case READY:
+		break;
+	case INST_STALL:
+		if (!pL1Slave->slaveValid) {
+			break;
+		}
+		execute(pL1Slave->data);
+		break;
+	case LW:
+		cerr << "CPU exception: illegal opcode " << (pL1Slave->data) << "!" << endl;
+		state = HALT;
+		break;
+	case LW_STALL:
+		if (!pL1Slave->slaveValid) {
+			break;
+		}
+		continueExecuteLw();
+		state = READY;
+		break;
+	case SW:
+		break;
+	case SW_STALL:
+		if (pL1Slave->slaveReady) {
+			state = READY;
+		}
+		continueExecuteSw();
+		break;
+	case HALT:
+		break;
+	default:
+		cerr << "CPU reached illegal state: " << (state) << "!" << endl;
+		state = HALT;
+		break; 
 	}
 }
 
-void CPU::onTick(int now) {
-	// Don't execute if halted
-	if (halted) {
-		return;
-	}
-	this->now = now;
-
-	if (dataReadStall) {  // Stalled on data read
-		int address;
-		int data;
-		if (!nextMemoryLevel->getReadResponse(&address, &data, now)) {
-			// Read did not return yet
-			return;
-		}
-		dataReadStall = false;
-		execute(pcToInstructionIndex(pc), data);
-
-	} else if (instructionReadStall) {  // Stalled on instruction read
-		int address;
-		int instruction;
-		if (!nextMemoryLevel->getReadResponse(&address, &instruction, now)) {
-			// Read did not return yet
-			return;
-		}
-		// Verify that instruction was read correctly
-		if (instruction != pcToInstructionIndex(pc)) {
-			cerr << "CPU exception: illegal opcode " << instruction << "!" << endl;
-			halted = true;
-			return;
-		}
-		instructionReadStall = false;
-		execute(pcToInstructionIndex(pc));
-	}
-
-	// If not ready for next instruction
-	if (dataReadStall) {
-		return;
-	}
-
-	if (!isValidInstructionAddress(pcToMemoryOffset(pc))) {
-		cerr << "CPU exception: program counter out of range! PC=" << pc << endl;
-		halted = true;
-		return;
-	}
-	// Read next instruction
-	nextMemoryLevel->requestRead(pcToMemoryOffset(pc), now);
-	memoryAccessCount++;
-	instructionReadStall = true;
+//TODO: change to general method on MasterSlaveInterface "MasterRequestRead/Write"
+void CPU::requestReadInstruction() {
+	pL1Slave->writeEnable = false;
+	pL1Slave->masterValid = false;
+	pL1Slave->masterReady = true;
+	pL1Slave->address = pcToMemoryOffset(pc);
 }
+
+void CPU::requestReadData(int address) {
+	pL1Slave->writeEnable = false;
+	pL1Slave->masterValid = false;
+	pL1Slave->masterReady = true;
+	pL1Slave->address = address;
+}
+
+void CPU::requestWrite(int address, int data) {
+	pL1Slave->writeEnable = true;
+	pL1Slave->masterValid = false;
+	pL1Slave->masterReady = true;
+	pL1Slave->address = address;
+	pL1Slave->data = data;
+}
+
 
 void CPU::execute(int instructionIndex) {
+	if (pL1Slave->data != pcToInstructionIndex(pc)) {
+		cerr << "CPU exception: illegal opcode " << (pL1Slave->data) << "!" << endl;
+		state = HALT;
+		return;
+	}
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
 	Instruction* instruction = instructions->at(instructionIndex);
-	int address, data;
+	int data;
 	switch (instruction->getOpcode()) {
 	case ISA::add:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -155,29 +174,27 @@ void CPU::execute(int instructionIndex) {
 		break;
 	case ISA::lw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		address = (*gpr)[itype->getRs()] + itype->getImmediate();
-		if (!isValidMemoryAddress(address)) {
+		nextLwAddress = (*gpr)[itype->getRs()] + itype->getImmediate();
+		nextLwRt = (*gpr)[itype->getRt()];
+		if (!isValidMemoryAddress(nextLwAddress)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
-			halted = true;
+			state = HALT;
 			break;
 		}
-		nextMemoryLevel->requestRead(address, now);
+		state = LW;
 		memoryAccessCount++;
 		// Note: stalled, don't advance PC and don't count instruction as committed
-		dataReadStall = true;
 		break;
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		address = (*gpr)[itype->getRs()] + itype->getImmediate();
-		data = (*gpr)[itype->getRt()];
-		if (!isValidMemoryAddress(address)) {
+		nextSwAddress = (*gpr)[itype->getRs()] + itype->getImmediate();
+		nextSwData = (*gpr)[itype->getRt()];
+		if (!isValidMemoryAddress(nextSwAddress)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
 			halted = true;
 			break;
 		}
-		nextMemoryLevel->requestWrite(address, data, now);
 		memoryAccessCount++;
-		// TODO do write operations stall?
 		pc++;
 		instructionsCommitted++;
 		break;
@@ -205,32 +222,24 @@ void CPU::execute(int instructionIndex) {
 		instructionsCommitted++;
 		break;
 	case ISA::halt:
-		halted = true;
+		state = HALT;
 		instructionsCommitted++;
 		break;
 	default:
 		cerr << "CPU exception: invalid opcode!" << endl;
-		halted = true;
+		state = HALT;
 		break;
 	}
 }
 
-void CPU::execute(int instructionIndex, int data) {
-	ITypeInstruction* itype = NULL;
-	Instruction* instruction = instructions->at(pc - instructionsBase);
-	// Note: switch only implements lw because other instruction types are not expected
-	switch (instruction->getOpcode()) {
-	case ISA::lw:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()] = data;
-		pc++;
-		instructionsCommitted++;
-		break;
-	default:
-		cerr << "CPU exception: invalid opcode!" << endl;
-		halted = true;
-		break;
-	}
+void CPU::continueExecuteLw() {
+	(*gpr)[nextLwRt] = pL1Slave->data;
+}
+
+void CPU::continueExecuteSw() {
+	pL1Slave->address = nextSwAddress;
+	pL1Slave->data = nextSwData;
+	pL1Slave->masterValid = nextSwData;
 }
 
 bool CPU::isValidMemoryAddress(int address) {
@@ -242,7 +251,7 @@ bool CPU::isValidInstructionAddress(int address) {
 		return false;
 	}
 	// (pc-instructionsBase) is known to be non-negative at this time
-	#pragma warning(disable:4018)
+#pragma warning(disable:4018)
 	if (address - instructionsBase >= instructions->size() * sizeof(int)) {
 		return false;
 	}

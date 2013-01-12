@@ -21,7 +21,8 @@ public:
 	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pMasterSlaveInterface) :
 		memorySize(memorySize),
 		gpr(gpr),
-		pMasterSlaveInterface(pMasterSlaveInterface),
+		pL1Slave(pMasterSlaveInterface),
+		state(READY),
 		now(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
@@ -49,17 +50,25 @@ public:
 	bool isHalted() const { return halted; }
 
 private:
+	enum CpuState {
+		READY,		//initial state, and after execution
+		INST_STALL,	//stalled on instruction read from L1
+		LW,			//after reading lw instrcution
+		LW_STALL,	//stalled on data read from L1
+		SW,			//after reading sw instruction 
+		SW_STALL,	//stalled on data write to L1
+		HALT,		//read halt opcode
+	};
+
 	/**
 	 * Executes an instruction. May stall on memory.
 	 * instructionIndex: position of instruction in program
 	 */
 	void execute(int instructionIndex);
-	/**
-	 * Executes an instruction with a given memory word.
-	 * instructionIndex: position of instruction in program
-	 * data: data from memory for instruction
-	 */
-	void execute(int instructionIndex, int data);
+	/** continue execution of lw when memory call returns **/
+	void continueExecuteLw();
+	/** continue execution of sw when memory call returns **/
+	void continueExecuteSw();
 	/** Returns whether the address is a valid memory offset. */
 	bool isValidMemoryAddress(int address);
 	/** Returns whether the address is a valid memory offset for instructions. */
@@ -68,6 +77,12 @@ private:
 	int pcToMemoryOffset(int pc);
 	/** Converts PC value to index of instruction in program. */
 	int pcToInstructionIndex(int pc);
+	/** set memory interface signals for reading instrcution **/
+	void requestReadInstruction();
+	/** set memory interface signals for reading data **/
+	void requestReadData(int address);
+	/** set memory interface signals for writing instrcution **/
+	void requestWrite(int address, int data);
 	// Size of memory (such that memorySize == highest valid address + 1)
 	int memorySize;
 	// General {urpose Registers
@@ -94,6 +109,16 @@ private:
 	int timeStalledOnMemory;
 	//counter for memory reads count
 	int memoryReadsCount;
-
-	MasterSlaveInterface* pMasterSlaveInterface;
+	//Next address to read
+	int nextLwAddress;
+	//Next Rt to write data to
+	int nextLwRt;
+	//Next address to write
+	int nextSwAddress;
+	//Next data to write
+	int nextSwData;
+	//Interface for communicating with L1
+	MasterSlaveInterface* pL1Slave;
+	//CPU internal state
+	CpuState state;
 };
