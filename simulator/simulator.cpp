@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
 	GPR gpr;
 	// Initialize CPU
 	CPU cpu(ISA::RAM_SIZE, &gpr, &l2RamInstInterface, &l2RamDataInterface);
-	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE>>2);
+	cpu.loadProgram(&program);
 	Clock sysClock;
 	sysClock.addObserver(&cpu);
 	//sysClock.addObserver(&l1Cache);
