@@ -117,7 +117,6 @@ void CPU::execute(int instructionIndex) {
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
 	Instruction* instruction = instructions->at(instructionIndex);
-	int data;
 	switch (instruction->getOpcode()) {
 	case ISA::add:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
@@ -233,13 +232,13 @@ void CPU::execute(int instructionIndex) {
 }
 
 void CPU::continueExecuteLw() {
-	(*gpr)[nextLwRt] = pL1Slave->data;
+	(*gpr)[nextLwRt] = pL1DataSlave->data;
 }
 
 void CPU::continueExecuteSw() {
-	pL1Slave->address = nextSwAddress;
-	pL1Slave->data = nextSwData;
-	pL1Slave->masterValid = nextSwData;
+	pL1DataSlave->address = nextSwAddress;
+	pL1DataSlave->data = nextSwData;
+	pL1DataSlave->masterValid = true;
 }
 
 bool CPU::isValidMemoryAddress(int address) {
