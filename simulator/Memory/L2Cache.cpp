@@ -34,9 +34,6 @@ void L2Cache::onTickUp(int now) {
 		break;
 	case WAIT_CWF:
 	case WRITE_TO_RAM:
-		//TODO
-	case READ_REST_OF_BLOCK:
-		//TODO
 	default:
 		
 	}
