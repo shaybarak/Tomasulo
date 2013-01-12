@@ -29,9 +29,14 @@ void L1Cache::onTickUp(int now) {
 	case WAIT_CWF:
 		// Blocked on L2 cache
 		break;
-	case WAIT_REST:
-		break;
 	case WRITE_MISS:
+		// Write allocate: first bring entire L1 block from L2
+		assert(pL2Slave->slaveReady);
+		// Start reading at base of block
+		pL2Slave->address = pCpuMaster->address - toOffset(pCpuMaster->address);
+		pL2Slave->writeEnable = false;
+		pL2Slave->masterValid = true;
+		state = WAIT_WA;
 		break;
 	case WAIT_WA:
 		break;
@@ -86,13 +91,23 @@ void L1Cache::onTickDown(int now) {
 			break;
 		}
 		// Early restart
-		pCpuMaster->data = 
-		break;
-	case WAIT_REST:
+		write(pCpuMaster->address, pL2Slave->data);
+		pCpuMaster->data = pL2Slave->data;
+		pCpuMaster->slaveValid = true;
+		state = WAIT_WA;
 		break;
 	case WRITE_MISS:
+		// Unexpected state
+		assert(false);
 		break;
 	case WAIT_WA:
+		write(pL2Slave->address, pL2Slave->data);
+		if (p2Slave->slaveReady) {
+			// Done filling
+			pL2Slave->masterValid = false;
+			pCpuMaster->slaveReady = true;
+			state = READY;
+		}
 		break;
 	default:
 		// Unknown state
@@ -152,7 +167,9 @@ void L1Cache::write(int address, int value) {
 	*getWordPtr(index, offset) = value;
 	valid[index] = true;
 	tag[index] = tag;
-	l2Cache->write(address, value);
+	if (l2Cache != NULL) {
+		l2Cache->write(address, value);
+	}
 }
 
 bool L1Cache::invalidate(int address) {

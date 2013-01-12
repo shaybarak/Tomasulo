@@ -62,7 +62,6 @@ private:
 		ACCESSING,	// Waiting on access delay
 		READ_MISS,	// Read miss
 		WAIT_CWF,	// Waiting for critical word first
-		WAIT_REST,	// Waiting for rest of block
 		WRITE_MISS,	// Write miss
 		WAIT_WA,	// Waiting for write-allocate
 	};
