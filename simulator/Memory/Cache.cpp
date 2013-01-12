@@ -5,7 +5,7 @@ Cache::Cache(int blockSize, int cacheSize, int accessDelay, int ways)
 		  hits(0), misses(0) {
 	buffer.resize(cacheSize);
 	// Tag and valid bit are per block
-	tag.resize(buffer.size() / blockSize);
+	tags.resize(buffer.size() / blockSize);
 	valid.resize(buffer.size() / blockSize);
 	// Use vector<unsigned char> as scoped int buffer
 	words = (int*)&buffer[0];
@@ -43,6 +43,6 @@ int Cache::toBlock(int index, int way) {
 	return index * ways + way;
 }
 
-int* Cache::getWordPtr(int index, int offset, int way) {
+int* Cache::getWordPtr(int block, int offset, int way) {
 	return &words[(toBlock(index, way) * blockSize + offset) / sizeof(int)];
 }

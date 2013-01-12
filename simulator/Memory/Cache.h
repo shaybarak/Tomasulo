@@ -44,7 +44,7 @@ protected:
 	
 	// Buffers
 	int* words;
-	vector<int> tag;
+	vector<int> tags;
 	vector<bool> valid;
 	
 	// Statistics
