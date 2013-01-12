@@ -15,9 +15,11 @@ void L1Cache::onTickUp(int now) {
 		// Accessing internal buffer
 		state = ACCESSING;
 		break;
+	
 	case ACCESSING:
 		// Blocked on internal buffers
 		break;
+	
 	case READ_MISS:
 		assert(pL2Slave->slaveReady);
 		// Request critical word first
@@ -26,9 +28,11 @@ void L1Cache::onTickUp(int now) {
 		pL2Slave->masterValid = true;
 		state = WAIT_CWF;
 		break;
+	
 	case WAIT_CWF:
 		// Blocked on L2 cache
 		break;
+	
 	case WRITE_MISS:
 		// Write allocate: first bring entire L1 block from L2
 		assert(pL2Slave->slaveReady);
@@ -38,8 +42,10 @@ void L1Cache::onTickUp(int now) {
 		pL2Slave->masterValid = true;
 		state = WAIT_WA;
 		break;
+	
 	case WAIT_WA:
 		break;
+	
 	default:
 		// Unknown state
 		assert(false);
@@ -52,6 +58,7 @@ void L1Cache::onTickDown(int now) {
 	case READY:
 		// Nothing to do
 		break;
+	
 	case ACCESSING:
 		delay--;
 		if (delay > 0) {
@@ -80,10 +87,12 @@ void L1Cache::onTickDown(int now) {
 			}
 		}
 		break;
+	
 	case READ_MISS:
 		// Unexpected state
 		assert(false);
 		break;
+	
 	case WAIT_CWF:
 		if (!pL2Slave->slaveValid) {
 			// Still blocking on L2
@@ -95,10 +104,12 @@ void L1Cache::onTickDown(int now) {
 		pCpuMaster->slaveValid = true;
 		state = WAIT_WA;
 		break;
+	
 	case WRITE_MISS:
 		// Unexpected state
 		assert(false);
 		break;
+	
 	case WAIT_WA:
 		write(pL2Slave->address, pL2Slave->data);
 		if (pL2Slave->slaveReady) {
@@ -108,6 +119,7 @@ void L1Cache::onTickDown(int now) {
 			state = READY;
 		}
 		break;
+	
 	default:
 		// Unknown state
 		assert(false);
