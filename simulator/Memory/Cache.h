@@ -9,7 +9,7 @@ using namespace std;
 
 class Cache {
 public:
-	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 0);
+	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 1);
 	const vector<unsigned char>* getBuffer() const { return &buffer; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
