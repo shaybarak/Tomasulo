@@ -29,9 +29,6 @@ void MainMemory::onTickUp(int now) {
 }
 
 void MainMemory::onTickDown(int now) {
-	if (!pL2Master->masterReady) {
-		return;
-	}
 	delayCountDown--;
 	if (delayCountDown > 0) {
 		return;
