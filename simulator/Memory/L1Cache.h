@@ -35,8 +35,6 @@ private:
 	 * May return uninitialized data.
 	 */
 	int read(int address);
-	
-	static const int WAYS = 1;
 
 	MasterSlaveInterface* pCpuMaster;
 	MasterSlaveInterface* pL2Slave;
