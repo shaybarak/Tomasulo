@@ -5,9 +5,8 @@
 #include "MIPS32\Labeler.h"
 #include "Clock\Clock.h"
 #include "Output\HexDump.h"
-//TODO uncomment out
-//#include "Memory\L1Cache.h"
-//#include "Memory\L2Cache.h"
+#include "Memory\L1Cache.h"
+#include "Memory\L2Cache.h"
 #include "Memory\MainMemory.h"
 #include <fstream>
 #include <iostream>
@@ -143,24 +142,25 @@ int main(int argc, char** argv) {
 	}
 
 	// Initialize memory interfaces
-	MasterSlaveInterface cpuL2DataInterface;
-	MasterSlaveInterface cpuL2InstInterface;
+	MasterSlaveInterface cpuL1DataInterface;
+	MasterSlaveInterface cpuL1InstInterface;
 	
 	MasterSlaveInterface l1L2DataInterface;
 	MasterSlaveInterface l1L2InstInterface;
 	
 	MasterSlaveInterface l2RamDataInterface;
 	MasterSlaveInterface l2RamInstInterface;
-
-	//Initialize memory units
-	//TODO fix!
-	//SUPER TODO: fix sizes to half, move "/2" factor in all fields calculations
-	//L1Cache	L1InstCache(mem_access_delay, l2_block_size, &l1L2InstInterface);
-	//L1Cache	L1DataCache(mem_access_delay, l2_block_size, &l1L2DataInterface);
-	//
-	//L2Cache	L2InstCache(mem_access_delay, l2_block_size, &l1L2InstInterface);
-	//L2Cache	L2DataCache(mem_access_delay, l2_block_size, &l1L2DataInterface);
 	
+	L1Cache l1DataCache(l1_block_size, l1_cache_size / 2, l1_access_delay,
+						&cpuL1DataInterface, &cpuL1DataInterface);
+	L1Cache l1InstCache(l1_block_size, l1_cache_size / 2, l1_access_delay,
+						&cpuL1InstInterface, &cpuL1InstInterface);
+
+	L2Cache l2DataCache(l2_block_size, l2_cache_size / 2, l2_access_delay, l1_block_size,
+						&l1L2DataInterface, &l2RamDataInterface);
+	L2Cache l2InstCache(l2_block_size, l2_cache_size / 2, l2_access_delay, l1_block_size,
+						&l1L2InstInterface, &l2RamInstInterface);
+
 	MainMemory ramInst(mem_access_delay, l2_block_size, &l2RamInstInterface, ISA::INST);
 	MainMemory ramData(mem_access_delay, l2_block_size, &l2RamDataInterface, ISA::DATA);
 	
@@ -178,14 +178,15 @@ int main(int argc, char** argv) {
 	// Initialize GPR
 	GPR gpr;
 	// Initialize CPU
-	CPU cpu(ISA::RAM_SIZE, &gpr, &l2RamInstInterface, &l2RamDataInterface);
+	CPU cpu(ISA::RAM_SIZE, &gpr, &cpuL1InstInterface, &cpuL1DataInterface);
 	cpu.loadProgram(&program);
 	Clock sysClock;
 	sysClock.addObserver(&cpu);
-	//sysClock.addObserver(&l1Cache);
-	//TODO uncomment out when l2Cache works
-	//sysClock.addObserver(&l2Cache);
+	sysClock.addObserver(&l1DataCache);
+	sysClock.addObserver(&l2DataCache);
 	sysClock.addObserver(&ramData);
+	sysClock.addObserver(&l1InstCache);
+	sysClock.addObserver(&l2InstCache);
 	sysClock.addObserver(&ramInst);
 	
 	while (!cpu.isHalted()) {

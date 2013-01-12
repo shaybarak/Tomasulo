@@ -2,6 +2,10 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
+void L1Cache::setL2Cache(Cache* l2Cache) {
+	this->l2Cache = l2Cache;
+}
+
 void L1Cache::onTickUp(int now) {
 	switch (state) {
 	case READY:
@@ -21,7 +25,6 @@ void L1Cache::onTickUp(int now) {
 		break;
 	
 	case READ_MISS:
-		assert(pL2Slave->slaveReady);
 		// Request critical word first
 		pL2Slave->address = pCpuMaster->address;
 		pL2Slave->writeEnable = false;

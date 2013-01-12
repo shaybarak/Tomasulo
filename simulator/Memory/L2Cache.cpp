@@ -3,15 +3,17 @@
 #include <assert.h>
 
 L2Cache::L2Cache(int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
-		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave,
-		Cache* l1Cache)
+		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave)
 		: Cache(blockSize, cacheSize, accessDelay, 2), l1BlockSize(l1BlockSize),
-		  pL1Master(pL1Master), pRamSlave(pRamSlave),
-		  l1Cache(l1Cache), state(READY), delay(-1) {
+		  pL1Master(pL1Master), pRamSlave(pRamSlave), state(READY), delay(-1) {
 	// Also initialize dirty bits
 	dirty.resize(valid.size());
 	// Also initialize LRU bits (2 ways per block)
 	way0IsLru.resize(valid.size() / 2);
+}
+
+void L2Cache::setL1Cache(Cache* l1Cache) {
+	this->l1Cache = l1Cache;
 }
 
 void L2Cache::onTickUp(int now) {

@@ -29,6 +29,9 @@ void MainMemory::onTickUp(int now) {
 }
 
 void MainMemory::onTickDown(int now) {
+	if (pL2Master->slaveReady) {
+		return;
+	}
 	delay--;
 	if (delay > 0) {
 		return;
