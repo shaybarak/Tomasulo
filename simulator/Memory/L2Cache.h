@@ -13,6 +13,10 @@ public:
 	// For reading signals from RAM and sending signals to L1 cache
 	virtual void onTickDown(int now);
 
+	// L1Cache is allowed private access to L2Cache
+	// (since L1 is inclusive in L2, L1 must have intimate knowledge of L2)
+	friend class L2Cache;
+
 protected:
 	typedef Cache::outcome outcome;
 	virtual outcome isPresent(int addressIn, int* addressOut);
