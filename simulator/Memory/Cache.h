@@ -15,12 +15,6 @@ public:
 	int getMissCount() const { return misses; }
 	double getHitRate() const { return (double)hits / (hits + misses); }
 
-	enum outcome {
-		PRESENT,	// Address is present in cache
-		CONFLICT,	// Cache has memory block from other address(es) in respective mapping
-		INVALID,	// Cache is invalid in respective mapping
-	};
-
 	// TODO decrease visibility
 	/**
 	 * Writes to cache.
