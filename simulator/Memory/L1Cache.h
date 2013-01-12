@@ -23,7 +23,6 @@ public:
 
 protected:
 	virtual void write(int address, int value);
-
 	virtual bool invalidate(int address);
 
 private:
