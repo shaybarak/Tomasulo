@@ -4,11 +4,10 @@
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
 
-void CPU::loadProgram(vector<Instruction*>* instructions, int instructionsBase, int pc) {
+void CPU::loadProgram(vector<Instruction*>* instructions, int pc) {
 	this->instructions = instructions;
-	this->instructionsBase = instructionsBase;
 	this->pc = pc;
-	halted = false;
+	state = READY;
 }
 
 void CPU::onTickUp(int now) {
@@ -246,15 +245,7 @@ bool CPU::isValidMemoryAddress(int address) {
 }
 
 bool CPU::isValidInstructionAddress(int address) {
-	if (address < instructionsBase) {
-		return false;
-	}
-	// (pc-instructionsBase) is known to be non-negative at this time
-#pragma warning(disable:4018)
-	if (address - instructionsBase >= instructions->size() * sizeof(int)) {
-		return false;
-	}
-	return true;
+	return ((address >= 0) && (address < instructions->size() * sizeof(int)));
 }
 
 int CPU::pcToMemoryOffset(int pc) {

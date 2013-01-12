@@ -23,7 +23,7 @@ public:
 		gpr(gpr),
 		pL1DataSlave(pInstInterface),
 		pL1InstSlave(pDataInterface),
-		state(READY),
+		state(HALTED),
 		now(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
@@ -32,14 +32,13 @@ public:
 		dataReadStall(false),
 		halted(false), 
 		timeStalledOnMemory(0),
-		memoryReadsCount(0){}
+		memoryReadsCount(0) {}
 	/**
 	 * Loads a program.
 	 * instructions: a program represented as a series of instructions
-	 * instructionsBase: absolute base memory address at which instructions are mapped
-	 * pc: value of Program Counter at start of execution
+	 * pc: value of Program Counter at start of execution, default of zero
 	 */
-	void loadProgram(vector<Instruction*>* instructions, int instructionsBase, int pc);
+	void loadProgram(vector<Instruction*>* instructions, int pc = 0);
 	// Clock tick handlers
 	virtual void onTickUp(int now);
 	virtual void onTickDown(int now);
@@ -98,8 +97,6 @@ private:
 	bool halted;
 	// Program to execute
 	vector<Instruction*>* instructions;
-	// Base address of instructions in memory
-	int instructionsBase;
 	// Program Counter
 	int pc;
 	// Whether stalled on reading instruction from memory
