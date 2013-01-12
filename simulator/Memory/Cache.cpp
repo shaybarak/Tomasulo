@@ -1,21 +1,14 @@
 #include "Cache.h"
 
-Cache::Cache(int blockSize, int cacheSize, int ways, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel)
-		: blockSize(blockSize), cacheSize(cacheSize), ways(ways), accessDelay(accessDelay),
-		  previousMemoryLevel(previousMemoryLevel), nextMemoryLevel(nextMemoryLevel),
+Cache::Cache(int blockSize, int cacheSize, int accessDelay, int ways)
+		: blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay), ways(ways),
 		  hits(0), misses(0) {
-	// Split cache buffer 50%-50% between instructions and data
-	instructionsBuffer.resize(cacheSize / 2);
-	dataBuffer.resize(cacheSize / 2);
+	buffer.resize(cacheSize);
 	// Tag and valid bit are per block
-	instructionsTag.resize(instructionsBuffer.size() / blockSize);
-	dataTag.resize(instructionsTag.size());
-	instructionsValid.resize(instructionsTag.size());
-	dataValid.resize(dataTag.size());
+	tag.resize(buffer.size() / blockSize);
+	valid.resize(buffer.size() / blockSize);
 	// Use vector<unsigned char> as scoped int buffer
-	instructions = (int*)&instructionsBuffer[0];
-	data = (int*)&dataBuffer[0];
+	words = (int*)&buffer[0];
 }
 
 /**
@@ -35,31 +28,21 @@ int Cache::toIndex(int address) {
 	// For each index we consume a block times how many ways there are per entry.
 	// This is consumed out of the entire cache buffer, which is split 50%/50%
 	// between instructions and data, hence the division by 2.
-	return (address / blockSize) % ((cacheSize / 2) / (blockSize * ways));
+	return (address / blockSize) % (cacheSize / (blockSize * ways));
 }
 
 int Cache::toTag(int address) {
-	return address / cacheSize * ways;
+	return address / (cacheSize / ways);
 }
 
 int Cache::toAddress(int tag, int index, int offset) {
 	return (tag * (cacheSize / ways)) + (index * blockSize) + offset;
 }
 
-int Cache::toInstructionsBlock(int index, int way) {
-	// Instructions are buffered way 0 first, then way 1 etc'
-	return way * instructionsBuffer.size() / ways + index;
-}
-
-int Cache::toDataBlock(int index, int way) {
-	// Data is buffered such that multiple ways are interleaved per index
+int Cache::toBlock(int index, int way) {
 	return index * ways + way;
 }
-	
-int* Cache::getInstructionPtr(int index, int offset, int way) {
-	return &instructions[(toInstructionsBlock(index, way) * blockSize + offset) / sizeof(int)];
-}
 
-int* Cache::getDataPtr(int index, int offset, int way) {
-	return &data[(toDataBlock(index, way) * blockSize + offset) / sizeof(int)];
+int* Cache::getWordPtr(int index, int offset, int waט) {
+	return &words[(toBlock(index, way) * blockSize + offset) / sizeof(int)];
 }

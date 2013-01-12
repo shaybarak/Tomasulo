@@ -9,8 +9,7 @@ using namespace std;
 
 class Cache : public MasterSlaveInterface {
 public:
-	Cache(int blockSize, int cacheSize, int ways, int accessDelay,
-		PreviousMemoryLevel* previousMemoryLevel, NextMemoryLevel* nextMemoryLevel);
+	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 0);
 	const vector<unsigned char>* getInstructionsBuffer() const { return &instructionsBuffer; }
 	const vector<unsigned char>* getDataBuffer() const { return &dataBuffer; }
 	int getHitCount() const { return hits; }
@@ -24,23 +23,6 @@ public:
 	};
 
 protected:
-	/**
-	 * Returns whether:
-	 * - A memory address is present in the cache
-	 * - It's conflicting with another block
-	 * - The mapping is invalid.
-	 *
-	 * addressIn: address to check
-	 * addressOut: conflicting address (if returned conflicting)
-	 */
-	virtual outcome isPresent(int addressIn, int* addressOut) = 0;
-	
-	/**
-	 * Evicts a block from cache by address.
-	 * If address was not present in the cache, does nothing.
-	 */
-	virtual void evict(int address) = 0;
-	
 	// Returns block offset of address
 	int toOffset(int address);
 	// Returns index of address
@@ -49,51 +31,27 @@ protected:
 	int toTag(int address);
 	// Builds a memory address out of the tag, index and offset
 	int toAddress(int tag, int index, int offset);
-	// Maps to instructions cache block space
-	int toInstructionsBlock(int index, int way = 0);
-	// Maps to data cache block space
-	int toDataBlock(int index, int way = 0);
+	// Maps to cache block space
+	int toBlock(int index, int way = 0);
+	// Returns pointer to word from cache
+	int* getWordPtr(int index, int offset, int way = 0);
 	
-	// Returns pointer to instruction from cache
-	int* getInstructionPtr(int index, int offset, int way = 0);
-	
-	 //Returns pointer to data from cache
-	int* getDataPtr(int index, int offset, int way = 0);
-	
-	// Dimensions in bytes
+	// Dimensions
 	int blockSize;
 	int cacheSize;
-	int ways;
 	int accessDelay;
+	int ways;
 	
 	// Buffers
-	int* instructions;
-	vector<int> instructionsTag;
-	vector<bool> instructionsValid;
-	int* data;
-	vector<int> dataTag;
-	vector<bool> dataValid;
+	int* words;
+	vector<int> tag;
+	vector<bool> valid;
 	
 	// Statistics
 	int hits;
 	int misses;
-	
-	// Interfaces to previous & next level
-	PreviousMemoryLevel* previousMemoryLevel;
-	NextMemoryLevel* nextMemoryLevel;
-	
-	// Memory addresses that have pending reads internally-requested (to fill block).
-	// If an incoming request matches any of these addresses it is considered a hit,
-	// despite the fact that the value at the address is not currently present in the cache.
-	set<int> pendingReadsInternal;
-	// Memory addresses that have pending reads externally-requested (to serve lower level).
-	// When these pending read operations return, the result will be sent to the lower level.
-	set<int> pendingReadsExternal;
-	// Writes that are pending due to write-allocate
-	map<int, int> pendingWrites;
 
 private:
-	// Internal buffers
-	vector<unsigned char> instructionsBuffer;
-	vector<unsigned char> dataBuffer;
+	// Internal buffer
+	vector<unsigned char> buffer;
 };
