@@ -77,7 +77,6 @@ void CPU::onTickDown(int now) {
 	case HALT:
 		break;
 	default:
-		default:
 		// Unknown state
 		state = HALT;
 		assert(false);
