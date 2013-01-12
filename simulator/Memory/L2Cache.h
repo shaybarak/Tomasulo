@@ -1,13 +1,16 @@
 #pragma once
 
-#include "L1Cache.h"
+#include "Cache.h"
 #include "../Clock/Clocked.h"
 
 class L2Cache : public Cache, public Clocked {
 public:
 	L2Cache(int blockSize, int cacheSize, int accessDelay,
 		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave,
-		L1Cache* l1Cache);
+		Cache* l1Cache);
+		: Cache(blockSize, cacheSize, accessDelay),
+		  pCpuMaster(pCpuMaster), pL2Slave(pL2Slave),
+		  l1Cache(l1Cache), state(READY), delay(-1) {}
 	// For reading signals from L1 cache and sending signals to RAM
 	virtual void onTickUp(int now);
 	// For reading signals from RAM and sending signals to L1 cache
@@ -18,8 +21,7 @@ public:
 	friend class L1Cache;
 
 protected:
-	typedef Cache::outcome outcome;
-	virtual void evict(int address);
+	
 
 private:
 	/**
