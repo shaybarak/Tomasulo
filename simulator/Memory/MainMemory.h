@@ -8,9 +8,9 @@
 #include "MasterSlaveInterface.h"
 using namespace std;
 
-class MainMemory : public Clocked, public MasterSlaveInterface {
+class MainMemory : public Clocked {
 public:
-	MainMemory(int accessDelay, int rowSize);
+	MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
 	// Design flaw: exposes non-const pointer to data member
 	// (required for loading memory initialization)
 	vector<unsigned char>* getBuffer();
@@ -18,6 +18,9 @@ public:
 	virtual void onTickUp(int now);
 	// For sending signals to L2 cache
 	virtual void onTickDown(int now);
+
+	//interface for communication with L2
+	MasterSlaveInterface* pL2Master;
 
 private:
 	vector<unsigned char> buffer;
@@ -31,7 +34,7 @@ private:
 	int lastReadAddress;
 	// Busy reading until this time
 	int busyReadingUntil;
-	
+
 	int toRow(int address);
 
 	int read(int offset);
