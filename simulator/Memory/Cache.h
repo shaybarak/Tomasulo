@@ -10,8 +10,7 @@ using namespace std;
 class Cache {
 public:
 	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 0);
-	const vector<unsigned char>* getInstructionsBuffer() const { return &instructionsBuffer; }
-	const vector<unsigned char>* getDataBuffer() const { return &dataBuffer; }
+	const vector<unsigned char>* getBuffer() const { return &buffer; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
 	double getHitRate() const { return (double)hits / (hits + misses); }
