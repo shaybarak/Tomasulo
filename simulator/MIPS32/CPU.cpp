@@ -79,33 +79,6 @@ void CPU::onTickDown(int now) {
 	}
 }
 
-//TODO: change to general method on MasterSlaveInterface "MasterRequestRead/Write"
-void CPU::requestReadInst() {
-	pL1InstSlave->writeEnable = false;
-	pL1InstSlave->masterValid = false;
-	pL1InstSlave->masterReady = true;
-	pL1InstSlave->address = pcToMemoryOffset(pc);
-	memoryAccessCount++;
-}
-
-void CPU::requestReadData(int address) {
-	pL1DataSlave->writeEnable = false;
-	pL1DataSlave->masterValid = false;
-	pL1DataSlave->masterReady = true;
-	pL1DataSlave->address = address;
-	memoryAccessCount++;
-}
-
-void CPU::requestWrite(int address, int data) {
-	pL1DataSlave->writeEnable = true;
-	pL1DataSlave->masterValid = false;
-	pL1DataSlave->masterReady = true;
-	pL1DataSlave->address = address;
-	pL1DataSlave->data = data;
-	memoryAccessCount++;
-}
-
-
 void CPU::execute(int instructionIndex) {
 	if (pL1InstSlave->data != pcToInstructionIndex(pc)) {
 		cerr << "CPU exception: illegal opcode " << (pL1InstSlave->data) << "!" << endl;
@@ -225,6 +198,32 @@ void CPU::execute(int instructionIndex) {
 		state = HALT;
 		break;
 	}
+}
+
+//TODO: change to general method on MasterSlaveInterface "MasterRequestRead/Write"
+void CPU::requestReadInst() {
+	pL1InstSlave->writeEnable = false;
+	pL1InstSlave->masterValid = false;
+	pL1InstSlave->masterReady = true;
+	pL1InstSlave->address = pcToMemoryOffset(pc);
+	memoryAccessCount++;
+}
+
+void CPU::requestReadData(int address) {
+	pL1DataSlave->writeEnable = false;
+	pL1DataSlave->masterValid = false;
+	pL1DataSlave->masterReady = true;
+	pL1DataSlave->address = address;
+	memoryAccessCount++;
+}
+
+void CPU::requestWrite(int address, int data) {
+	pL1DataSlave->writeEnable = true;
+	pL1DataSlave->masterValid = false;
+	pL1DataSlave->masterReady = true;
+	pL1DataSlave->address = address;
+	pL1DataSlave->data = data;
+	memoryAccessCount++;
 }
 
 void CPU::continueExecuteLw() {
