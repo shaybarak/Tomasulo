@@ -21,7 +21,6 @@ public:
 		INVALID,	// Cache is invalid in respective mapping
 	};
 
-protected:
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
@@ -37,6 +36,7 @@ protected:
 	 */
 	virtual bool invalidate(int address) = 0;
 
+protected:
 	// Returns block offset of address
 	int toOffset(int address);
 	// Returns index of address

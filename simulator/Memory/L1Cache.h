@@ -20,6 +20,7 @@ public:
 	// (since L1 is inclusive in L2, L2 must have intimate knowledge of L1)
 	friend class L2Cache;
 
+
 protected:
 	virtual void write(int address, int value);
 
@@ -45,7 +46,7 @@ private:
 	int delay;
 
 	// Access to L2 cache for forwarding writes
-	L2Cache* l2Cache;
+	Cache* l2Cache;
 
 	enum State {
 		READY,		// Ready for next request from master (initial state)
