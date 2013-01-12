@@ -1,10 +1,6 @@
 #include "ISA.h"
 #include <algorithm>
 
-bool ISA::isCodeAddress(int address) {
-	return address >= CODE_BASE;
-}
-
 ISA::Opcode ISA::toOpcode(const string& opcodeName) {
 	// Convert opcode to lowercase for comparison
 	string opcodeLowered(opcodeName);

@@ -80,7 +80,7 @@ void CPU::onTickDown(int now) {
 }
 
 void CPU::execute(int instructionIndex) {
-	if (pL1InstSlave->data != pcToInstructionIndex(pc)) {
+	if (pL1InstSlave->data != pc) {
 		cerr << "CPU exception: illegal opcode " << (pL1InstSlave->data) << "!" << endl;
 		state = HALT;
 		return;
@@ -241,13 +241,9 @@ bool CPU::isValidMemoryAddress(int address) {
 }
 
 bool CPU::isValidInstructionAddress(int address) {
-	return ((address >= 0) && (address < instructions->size() * sizeof(int)));
+	return ((address >= 0) && (address < (int)(instructions->size() * sizeof(int))));
 }
 
 int CPU::pcToMemoryOffset(int pc) {
 	return pc * sizeof(int);
-}
-
-int CPU::pcToInstructionIndex(int pc) {
-	return (pc * sizeof(int) - instructionsBase) / sizeof(int);
 }

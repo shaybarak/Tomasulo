@@ -75,8 +75,6 @@ private:
 	bool isValidInstructionAddress(int address);
 	/** Converts PC value to memory offset. */
 	int pcToMemoryOffset(int pc);
-	/** Converts PC value to index of instruction in program. */
-	int pcToInstructionIndex(int pc);
 	/** set memory interface signals for reading instrcution **/
 	void requestReadInst();
 	/** set memory interface signals for reading data **/
