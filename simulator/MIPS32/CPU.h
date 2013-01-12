@@ -18,11 +18,11 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pInstInterface, MasterSlaveInterface* pDataInterface) :
+	CPU(int memorySize, GPR* gpr, MasterSlaveInterface* pL1InstSlave, MasterSlaveInterface* pL1DataSlave) :
 		memorySize(memorySize),
 		gpr(gpr),
-		pL1DataSlave(pInstInterface),
-		pL1InstSlave(pDataInterface),
+		pL1InstSlave(pL1InstSlave),
+		pL1DataSlave(pL1DataSlave),
 		state(HALT),
 		now(0),
 		instructionsCommitted(0),
@@ -47,7 +47,7 @@ public:
 	// Returns the Average Memory Access Time
 	double getAmat() const { return (double)now / memoryAccessCount; }
 	// Returns whether the CPU has halted due to a halt instruction or an exception
-	bool isHalted() const { return halted; }
+	bool isHalted() const { return state == HALT; }
 
 private:
 	enum CpuState {

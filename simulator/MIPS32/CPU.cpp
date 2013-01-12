@@ -19,16 +19,12 @@ void CPU::onTickUp(int now) {
 	case INST_STALL:
 		break;
 	case LW:
-		requestReadData(nextLwAddress);
-		state = LW_STALL;
+		if (pL1DataSlave->slaveReady) {
+			requestReadData(nextLwAddress);
+			state = LW_STALL;
+		}
 		break;
 	case LW_STALL:
-		break;
-	case SW:
-		if (pL1DataSlave->slaveReady) {
-			requestWrite(nextSwAddress, nextSwData);
-			state = SW_STALL;
-		}
 		break;
 	case SW_STALL:
 		break;
@@ -52,8 +48,10 @@ void CPU::onTickDown(int now) {
 		execute(pL1InstSlave->data);
 		break;
 	case LW:
-		cerr << "CPU exception: illegal opcode " << (pL1DataSlave->data) << "!" << endl;
-		state = HALT;
+		if (!pL1DataSlave->slaveReady) {
+			cerr << "CPU exception: cannot be in LW state on tick down!" << endl;
+			state = HALT;
+		}
 		break;
 	case LW_STALL:
 		if (!pL1DataSlave->slaveValid) {
@@ -62,13 +60,12 @@ void CPU::onTickDown(int now) {
 		continueExecuteLw();
 		state = READY;
 		break;
-	case SW:
-		break;
 	case SW_STALL:
 		if (pL1InstSlave->slaveReady) {
+			requestWrite(nextSwAddress, nextSwData);
+			continueExecuteSw();
 			state = READY;
-		}
-		continueExecuteSw();
+		}		
 		break;
 	case HALT:
 		break;
@@ -85,6 +82,7 @@ void CPU::execute(int instructionIndex) {
 		state = HALT;
 		return;
 	}
+	state = READY;
 	RTypeInstruction* rtype = NULL;
 	ITypeInstruction* itype = NULL;
 	JTypeInstruction* jtype = NULL;
@@ -161,11 +159,17 @@ void CPU::execute(int instructionIndex) {
 		nextSwData = (*gpr)[itype->getRt()];
 		if (!isValidMemoryAddress(nextSwAddress)) {
 			cerr << "CPU exception: memory offset out of range!" << endl;
-			halted = true;
+			state = HALT;
 			break;
 		}
-		pc++;
-		instructionsCommitted++;
+		if (pL1DataSlave->slaveReady) {
+			//write buffer enables trying to write on same cycle without waiting access time.
+			requestWrite(nextSwAddress, nextSwData);
+			continueExecuteSw();
+			state = READY;
+			break;
+		}
+		state = SW_STALL;
 		break;
 	case ISA::beq:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
@@ -203,10 +207,9 @@ void CPU::execute(int instructionIndex) {
 //TODO: change to general method on MasterSlaveInterface "MasterRequestRead/Write"
 void CPU::requestReadInst() {
 	pL1InstSlave->writeEnable = false;
-	pL1InstSlave->masterValid = false;
+	pL1InstSlave->masterValid = true;
 	pL1InstSlave->masterReady = true;
 	pL1InstSlave->address = pcToMemoryOffset(pc);
-	memoryAccessCount++;
 }
 
 void CPU::requestReadData(int address) {
@@ -214,26 +217,25 @@ void CPU::requestReadData(int address) {
 	pL1DataSlave->masterValid = false;
 	pL1DataSlave->masterReady = true;
 	pL1DataSlave->address = address;
-	memoryAccessCount++;
 }
 
 void CPU::requestWrite(int address, int data) {
 	pL1DataSlave->writeEnable = true;
-	pL1DataSlave->masterValid = false;
+	pL1DataSlave->masterValid = true;
 	pL1DataSlave->masterReady = true;
 	pL1DataSlave->address = address;
 	pL1DataSlave->data = data;
-	memoryAccessCount++;
 }
 
 void CPU::continueExecuteLw() {
 	(*gpr)[nextLwRt] = pL1DataSlave->data;
+	pc++;
+	instructionsCommitted++;
 }
 
 void CPU::continueExecuteSw() {
-	pL1DataSlave->address = nextSwAddress;
-	pL1DataSlave->data = nextSwData;
-	pL1DataSlave->masterValid = true;
+	pc++;
+	instructionsCommitted++;
 }
 
 bool CPU::isValidMemoryAddress(int address) {
