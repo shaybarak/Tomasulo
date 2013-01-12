@@ -2,8 +2,8 @@
 #include "../MIPS32/ISA.h"
 
 MainMemory::MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master, ISA::MemoryType memoryType)
-	: accessDelay(accessDelay), rowSize(rowSize), pL2Master(pL2Master), memoryType(memoryType),
-		  lastReadAddress(-1), openedRow(-1), busyReadingUntil(0) {
+	: accessDelay(accessDelay), rowSize(rowSize), delay(-1), pL2Master(pL2Master), memoryType(memoryType),
+		  lastReadAddress(-1), openRow(-1) {
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
 }
@@ -19,10 +19,10 @@ void MainMemory::onTickUp(int now) {
 	if (!pL2Master->masterValid) {
 		return;
 	}
-	if (openedRow == toRow(pL2Master->address)) {
-		delayCountDown = 1;
+	if (openRow == toRow(pL2Master->address)) {
+		delay = 1;
 	} else {
-		delayCountDown = accessDelay;
+		delay = accessDelay;
 	}
 	pL2Master->slaveReady = false;
 	pL2Master->slaveValid = false;
@@ -33,7 +33,7 @@ void MainMemory::onTickDown(int now) {
 	if (delayCountDown > 0) {
 		return;
 	}
-	openedRow = toRow(pL2Master->address);
+	openRow = toRow(pL2Master->address);
 	if (pL2Master->writeEnable) {
 		words[pL2Master->address / sizeof(int)] = pL2Master->data;
 		pL2Master->slaveValid = false;
