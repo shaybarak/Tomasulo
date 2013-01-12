@@ -1,9 +1,9 @@
 #pragma once
 
-#include "PreviousMemoryLevel.h"
-#include "NextMemoryLevel.h"
 #include <map>
 #include <set>
+#include <vector>
+#include "MasterSlaveInterface.h"
 
 using namespace std;
 
