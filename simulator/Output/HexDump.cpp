@@ -24,6 +24,9 @@ bool HexDump::load(vector<unsigned char>& buffer, FILE* in) {
 }
 
 bool HexDump::store(const vector<unsigned char>& buffer, FILE* out) {
+	if (buffer.size() == 0) {
+		return;
+	}
 	// 8 bytes per line
 	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[0] + buffer.size() - 8; base += 8) {
 		if (fprintf(out, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
@@ -52,6 +55,9 @@ bool HexDump::load(vector<unsigned char>& buffer, fstream& in) {
 }
 
 bool HexDump::store(const vector<unsigned char>& buffer, fstream& out) {
+	if (buffer.size() == 0) {
+		return;
+	}
 	// 8 bytes per line
 	for (unsigned char* base = (unsigned char*)&buffer[0]; base <= &buffer[0] + buffer.size() - 8; base += 8) {
 		out << HEX(base[0]) << " " << HEX(base[1]) << " " << HEX(base[2]) << " " << HEX(base[3]) << " "
