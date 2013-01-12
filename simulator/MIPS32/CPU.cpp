@@ -61,7 +61,7 @@ void CPU::onTickDown(int now) {
 		state = READY;
 		break;
 	case SW_STALL:
-		if (pL1InstSlave->slaveReady) {
+		if (pL1DataSlave->slaveReady) {
 			requestWrite(nextSwAddress, nextSwData);
 			continueExecuteSw();
 			state = READY;
