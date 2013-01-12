@@ -16,7 +16,7 @@ public:
 
 	enum memoryType {
 		INST, DATA,
-	}
+	};
 	// Convert opcode by name to enum value
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	// Count of registers in ISA
