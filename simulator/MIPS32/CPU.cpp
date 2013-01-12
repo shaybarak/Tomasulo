@@ -14,14 +14,12 @@ void CPU::onTickUp(int now) {
 	switch (state) {
 	case READY:
 		requestReadInst();
-		memoryAccessCount++;
 		state = INST_STALL;
 		break;
 	case INST_STALL:
 		break;
 	case LW:
 		requestReadData(nextLwAddress);
-		memoryAccessCount++;
 		state = LW_STALL;
 		break;
 	case LW_STALL:
@@ -29,7 +27,6 @@ void CPU::onTickUp(int now) {
 	case SW:
 		if (pL1DataSlave->slaveReady) {
 			requestWrite(nextSwAddress, nextSwData);
-			memoryAccessCount++;
 			state = SW_STALL;
 		}
 		break;
@@ -88,6 +85,7 @@ void CPU::requestReadInst() {
 	pL1InstSlave->masterValid = false;
 	pL1InstSlave->masterReady = true;
 	pL1InstSlave->address = pcToMemoryOffset(pc);
+	memoryAccessCount++;
 }
 
 void CPU::requestReadData(int address) {
@@ -95,6 +93,7 @@ void CPU::requestReadData(int address) {
 	pL1DataSlave->masterValid = false;
 	pL1DataSlave->masterReady = true;
 	pL1DataSlave->address = address;
+	memoryAccessCount++;
 }
 
 void CPU::requestWrite(int address, int data) {
@@ -103,6 +102,7 @@ void CPU::requestWrite(int address, int data) {
 	pL1DataSlave->masterReady = true;
 	pL1DataSlave->address = address;
 	pL1DataSlave->data = data;
+	memoryAccessCount++;
 }
 
 
@@ -180,7 +180,6 @@ void CPU::execute(int instructionIndex) {
 			break;
 		}
 		state = LW;
-		memoryAccessCount++;
 		// Note: stalled, don't advance PC and don't count instruction as committed
 		break;
 	case ISA::sw:
@@ -192,17 +191,15 @@ void CPU::execute(int instructionIndex) {
 			halted = true;
 			break;
 		}
-		memoryAccessCount++;
 		pc++;
 		instructionsCommitted++;
 		break;
 	case ISA::beq:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		if ((*gpr)[itype->getRs()] == (*gpr)[itype->getRt()]) {
-			pc += itype->getImmediate() + 1;
-		} else {
-			pc++;
+			pc += itype->getImmediate();
 		}
+		pc++;
 		instructionsCommitted++;
 		break;
 	case ISA::bne:
