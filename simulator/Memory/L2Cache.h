@@ -46,7 +46,7 @@ private:
 	bool isDirty(int address);
 
 private:
-	enum L2States {
+	enum L2CacheState {
 		READY,					//ready to serve
 		ACCESSING,				//trying to access a word inside the cache
 		SERVE_REST_L1_BLOCK,	//sending rest of l1 block, after critical word
