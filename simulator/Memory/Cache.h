@@ -21,6 +21,7 @@ public:
 		INVALID,	// Cache is invalid in respective mapping
 	};
 
+	// TODO decrease visibility
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
@@ -29,6 +30,7 @@ public:
 	 */
 	virtual void write(int address, int value) = 0;
 
+	// TODO decrease visibility
 	/**
 	 * Instructs cache to invalidate a block by address.
 	 * Used by L2 cache to maintain inclusivity of L1.
