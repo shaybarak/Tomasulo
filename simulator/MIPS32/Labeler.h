@@ -15,7 +15,7 @@ class Labeler {
 public:
 	typedef map<string, int> Labels;
 	// Initialize with absolute base address of code
-	Labeler(unsigned int base) : pc(base) {}
+	Labeler(int base = 0) : pc(base) {}
 	// Parse a single line of assembly code at a given memory address, returns PC after this instruction
 	unsigned int parse(string& line);
 	const map<string, int>& getLabels() const;

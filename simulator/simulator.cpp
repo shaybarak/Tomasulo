@@ -99,14 +99,14 @@ int main(int argc, char** argv) {
 
 	// Read inputs
 	//////////////
-	Labeler labeler(ISA::CODE_BASE);
+	Labeler labeler();
 	// First pass on code: find and process labels
 	while (cmd_file) {
 		string line;
 		getline(cmd_file, line);
 		labeler.parse(line);
 	}
-	InstructionFactory instructionFactory(labeler.getLabels(), ISA::CODE_BASE);
+	InstructionFactory instructionFactory(labeler.getLabels());
 	cmd_file.clear();
 	cmd_file.seekg(0);
 	// Second pass on code: process instructions
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
 	}
 	mem_init.close();
 	// Write instructions to memory
-	addInstructions(*ramInst.getBuffer(), program, ISA::CODE_BASE);
+	addInstructions(*ramInst.getBuffer(), program);
 	
 	// Set up CPU
 	/////////////

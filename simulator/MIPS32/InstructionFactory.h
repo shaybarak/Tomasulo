@@ -23,7 +23,7 @@ public:
 	 * labels: mapping of label to memory address
 	 * startPc: initial value for the Program Counter
 	 */
-	InstructionFactory(const Labeler::Labels& labels, int startPc) : labels(labels), pc(startPc) {}
+	InstructionFactory(const Labeler::Labels& labels, int startPc = 0) : labels(labels), pc(startPc) {}
 	// Parses a single line of assembly code, on error returns NULL
 	Instruction* parse(string& line);
 
