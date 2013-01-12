@@ -7,7 +7,7 @@ class L1Cache : public Cache, public Clocked {
 public:
 	L1Cache(int blockSize, int cacheSize, int accessDelay,
 		MasterSlaveInterface* pCpuMaster, MasterSlaveInterface* pL2Slave,
-		L2Cache* l2Cache)
+		Cache* l2Cache)
 		: Cache(blockSize, cacheSize, accessDelay),
 		  pCpuMaster(pCpuMaster), pL2Slave(pL2Slave),
 		  l2Cache(l2Cache), state(READY), delay(-1) {}
@@ -20,6 +20,11 @@ public:
 	// (since L1 is inclusive in L2, L2 must have intimate knowledge of L1)
 	friend class L2Cache;
 
+protected:
+	virtual void write(int address, int value);
+
+	virtual bool invalidate(int address);
+
 private:
 	// Returns whether address is a hit
 	bool isHit(int address);
@@ -27,24 +32,9 @@ private:
 	/**
 	 * Reads from cache.
 	 * address: memory address to read from.
-	 * May return uninitialized data, users should precede with a call to isPresent.
+	 * May return uninitialized data.
 	 */
 	int read(int address);
-	
-	/**
-	 * Writes to cache.
-	 * address: memory address to write to.
-	 * data: memory value to write.
-	 * May overwrite previous data, users should precede with a call to isPresent.
-	 */
-	void write(int address, int value);
-
-	/**
-	 * Instructs cache to invalidate a block by address.
-	 * Used by L2 cache to maintain inclusivity of L1.
-	 * On hit invalidates and returns true, on miss returns false.
-	 */
-	bool invalidate(int address);
 	
 	static const int WAYS = 1;
 

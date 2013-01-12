@@ -22,6 +22,21 @@ public:
 	};
 
 protected:
+	/**
+	 * Writes to cache.
+	 * address: memory address to write to.
+	 * data: memory value to write.
+	 * May overwrite previous data.
+	 */
+	virtual void write(int address, int value) = 0;
+
+	/**
+	 * Instructs cache to invalidate a block by address.
+	 * Used by L2 cache to maintain inclusivity of L1.
+	 * On hit invalidates and returns true, on miss returns false.
+	 */
+	virtual bool invalidate(int address) = 0;
+
 	// Returns block offset of address
 	int toOffset(int address);
 	// Returns index of address
