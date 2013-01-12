@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Cache.h"
 #include "L1Cache.h"
 #include "../Clock/Clocked.h"
 
@@ -43,6 +42,15 @@ private:
 	bool isDirty(int address);
 
 private:
+	enum L2States {
+		READY,					//ready to serve
+		BUSY_ACCESSING,			//trying to access a word inside the cache
+		SERVE_REST_L1_BLOCK,	//sending rest of l1 block, after critical word
+		WAIT_CWF,				//waiting for main memory to return CriticalWordFirst
+		READ_REST_L1_BLOCK,		//reading rest of l1 block from main memory
+		WRITE_BLOCK_TO_RAM,		//write l2 blck to ram, when write-back policy enforces
+		READ_REST_L2_BLOCK,		//reading rest of l2 block from memory
+	};
 	static const int WAYS = 2;
 
 	vector<bool> instructionsDirty;
