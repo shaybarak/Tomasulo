@@ -35,6 +35,10 @@ void L1Cache::onTickUp(int now) {
 		break;
 	case WAIT_WA:
 		break;
+	default:
+		// Unknown state
+		assert(false);
+		break;
 	}
 }
 
@@ -89,6 +93,10 @@ void L1Cache::onTickDown(int now) {
 	case WRITE_MISS:
 		break;
 	case WAIT_WA:
+		break;
+	default:
+		// Unknown state
+		assert(false);
 		break;
 	}
 }
