@@ -1,9 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "MemoryInterface.h"
-#include "NextMemoryLevel.h"
-#include "PreviousMemoryLevel.h"
 #include "../Clock/Clocked.h"
 #include "MasterSlaveInterface.h"
 using namespace std;

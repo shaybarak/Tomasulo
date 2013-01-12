@@ -5,10 +5,9 @@
 #include "MIPS32\Labeler.h"
 #include "Clock\Clock.h"
 #include "Output\HexDump.h"
-#include "Memory\L1Cache.h"
-#include "Memory\L2Cache.h"
-#include "Memory\PreviousMemoryLevel.h"
-#include "Memory\NextMemoryLevel.h"
+//TODO uncomment out
+//#include "Memory\L1Cache.h"
+//#include "Memory\L2Cache.h"
 #include "Memory\MainMemory.h"
 #include <fstream>
 #include <iostream>

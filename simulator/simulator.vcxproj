@@ -14,13 +14,8 @@
     <ClInclude Include="Clock\Clock.h" />
     <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
-    <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\MasterSlaveInterface.h" />
-    <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\MainMemory.h" />
-    <ClInclude Include="Memory\MemoryInterface.h" />
-    <ClInclude Include="Memory\NextMemoryLevel.h" />
-    <ClInclude Include="Memory\PreviousMemoryLevel.h" />
     <ClInclude Include="Memory\TimedQueue.h" />
     <ClInclude Include="Memory\WriteRequest.h" />
     <ClInclude Include="MIPS32\CPU.h" />
@@ -37,12 +32,8 @@
   <ItemGroup>
     <ClCompile Include="Clock\Clock.cpp" />
     <ClCompile Include="Configuration\Configuration.cpp" />
-    <ClCompile Include="Memory\Cache.cpp" />
-    <ClCompile Include="Memory\L1Cache.cpp" />
     <ClCompile Include="Memory\MainMemory.cpp" />
     <ClCompile Include="Memory\MemoryInterface.cpp" />
-    <ClCompile Include="Memory\NextMemoryLevel.cpp" />
-    <ClCompile Include="Memory\PreviousMemoryLevel.cpp" />
     <ClCompile Include="Memory\TimedQueue.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
     <ClCompile Include="MIPS32\GPR.cpp" />

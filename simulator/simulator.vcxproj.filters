@@ -90,22 +90,7 @@
     <ClInclude Include="Memory\WriteRequest.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\NextMemoryLevel.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\PreviousMemoryLevel.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\L1Cache.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\Cache.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Memory\MainMemory.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\MemoryInterface.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="Memory\MasterSlaveInterface.h">
@@ -154,18 +139,6 @@
     </ClCompile>
     <ClCompile Include="Clock\Clock.cpp">
       <Filter>Source Files\Clock</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\NextMemoryLevel.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\PreviousMemoryLevel.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\Cache.cpp">
-      <Filter>Source Files\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory\L1Cache.cpp">
-      <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MemoryInterface.cpp">
       <Filter>Source Files\Memory</Filter>
