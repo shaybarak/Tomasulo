@@ -15,6 +15,7 @@
     <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
     <ClInclude Include="Memory\Cache.h" />
+    <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\L2Cache.h" />
     <ClInclude Include="Memory\MasterSlaveInterface.h" />
     <ClInclude Include="Memory\MainMemory.h" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Clock\Clock.cpp" />
     <ClCompile Include="Configuration\Configuration.cpp" />
     <ClCompile Include="Memory\Cache.cpp" />
+    <ClCompile Include="Memory\L1Cache.cpp" />
     <ClCompile Include="Memory\L2Cache.cpp" />
     <ClCompile Include="Memory\MainMemory.cpp" />
     <ClCompile Include="Memory\MemoryInterface.cpp" />
