@@ -143,51 +143,53 @@ int main(int argc, char** argv) {
 		!readConfig(config, "mem_access_delay", &mem_access_delay)) {
 		return BAD_CONFIG;
 	}
+
 	// Initialize memory interfaces
-	MemoryInterface cpuL1;
-	NextMemoryLevel cpuToL1(&cpuL1);
-	PreviousMemoryLevel l1ToCpu(&cpuL1);
-	MemoryInterface l1L2;
-	NextMemoryLevel l1ToL2(&l1L2);
-	PreviousMemoryLevel l2ToL1(&l1L2);
-	MemoryInterface l2MainMemory;
-	NextMemoryLevel l2ToMainmemory(&l2MainMemory);
-	PreviousMemoryLevel mainMemoryToL2(&l2MainMemory);
+	MasterSlaveInterface cpuL2DataInterface;
+	MasterSlaveInterface cpuL2InstInterface;
+	
+	MasterSlaveInterface l1L2DataInterface;
+	MasterSlaveInterface l1L2InstInterface;
+	
+	MasterSlaveInterface l2RamDataInterface;
+	MasterSlaveInterface l2RamInstInterface;
 
-	// Initialize L1
-	L1Cache l1Cache(l1_block_size, l1_cache_size, l1_access_delay, &l1ToCpu, &l1ToL2);
-	// Initialize L2
-
-	//TODO uncomment out
-	/*L2Cache l2Cache(l2_block_size, l2_cache_size, l2_access_delay, &l2ToL1, &l2ToMainmemory, &l1Cache);*/
-	// Initialize main memory
-	// TODO connect MainMemory to L2, not directly to L1
-	MainMemory ram(mem_access_delay, l2_block_size, &l2ToL1);
-
+	//Initialize memory units
+	//TODO fix!
+	//SUPER TODO: fix sizes to half, move "/2" factor in all fields calculations
+	//L1Cache	L1InstCache(mem_access_delay, l2_block_size, &l1L2InstInterface);
+	//L1Cache	L1DataCache(mem_access_delay, l2_block_size, &l1L2DataInterface);
+	//
+	//L2Cache	L2InstCache(mem_access_delay, l2_block_size, &l1L2InstInterface);
+	//L2Cache	L2DataCache(mem_access_delay, l2_block_size, &l1L2DataInterface);
+	
+	MainMemory ramInst(mem_access_delay, l2_block_size, &l2RamInstInterface);
+	MainMemory ramData(mem_access_delay, l2_block_size, &l2RamDataInterface);
+	
 	// Read memory initialization
-	if (!HexDump::load(*ram.getBuffer(), mem_init)) {
+	if (!HexDump::load(*ramData.getBuffer(), mem_init)) {
 		cerr << "Error reading memory initialization" << endl;
 		return BAD_INPUT;
 	}
 	mem_init.close();
 	// Write instructions to memory
-	addInstructions(*ram.getBuffer(), program, ISA::CODE_BASE);
+	addInstructions(*ramInst.getBuffer(), program, ISA::CODE_BASE);
 	
 	// Set up CPU
 	/////////////
 	// Initialize GPR
 	GPR gpr;
 	// Initialize CPU
-	CPU cpu(&cpuToL1, ISA::RAM_SIZE, &gpr);
+	CPU cpu(ISA::RAM_SIZE, &gpr, &l2RamInstInterface, &l2RamDataInterface);
 	cpu.loadProgram(&program, ISA::CODE_BASE, ISA::CODE_BASE>>2);
 	Clock sysClock;
 	sysClock.addObserver(&cpu);
-	sysClock.addObserver(&l1Cache);
+	//sysClock.addObserver(&l1Cache);
 	//TODO uncomment out when l2Cache works
 	//sysClock.addObserver(&l2Cache);
-	sysClock.addObserver(&ram);
+	sysClock.addObserver(&ramData);
+	sysClock.addObserver(&ramInst);
 	
-
 	while (!cpu.isHalted()) {
 		sysClock.tick();
 	}
@@ -195,20 +197,18 @@ int main(int argc, char** argv) {
 	// Write outputs
 	////////////////
 	// Trim trailing zeroes from memory
-	trimMemory(*ram.getBuffer());
+	trimMemory(*ramData.getBuffer());
 	// Write register dump
 	if (!gpr.dump(regs_dump)) {
 		cerr << "Error writing registers dump" << endl;
 	}
 	regs_dump.close();
 	// Write memory dumps
-	if (!HexDump::store(*l1Cache.getInstructionsBuffer(), L1i) ||
+	if (/*!HexDump::store(*l1Cache.getInstructionsBuffer(), L1i) ||
 		!HexDump::store(*l1Cache.getDataBuffer(), L1d) ||
-		
-		//TODO uncomment out
-		//!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
-		//!HexDump::store(*l2Cache.getDataBuffer(), L2d) ||
-		!HexDump::store(*ram.getBuffer(), mem_dump)) {
+		!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
+		!HexDump::store(*l2Cache.getDataBuffer(), L2d) || */
+		!HexDump::store(*ramData.getBuffer(), mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
 	mem_dump.close();
