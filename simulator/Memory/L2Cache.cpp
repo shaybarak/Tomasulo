@@ -40,21 +40,14 @@ void L2Cache::onTickUp(int now) {
 		// Do nothing
 		break;
 	
+	// Behavior on tickUp is identical
 	case READ_L1_BLOCK_FROM_RAM:
-		if (!pRamSlave->slaveReady) {
-			// Blocking on RAM
-			break;
-		}
-		pRamSlave->address = address;
-		pRamSlave->writeEnable = false;
-		pRamSlave->masterValid = true;
-		break;
-	
 	case READ_REST_L2_BLOCK:
 		if (!pRamSlave->slaveReady) {
 			// Blocking on RAM
 			break;
 		}
+		// Read next word from RAM
 		pRamSlave->address = address;
 		pRamSlave->writeEnable = false;
 		pRamSlave->masterValid = true;
@@ -65,6 +58,7 @@ void L2Cache::onTickUp(int now) {
 			// Blocking on RAM
 			break;
 		}
+		// Write back next word to RAM
 		pRamSlave->address = address;
 		pRamSlave->data = read(address);
 		pRamSlave->writeEnable = true;
@@ -89,6 +83,7 @@ void L2Cache::onTickDown(int now) {
 		if (delay > 0) {
 			break;
 		}
+		assert(delay >= 0);
 		if (isHit(pL1Master->address)) {
 			// Hit
 			hits++;
@@ -135,7 +130,7 @@ void L2Cache::onTickDown(int now) {
 		wordsLeft--;
 		if (wordsLeft == 0) {
 			// Returned last word in L1 block
-			pL1Master->slaveReady;
+			pL1Master->slaveReady = true;
 			state = READY;
 			break;
 		}
@@ -149,6 +144,8 @@ void L2Cache::onTickDown(int now) {
 		}
 		// Store result
 		write(pRamSlave->address, pRamSlave->data, destinationWay);
+		// Evict conflicting block from L1
+		l1Cache->invalidate(address);
 		// Forward to L1
 		pL1Master->address = pRamSlave->address;
 		pL1Master->data = pRamSlave->data;
@@ -171,10 +168,13 @@ void L2Cache::onTickDown(int now) {
 		}
 		// Store result
 		write(pRamSlave->address, pRamSlave->data, destinationWay);
+		// Evict conflicting block from L1
+		l1Cache->invalidate(address);
 		// Prepare to handle next word in L1 block
 		address = nextAddress(address, l1BlockSize);
 		wordsLeft--;
 		if (wordsLeft == 0) {
+			pRamSlave->masterValid = false;
 			pL1Master->slaveReady = true;
 			state = READY;
 		}
