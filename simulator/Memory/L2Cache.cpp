@@ -2,9 +2,9 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
-L2Cache::L2Cache(int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
+L2Cache::L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
 		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave)
-		: Cache(blockSize, cacheSize, accessDelay, 2), l1BlockSize(l1BlockSize),
+		: Cache(memoryType, blockSize, cacheSize, accessDelay, 2), l1BlockSize(l1BlockSize),
 		  pL1Master(pL1Master), pRamSlave(pRamSlave), state(READY), delay(-1) {
 	// Also initialize dirty bits
 	dirty.resize(valid.size());

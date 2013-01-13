@@ -8,7 +8,7 @@ using namespace std;
 
 class MainMemory : public Clocked {
 public:
-	MainMemory(int accessDelay, int rowSize, MasterSlaveInterface* pL2Master, ISA::MemoryType memoryType);
+	MainMemory(ISA::MemoryType memoryType, int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
 	// Design flaw: exposes non-const pointer to data member
 	// (required for loading memory initialization)
 	vector<unsigned char>* getBuffer();

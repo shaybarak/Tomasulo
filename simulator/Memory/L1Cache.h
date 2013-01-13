@@ -5,9 +5,9 @@
 
 class L1Cache : public Cache, public Clocked {
 public:
-	L1Cache(int blockSize, int cacheSize, int accessDelay,
+	L1Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay,
 		MasterSlaveInterface* pCpuMaster, MasterSlaveInterface* pL2Slave)
-		: Cache(blockSize, cacheSize, accessDelay), 
+		: Cache(memoryType, blockSize, cacheSize, accessDelay), 
 		pCpuMaster(pCpuMaster), pL2Slave(pL2Slave), state(READY), delay(-1) {}
 	// For reading signals from CPU and sending signals to L2 cache
 	virtual void onTickUp(int now);
