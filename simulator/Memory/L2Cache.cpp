@@ -261,9 +261,11 @@ void L2Cache::write(int address, int value, int way) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
+	int block = toBlock(index, way);
 	*getWordPtr(index, offset, way) = value;
-	dirty[toBlock(index, way)] = true;
-	valid[toBlock(index, way)] = true;
+	tags[block] = tag;
+	dirty[block] = false;
+	valid[block] = true;
 	if (way == 0) {
 		way0IsLru[index] = false;
 	} else {
