@@ -101,7 +101,7 @@ void L2Cache::onTickDown(int now) {
 			if (destinationWay >= 0) {
 				// There is a vacant spot under this index, use it
 				address = pL1Master->address;
-				wordsLeft = l1BlockSize;
+				wordsLeft = l1BlockSize / sizeof(int);
 				state = READ_L1_BLOCK_FROM_RAM;
 			} else {
 				// Must evict LRU block in index to bring in new block from RAM
@@ -113,12 +113,12 @@ void L2Cache::onTickDown(int now) {
 				if (dirty[toBlock(toIndex(pL1Master->address), destinationWay)]) {
 					// Need to write back before bringing in new block
 					state = WRITE_BACK;
-					wordsLeft = blockSize;
+					wordsLeft = blockSize / sizeof(int);
 					// Start write back at start of L2 block
 					address = (pL1Master->address / blockSize) * blockSize;
 				} else {
 					address = pL1Master->address;
-					wordsLeft = l1BlockSize;
+					wordsLeft = l1BlockSize / sizeof(int);
 					state = READ_L1_BLOCK_FROM_RAM;
 				}
 			}
@@ -156,7 +156,7 @@ void L2Cache::onTickDown(int now) {
 		address = nextAddress(address, l1BlockSize);
 		wordsLeft--;
 		if (wordsLeft == 0) {
-			wordsLeft = blockSize - l1BlockSize;
+			wordsLeft = (blockSize - l1BlockSize) / sizeof(int);
 			address = (address / blockSize * blockSize) + ((address / l1BlockSize * l1BlockSize + l1BlockSize) % blockSize);
 			state = READ_REST_L2_BLOCK;
 		}
@@ -192,7 +192,7 @@ void L2Cache::onTickDown(int now) {
 		wordsLeft--;
 		if (wordsLeft == 0) {
 			state = READ_L1_BLOCK_FROM_RAM;
-			wordsLeft = l1BlockSize;
+			wordsLeft = l1BlockSize / sizeof(int);
 		}
 		assert(wordsLeft >= 0);
 		break;
