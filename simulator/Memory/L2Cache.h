@@ -10,6 +10,7 @@ public:
 
 	// Returns whether address is present in a given way
 	bool isPresentInWay(int address, int way);
+	int getWayCount() { return ways; };
 
 private:
 	
