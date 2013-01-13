@@ -14,7 +14,7 @@ int L1Cache::read(int address) {
 	return *getWordPtr(index, offset);
 }
 
-void L1Cache::write(int address, int value) {
+void L1Cache::write(int address, int value, int way_unused) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);

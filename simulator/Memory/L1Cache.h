@@ -25,4 +25,7 @@ public:
 	 * May overwrite previous data.
 	 */
 	virtual void write(int address, int value, int way = 0);
+
+	// Invalidates a block at an address, returns whether was present
+	bool invalidate(int address);
 };

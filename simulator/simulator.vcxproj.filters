@@ -31,12 +31,6 @@
     <Filter Include="Source Files\MIPS32">
       <UniqueIdentifier>{bc5ae740-a65c-4bbc-bd75-b7632e71175a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Clock">
-      <UniqueIdentifier>{b8ea3994-be67-4083-9ee8-8593e0bd3133}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Clock">
-      <UniqueIdentifier>{7bb150c8-0a32-4c86-9976-c8c5086b5030}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Memory">
       <UniqueIdentifier>{bf4a8143-aba3-4d1f-967f-567304aef3b0}</UniqueIdentifier>
     </Filter>
@@ -77,12 +71,6 @@
     </ClInclude>
     <ClInclude Include="MIPS32\Labeler.h">
       <Filter>Header Files\MIPS32</Filter>
-    </ClInclude>
-    <ClInclude Include="Clock\Clock.h">
-      <Filter>Header Files\Clock</Filter>
-    </ClInclude>
-    <ClInclude Include="Clock\Clocked.h">
-      <Filter>Header Files\Clock</Filter>
     </ClInclude>
     <ClInclude Include="Memory\MainMemory.h">
       <Filter>Header Files\Memory</Filter>
@@ -139,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="simulator.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Clock\Clock.cpp">
-      <Filter>Source Files\Clock</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MainMemory.cpp">
       <Filter>Source Files\Memory</Filter>

@@ -11,8 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Clock\Clock.h" />
-    <ClInclude Include="Clock\Clocked.h" />
     <ClInclude Include="Configuration\Configuration.h" />
     <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\L1Cache.h" />
@@ -32,7 +30,6 @@
     <ClInclude Include="Output\HexDump.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Clock\Clock.cpp" />
     <ClCompile Include="Configuration\Configuration.cpp" />
     <ClCompile Include="Memory\Cache.cpp" />
     <ClCompile Include="Memory\L1Cache.cpp" />
