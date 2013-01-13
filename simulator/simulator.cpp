@@ -10,6 +10,7 @@
 #include "Memory\MainMemory.h"
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 using namespace std;
