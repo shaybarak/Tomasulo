@@ -172,8 +172,8 @@ void L2Cache::onTickDown(int now) {
 		write(pRamSlave->address, pRamSlave->data, destinationWay);
 		// Evict conflicting block from L1
 		l1Cache->invalidate(address);
-		// Prepare to handle next word in L1 block
-		address = nextAddress(address, l1BlockSize);
+		// Prepare to handle next word in L2 block
+		address = nextAddress(address, blockSize);
 		wordsLeft--;
 		if (wordsLeft == 0) {
 			pRamSlave->masterValid = false;
