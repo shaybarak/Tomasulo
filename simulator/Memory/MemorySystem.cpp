@@ -6,6 +6,16 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Apply all pending operations until this time
 	applyPendingWrites(now);
 
+	// If pending write then delay until applied, register L1 hit and return
+	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
+	if (pending.when >= 0) {
+		l1->registerHit();
+		now = pending.when;
+		applyPendingWrites(now);
+		value = l1->read(address);
+		return now;
+	}
+
 	// If present in L1, register L1 hit and return
 	if (l1->isPresent(address)) {
 		l1->registerHit();
@@ -13,23 +23,35 @@ int MemorySystem::read(int now, int address, int& value) {
 		return now;
 	}
 
-	// If pending then delay until applied, register L1 hit and return.
-	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
-	if (pending.when >= 0) {
-		l1->registerHit();
-		applyPendingWrites(pending.when);
-		now = pending.when;
-		value = l1->read(address);
-		return now;
-	}
-
 	// Else register L1 miss.
 	l1->registerMiss();
 
-	// If L1-L2 interface busy, delay until free.
-	// Delay by L2 access time.
-	// If present in L2 or pending, register L2 hit.
-	//   If pending then delay until applied.
+	// If L1-L2 interface busy, delay until free
+	if (l1L2InterfaceBusyUntil > now) {
+		now = l1L2InterfaceBusyUntil;
+		applyPendingWrites(now);
+	}
+
+	// Delay by L2 access time
+	now += l2->getAccessDelay();
+	applyPendingWrites(now);
+
+	// If pending write then delay until applied, register L2 hit
+	PendingWrite pending = findPendingWrite(l2PendingWrites, address);
+	if (pending.when >= 0) {
+		l2->registerHit();
+		now = pending.when;
+		applyPendingWrites(now);
+		value = l2->read(address);
+	} else {
+		// If present in L2, register L2 hit.
+		l2->registerHit();
+		value = l2->read(address);
+	}
+	
+	// Write block from L2 to L1, critical word first
+	//for (int i = 0; i < l1->get
+
 	//   Register pending writes to L1, critical word first.
 	//	 Update time until L1-L2 interface is free (by last word, not by critical word).
 	//   Return (with critical word time which is L1 access + L2 access + pending delay).
