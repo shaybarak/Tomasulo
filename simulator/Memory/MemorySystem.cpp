@@ -227,8 +227,10 @@ int MemorySystem::write(int now, int address, int value) {
 		PendingWrite pending;
 		pending.when = now + i;
 		pending.value = ram->read(l2WriteAddress);
-		l2WriteAddress = nextAddress(l2WriteAddress, l2->getBlockSize());
+		pending.address = l2WriteAddress;
+		pending.way = destinationWay;
 		l2PendingWrites.push_back(pending);
+		l2WriteAddress = nextAddress(l2WriteAddress, l2->getBlockSize());
 		// Make sure we know that the L2-RAM interface is busy
 		l2RamInterfaceBusyUntil = pending.when;
 	}
