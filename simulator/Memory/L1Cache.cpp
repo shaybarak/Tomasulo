@@ -122,6 +122,7 @@ void L1Cache::onTickDown(int now) {
 		break;
 	
 	case WAIT_WA:
+		pCpuMaster->slaveValid = false;
 		write(pL2Slave->address, pL2Slave->data);
 		if (pL2Slave->slaveReady) {
 			// Done filling
