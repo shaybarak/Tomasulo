@@ -31,7 +31,7 @@ private:
 	/**
 	 * Reads from cache.
 	 * address: memory address to read from.
-	 * May return uninitialized data.
+	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
 	int read(int address);
 

@@ -12,26 +12,29 @@ class Cache {
 public:
 	Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int ways = 1);
 	const vector<unsigned char>* getBuffer() const { return &buffer; }
+	int registerHit() { hits++; }
+	int registerMiss() { misses++; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
-	double getHitRate() const { return (double)hits / (hits + misses); }
 
-	// TODO decrease visibility
+	// Returns whether address is present in cache
+	virtual bool isPresent(int address) = 0;
+
+	/**
+	 * Reads from cache.
+	 * address: memory address to read from.
+	 * May return uninitialized data. Precede with a call to isPresent.
+	 */
+	virtual int read(int address) = 0;
+	
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
 	 * data: memory value to write.
+	 * way: destination way when relevant.
 	 * May overwrite previous data.
 	 */
-	virtual void write(int address, int value) = 0;
-
-	// TODO decrease visibility
-	/**
-	 * Instructs cache to invalidate a block by address.
-	 * Used by L2 cache to maintain inclusivity of L1.
-	 * On hit invalidates and returns true, on miss returns false.
-	 */
-	virtual bool invalidate(int address) = 0;
+	virtual void write(int address, int value, int way = 0) = 0;
 
 	int getAccessDelay() { return accessDelay; }
 
