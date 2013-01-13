@@ -15,7 +15,7 @@ public:
 	 * address: memory address to read from.
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
-	int read(int address) = 0;
+	int read(int address);
 	
 	/**
 	 * Writes to cache.

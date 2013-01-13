@@ -35,7 +35,7 @@ int L2Cache::read(int address) {
 	}
 }
 
-void L2Cache::write(int address, int value, bool dirty, int way) {
+void L2Cache::write(int address, int value, int way, bool dirty) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
