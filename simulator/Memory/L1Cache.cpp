@@ -84,6 +84,8 @@ void L1Cache::onTickDown(int now) {
 			} else {
 				// Commit write on write hit
 				write(pCpuMaster->address, pCpuMaster->data);
+				// Also commit to L2
+				l2Cache->write(pCpuMaster->address, pCpuMaster->data);
 			}
 			pCpuMaster->slaveValid = true;
 			pCpuMaster->slaveReady = true;
@@ -128,6 +130,8 @@ void L1Cache::onTickDown(int now) {
 			// Done filling
 			pL2Slave->masterValid = false;
 			pCpuMaster->slaveReady = true;
+			// Also commit to L2
+			l2Cache->write(pCpuMaster->address, pCpuMaster->data);
 			state = READY;
 		}
 		break;
@@ -158,9 +162,6 @@ void L1Cache::write(int address, int value) {
 	*getWordPtr(index, offset) = value;
 	valid[index] = true;
 	tags[index] = tag;
-	if (l2Cache != NULL) {
-		l2Cache->write(address, value);
-	}
 }
 
 bool L1Cache::invalidate(int address) {
