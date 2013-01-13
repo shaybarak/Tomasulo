@@ -9,6 +9,9 @@ public:
 	// Returns whether address is present in cache
 	virtual bool isPresent(int address);
 
+	// Returns whether address is present in cache at given way
+	bool isPresentInWay(int address, int way);
+
 	/**
 	 * Reads from cache.
 	 * address: memory address to read from.
@@ -41,6 +44,4 @@ public:
 private:
 	vector<bool> dirty;
 	vector<int> lruWay;
-
-	bool isPresentInWay(int address, int way);
 };

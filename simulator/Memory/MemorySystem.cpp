@@ -39,7 +39,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	applyPendingWrites(now);
 
 	// If pending write then delay until applied
-	PendingWrite pending = findPendingWrite(l2PendingWrites, address);
+	pending = findPendingWrite(l2PendingWrites, address);
 	if (pending.when >= 0) {
 		now = pending.when;
 		applyPendingWrites(now);
@@ -52,7 +52,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		value = l2->read(address);
 		
 		// Write block from L2 to L1, critical word first
-		for (int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
+		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 			PendingWrite pending;
 			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
 			pending.address = address;
@@ -127,7 +127,7 @@ int MemorySystem::write(int now, int address, int value) {
 		l2->registerHit();
 		//WRITE ALLOCATE: first copy block to L1, then write word to both L1 and L2
 		int copyAddress = address;
-		for (int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
+		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 			PendingWrite pending;
 			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
 			pending.address = copyAddress;
@@ -172,7 +172,7 @@ int MemorySystem::write(int now, int address, int value) {
 	}
 	//Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
 	int baseL1Address = address / l1->getBlockSize() * l1->getBlockSize();
-	for (int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
+	for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 		PendingWrite pendingL1, pendingL2;
 		pendingL1.address = baseL1Address + i * sizeof(int);
 		pendingL1.value = ram->read(pendingL1.address);

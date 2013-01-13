@@ -17,6 +17,7 @@ void CPU::runOnce() {
 	}
 	// Validate program counter
 	assert(pc >= 0);
+	#pragma warning(disable:4018)  // pc is known to be non-negative at this time
 	assert(pc < instructions->size());
 	readInstruction();
 	pc++;
@@ -97,8 +98,7 @@ void CPU::execute(Instruction* instruction) {
 		break;
 	case ISA::lw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		int mem = readData((*gpr)[itype->getRs()] + itype->getImmediate());
-		(*gpr)[itype->getRt()] = mem;
+		(*gpr)[itype->getRt()] = readData((*gpr)[itype->getRs()] + itype->getImmediate());
 		break;
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
