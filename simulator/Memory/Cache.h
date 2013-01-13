@@ -12,10 +12,13 @@ class Cache {
 public:
 	Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int ways = 1);
 	const vector<unsigned char>* getBuffer() const { return &buffer; }
+	
 	int registerHit() { hits++; }
 	int registerMiss() { misses++; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
+	int getAccessDelay() { return accessDelay; }
+	int getBlockSize() { return blockSize; }
 
 	// Returns whether address is present in cache
 	virtual bool isPresent(int address) = 0;
@@ -35,8 +38,6 @@ public:
 	 * May overwrite previous data.
 	 */
 	virtual void write(int address, int value, int way = 0) = 0;
-
-	int getAccessDelay() { return accessDelay; }
 
 protected:
 	// Defines whether type is instructions/data

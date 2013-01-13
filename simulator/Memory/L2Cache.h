@@ -24,21 +24,6 @@ private:
 	 */
 	bool isDirty(int address);
 
-	/**
-	 * Reads from cache.
-	 * address: memory address to read from.
-	 * May return uninitialized data, users should precede with a call to isPresent.
-	 */
-	int read(int address);
-
-	/**
-	 * Writes to cache.
-	 * address: memory address to write to.
-	 * value: value to write.
-	 * way: destination way to write to.
-	 */
-	void write(int address, int value, int way);
-
 	// Generates the next address in cyclic order
 	int nextAddress(int address, int blockSize);
 

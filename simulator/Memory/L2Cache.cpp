@@ -8,8 +8,8 @@ L2Cache::L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int a
 		  pL1Master(pL1Master), pRamSlave(pRamSlave), state(READY), delay(-1) {
 	// Also initialize dirty bits
 	dirty.resize(valid.size());
-	// Also initialize LRU bits (2 ways per block)
-	way0IsLru.resize(valid.size() / 2);
+	// Also initialize LRU way (contains way number of LRU way but represents an actual bit in the cache's buffer)
+	lruWay.resize(valid.size() / 2);  // Note that LRU is initialized to 0
 }
 
 bool L2Cache::isPresentInWay(int address, int way) {
