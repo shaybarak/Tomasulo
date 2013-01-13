@@ -17,8 +17,7 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(int dataMemorySize, GPR* gpr, MemorySystem* instructionMemory, MemorySystem* dataMemory) :
-		dataMemorySize(dataMemorySize),
+	CPU(GPR* gpr, MemorySystem* instructionMemory, MemorySystem* dataMemory) :
 		gpr(gpr),
 		instructionMemory(instructionMemory),
 		dataMemory(dataMemory),

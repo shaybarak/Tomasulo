@@ -36,7 +36,7 @@ void CPU::readInstruction() {
 int CPU::readData(int address) {
 	// Verify address is within range
 	assert(address >= 0);
-	assert(address < dataMemorySize);
+	assert(address < ISA::DATA_SEG_SIZE);
 	// Read from data memory
 	int data;
 	now = dataMemory->read(now, address, data);
@@ -47,7 +47,7 @@ int CPU::readData(int address) {
 void CPU::writeData(int address, int data) {
 	// Verify address is within range
 	assert(address >= 0);
-	assert(address < dataMemorySize);
+	assert(address < ISA::DATA_SEG_SIZE);
 	// Write to data memory
 	now = dataMemory->write(now, address, data);
 	memoryAccessCount++;
