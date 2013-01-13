@@ -154,7 +154,7 @@ void MemorySystem::applyPendingWrites(int until) {
 			l1->write(write.address, write.value);
 		}
 	}
-	// Commit all pending writes to L1
+	// Commit all pending writes to L2
 	for (vector<PendingWrite>::iterator it = l2PendingWrites.begin(); it < l2PendingWrites.end(); it++) {
 		write = *it;
 		if (write.when <= until) {
