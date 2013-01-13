@@ -33,6 +33,8 @@ public:
 	 */
 	virtual bool invalidate(int address) = 0;
 
+	int getAccessDelay() { return accessDelay; }
+
 protected:
 	// Defines whether type is instructions/data
 	ISA::MemoryType memoryType;

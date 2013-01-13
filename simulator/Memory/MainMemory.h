@@ -9,9 +9,13 @@ using namespace std;
 class MainMemory : public Clocked {
 public:
 	MainMemory(ISA::MemoryType memoryType, int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
+	
 	// Design flaw: exposes non-const pointer to data member
 	// (required for loading memory initialization)
 	vector<unsigned char>* getBuffer();
+
+	int getAccessDelay() { return accessDelay; }
+	
 	// For reading signals from L2 cache
 	virtual void onTickUp(int now);
 	// For sending signals to L2 cache
