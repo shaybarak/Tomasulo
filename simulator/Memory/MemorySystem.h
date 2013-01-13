@@ -81,4 +81,6 @@ private:
 
 	bool isWriteBufferEmpty(int now);
 
+	void pushWriteThrough(int address, int value, int way, int now);
+
 };
