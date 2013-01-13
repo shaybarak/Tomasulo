@@ -34,6 +34,8 @@ public:
 	void loadProgram(vector<Instruction*>* instructions, int pc = 0);
 	// Executes one instruction
 	virtual void runOnce();
+	// Returns elapsed execution time
+	int getTime() { return now; }
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const { return instructionsCommitted; }
 	// Returns the Average Memory Access Time

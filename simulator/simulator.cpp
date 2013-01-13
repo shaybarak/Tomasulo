@@ -3,11 +3,11 @@
 #include "MIPS32\InstructionFactory.h"
 #include "MIPS32\ISA.h"
 #include "MIPS32\Labeler.h"
-#include "Clock\Clock.h"
 #include "Output\HexDump.h"
 #include "Memory\L1Cache.h"
 #include "Memory\L2Cache.h"
 #include "Memory\MainMemory.h"
+#include "Memory\MemorySystem.h"
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -142,85 +142,64 @@ int main(int argc, char** argv) {
 		return BAD_CONFIG;
 	}
 
-	// Initialize memory interfaces
-	MasterSlaveInterface cpuL1InstInterface;
-	MasterSlaveInterface cpuL1DataInterface;
-	
-	MasterSlaveInterface l1L2InstInterface;
-	MasterSlaveInterface l1L2DataInterface;
-	
-	MasterSlaveInterface l2RamInstInterface;
-	MasterSlaveInterface l2RamDataInterface;
-	
-	L1Cache l1InstCache(ISA::INST, l1_block_size, l1_cache_size / 2, l1_access_delay,
-						&cpuL1InstInterface, &l1L2InstInterface);
-	L1Cache l1DataCache(ISA::DATA, l1_block_size, l1_cache_size / 2, l1_access_delay,
-						&cpuL1DataInterface, &l1L2DataInterface);
+	// Split cache buffer space 50%/50% between instruction and data caches
+	L1Cache l1InstCache(ISA::INST, l1_block_size, l1_cache_size / 2, l1_access_delay);
+	L1Cache l1DataCache(ISA::DATA, l1_block_size, l1_cache_size / 2, l1_access_delay);
+	L2Cache l2InstCache(ISA::INST, l2_block_size, l2_cache_size / 2, l2_access_delay);
+	L2Cache l2DataCache(ISA::DATA, l2_block_size, l2_cache_size / 2, l2_access_delay);
 
-	L2Cache l2InstCache(ISA::INST, l2_block_size, l2_cache_size / 2, l2_access_delay, l1_block_size,
-						&l1L2InstInterface, &l2RamInstInterface);
-	L2Cache l2DataCache(ISA::DATA, l2_block_size, l2_cache_size / 2, l2_access_delay, l1_block_size,
-						&l1L2DataInterface, &l2RamDataInterface);
-
-	l1InstCache.setL2Cache(&l2InstCache);
-	l1DataCache.setL2Cache(&l2DataCache);
-	
-	l2InstCache.setL1Cache(&l1InstCache);
-	l2DataCache.setL1Cache(&l1DataCache);
-	
-	MainMemory ramInst(ISA::INST, mem_access_delay, l2_block_size, &l2RamInstInterface);
-	MainMemory ramData(ISA::DATA, mem_access_delay, l2_block_size, &l2RamDataInterface);
+	// Initialize RAM
+	vector<unsigned char> instructions;
+	instructions.resize(ISA::DATA_SEG_SIZE);
+	MainMemory ramInst(ISA::INST, (int*)&instructions[0], mem_access_delay);
+	vector<unsigned char> data;
+	data.resize(ISA::CODE_SEG_SIZE);
+	MainMemory ramData(ISA::INST, (int*)&data[0], mem_access_delay);
 	
 	// Read memory initialization
-	if (!HexDump::load(*ramData.getBuffer(), mem_init)) {
+	if (!HexDump::load(data, mem_init)) {
 		cerr << "Error reading memory initialization" << endl;
 		return BAD_INPUT;
 	}
 	mem_init.close();
 	// Write instructions to memory
-	addInstructions(*ramInst.getBuffer(), program);
+	addInstructions(instructions, program);
+
+	// Build memory systems
+	MemorySystem instructionMemory(&l1InstCache, &l2InstCache, &ramInst);
+	MemorySystem dataMemory(&l1DataCache, &l2DataCache, &ramData);
 	
 	// Set up CPU
 	/////////////
 	// Initialize GPR
 	GPR gpr;
 	// Initialize CPU
-	CPU cpu(ISA::RAM_SIZE, &gpr, &cpuL1InstInterface, &cpuL1DataInterface);
+	CPU cpu(&gpr, &instructionMemory, &dataMemory);
 	cpu.loadProgram(&program);
-	Clock sysClock;
-	sysClock.addObserver(&cpu);
-	
-	sysClock.addObserver(&l1InstCache);
-	sysClock.addObserver(&l2InstCache);
-	sysClock.addObserver(&ramInst);
-	
-	sysClock.addObserver(&l1DataCache);
-	sysClock.addObserver(&l2DataCache);
-	sysClock.addObserver(&ramData);
-	
+	// Run the program until halt is encountered
 	while (!cpu.isHalted()) {
-		sysClock.tick();
+		cpu.runOnce();
 	}
 
 	// Write outputs
 	////////////////
-	// Trim trailing zeroes from memory
-	trimMemory(*ramData.getBuffer());
 	// Write register dump
 	if (!gpr.dump(regs_dump)) {
 		cerr << "Error writing registers dump" << endl;
 	}
 	regs_dump.close();
 	// Write memory dumps
+	// Trim trailing zeroes from memory
+	trimMemory(data);
 	if (!HexDump::store(*l1InstCache.getBuffer(), L1i) ||
 		!HexDump::store(*l1DataCache.getBuffer(), L1d) ||
 		!HexDump::store(*l2InstCache.getBuffer(), L2i) ||
 		!HexDump::store(*l2DataCache.getBuffer(), L2d) || 
-		!HexDump::store(*ramData.getBuffer(), mem_dump)) {
+		!HexDump::store(data, mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
 	mem_dump.close();
-	time_txt << sysClock.getTime() << endl;
+	time_txt << cpu.getTime() << endl;
 	if (time_txt.fail()) {
 		cerr << "Error writing time" << endl;
 	}
