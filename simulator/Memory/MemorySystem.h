@@ -70,4 +70,7 @@ private:
 	 * until: applies all pending operations until this time.
 	 */
 	void applyPendingWrites(int until);
+
+	bool isWriteBufferEmpty(int now);
+
 };
