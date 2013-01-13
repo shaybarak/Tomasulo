@@ -17,20 +17,26 @@ public:
 	 * address: memory address to read from.
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
-	int read(int address);
-
+	virtual int read(int address);
+	
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
 	 * value: memory value to write.
-	 * way: destination way.
+	 * way: destination way (when relevant).
 	 * isDirty: whether this write dirties the cache (when relevant).
 	 * May overwrite previous data.
 	 */
-	void write(int address, int value, int way, bool isDirty);
+	virtual void write(int address, int value, int way, bool isDirty);
 
 	// Returns LRU way mapped to address
 	int getLruWay(int address);
+	
+	// Return the way that has an invalid block that matches address location, -1 if not exist
+	int getInvalidWay(int address);
+
+	// Return the way where an address is present, -1 if not exist
+	int getPresentWay(int address);
 
 	// Returns whether block mapped to address at given way is valid
 	bool isValid(int address, int way);
@@ -40,9 +46,6 @@ public:
 
 	// Returns whether a block at an address is dirty (assumes address is present)
 	bool isDirty(int address);
-
-	//returns way where address is present, -1 if not present at all
-	int getPresentWay(int address);
 
 private:
 	vector<bool> dirty;

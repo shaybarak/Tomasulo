@@ -17,10 +17,6 @@ bool L2Cache::isPresentInWay(int address, int way) {
 	return (valid[block] && (tags[block] == tag));
 }
 
-bool L2Cache::isPresent(int address) {
-	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
-}
-
 int L2Cache::getPresentWay(int address) {
 	for (int way = 0; way < ways; way++) {
 		if (isPresentInWay(address, way)) {
@@ -28,6 +24,20 @@ int L2Cache::getPresentWay(int address) {
 		}
 	}
 	return -1;
+}
+
+int L2Cache::getInvalidWay(int address) {
+	for (int way = 0; way < ways; way++) {
+		if (!isValid(address, way)) {
+			return way;
+		}
+	}
+	return -1;
+}
+
+
+bool L2Cache::isPresent(int address) {
+	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
 }
 
 int L2Cache::read(int address) {
