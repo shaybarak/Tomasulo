@@ -2,30 +2,32 @@
 
 #include <vector>
 #include "../MIPS32/ISA.h"
-#include "../Clock/Clocked.h"
-#include "MasterSlaveInterface.h"
 using namespace std;
 
 class MainMemory {
 public:
-	MainMemory(ISA::MemoryType memoryType, int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
+	MainMemory(ISA::MemoryType memoryType, int accessDelay);
+
+	/**
+	 * Reads from cache.
+	 * address: memory address to read from.
+	 * May return uninitialized data. Precede with a call to isPresent.
+	 */
+	int read(int address);
+	
+	/**
+	 * Writes to cache.
+	 * address: memory address to write to.
+	 * data: memory value to write.
+	 * May overwrite previous data.
+	 */
+	void write(int address, int value);
 	
 	// Design flaw: exposes non-const pointer to data member
 	// (required for loading memory initialization)
-	vector<unsigned char>* getBuffer();
+	vector<unsigned char>* getBuffer() { return &buffer; }
 
 	int getAccessDelay() { return accessDelay; }
-	
-	// For reading signals from L2 cache
-	virtual void onTickUp(int now);
-	// For sending signals to L2 cache
-	virtual void onTickDown(int now);
-
-	//interface for communication with L2
-	MasterSlaveInterface* pL2Master;
-
-	int read(int offset);
-	void write(int offset, int value);
 
 private:
 	// Defines whether type is instructions/data
@@ -34,15 +36,4 @@ private:
 	vector<unsigned char> buffer;
 	int* words;
 	int accessDelay;
-	int delay; 
-	int rowSize;
-	// For identifying sequential access
-	int openRow;
-	// Busy reading until this time
-	int busyReadingUntil;
-
-	int toRow(int address);
-
-	
-	bool ready;
 };

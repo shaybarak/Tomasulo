@@ -1,52 +1,16 @@
 #include "MainMemory.h"
 #include "../MIPS32/ISA.h"
 
-MainMemory::MainMemory(ISA::MemoryType memoryType, int accessDelay, int rowSize, MasterSlaveInterface* pL2Master)
-	: memoryType(memoryType), accessDelay(accessDelay), rowSize(rowSize), pL2Master(pL2Master),
-		  delay(-1), openRow(-1) {
+MainMemory::MainMemory(ISA::MemoryType memoryType, int accessDelay)
+	: memoryType(memoryType), accessDelay(accessDelay) {
 	buffer.resize(ISA::RAM_SIZE);
 	words = (int*)&buffer[0];
 }
 
-vector<unsigned char>* MainMemory::getBuffer() { 
-	return &buffer; 
+int MainMemory::read(int address) {
+	return words[address / sizeof(int)];
 }
-
-void MainMemory::onTickUp(int now) {
-	if (!pL2Master->slaveReady) {
-		return;
-	}
-	if (!pL2Master->masterValid) {
-		return;
-	}
-	if (openRow == toRow(pL2Master->address)) {
-		delay = 1;
-	} else {
-		delay = accessDelay;
-	}
-	pL2Master->slaveReady = false;
-	pL2Master->slaveValid = false;
-}
-
-void MainMemory::onTickDown(int now) {
-	if (pL2Master->slaveReady) {
-		return;
-	}
-	delay--;
-	if (delay > 0) {
-		return;
-	}
-	openRow = toRow(pL2Master->address);
-	if (pL2Master->writeEnable) {
-		words[pL2Master->address / sizeof(int)] = pL2Master->data;
-		pL2Master->slaveValid = false;
-	} else {
-		pL2Master->data = words[pL2Master->address / sizeof(int)];
-		pL2Master->slaveValid = true;
-	}
-	pL2Master->slaveReady = true;
-}
-
-int MainMemory::toRow(int address) {
-	return address / rowSize;
+	
+void MainMemory::write(int address, int value) {
+	words[address / sizeof(int)] = value;
 }
