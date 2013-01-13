@@ -39,7 +39,7 @@ bool HexDump::store(const vector<unsigned char>& buffer, FILE* out) {
 }
 
 bool HexDump::load(vector<unsigned char>& buffer, fstream& in) {
-	while (in.eof()) {
+	while (!in.eof()) {
 		// Line is of format:
 		// 00 11 22 33 44 55 66 77
 		int temp;
