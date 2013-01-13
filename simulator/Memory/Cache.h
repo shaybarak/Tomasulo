@@ -4,7 +4,6 @@
 #include <set>
 #include <vector>
 #include "../MIPS32/ISA.h"
-#include "MasterSlaveInterface.h"
 
 using namespace std;
 

@@ -6,7 +6,7 @@
 #include "MasterSlaveInterface.h"
 using namespace std;
 
-class MainMemory : public Clocked {
+class MainMemory {
 public:
 	MainMemory(ISA::MemoryType memoryType, int accessDelay, int rowSize, MasterSlaveInterface* pL2Master);
 	
