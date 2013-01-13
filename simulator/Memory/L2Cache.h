@@ -44,4 +44,5 @@ public:
 private:
 	vector<bool> dirty;
 	vector<int> lruWay;
+
 };
