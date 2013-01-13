@@ -4,8 +4,7 @@
 
 class L2Cache : public Cache {
 public:
-	L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
-		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave);
+	L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay);
 
 	// Returns whether address is present in cache
 	virtual bool isPresent(int address) = 0;
@@ -20,11 +19,12 @@ public:
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
-	 * data: memory value to write.
-	 * way: destination way when relevant.
+	 * value: memory value to write.
+	 * way: destination way (when relevant).
+	 * dirty: whether this write dirties the cache (when relevant).
 	 * May overwrite previous data.
 	 */
-	virtual void write(int address, int value, int way = 0);
+	virtual void write(int address, int value, int way, bool dirty);
 
 	// Returns LRU way mapped to address
 	int getLruWay(int address);
@@ -40,5 +40,10 @@ public:
 
 private:
 	vector<bool> dirty;
-	vector<bool> way0IsLru;
+	vector<int> lruWay;
+
+	bool isPresentInWay(int address, int way);
 };
+
+// TODO include offset in getConflictingAddress
+// TODO assert present in isDirty

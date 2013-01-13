@@ -15,16 +15,15 @@ public:
 	 * address: memory address to read from.
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
-	virtual int read(int address) = 0;
+	int read(int address) = 0;
 	
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
 	 * data: memory value to write.
-	 * way: destination way when relevant.
 	 * May overwrite previous data.
 	 */
-	virtual void write(int address, int value, int way = 0);
+	void write(int address, int value);
 
 	// Invalidates a block at an address, returns whether was present
 	bool invalidate(int address);

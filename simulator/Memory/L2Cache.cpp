@@ -2,10 +2,8 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
-L2Cache::L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
-		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave)
-		: Cache(memoryType, blockSize, cacheSize, accessDelay, 2), l1BlockSize(l1BlockSize),
-		  pL1Master(pL1Master), pRamSlave(pRamSlave), state(READY), delay(-1) {
+L2Cache::L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay)
+		: Cache(memoryType, blockSize, cacheSize, accessDelay, 2) {
 	// Also initialize dirty bits
 	dirty.resize(valid.size());
 	// Also initialize LRU way (contains way number of LRU way but represents an actual bit in the cache's buffer)
@@ -19,20 +17,8 @@ bool L2Cache::isPresentInWay(int address, int way) {
 	return (valid[block] && (tags[block] == tag));
 }
 
-bool L2Cache::isHit(int address) {
+bool L2Cache::isPresent(int address) {
 	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
-}
-
-int L2Cache::findVacancy(int address) {
-	int tag = toTag(address);
-	int index = toIndex(address);
-	if (!valid[toBlock(index, 0)]) {
-		return 0;
-	} else if (!valid[toBlock(index, 1)]) {
-		return 1;
-	} else {
-		return -1;
-	}
 }
 
 int L2Cache::read(int address) {
@@ -40,15 +26,16 @@ int L2Cache::read(int address) {
 	int index = toIndex(address);
 	int offset = toOffset(address);
 	if (isPresentInWay(address, 0)) {
-		way0IsLru[index] = false;
+		lruWay[index] = 1;
 		return *getWordPtr(index, offset, 0);
 	} else {
-		way0IsLru[index] = true;
+		assert(isPresentInWay(address, 1));
+		lruWay[index] = 0;
 		return *getWordPtr(index, offset, 1);
 	}
 }
 
-void L2Cache::write(int address, int value) {
+void L2Cache::write(int address, int value, bool dirty, int way) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
@@ -63,6 +50,18 @@ void L2Cache::write(int address, int value) {
 		way0IsLru[index] = true;
 		dirty[toBlock(index, 1)] = true;
 		*getWordPtr(index, offset, 1) = value;
+	}
+}
+
+int L2Cache::findVacancy(int address) {
+	int tag = toTag(address);
+	int index = toIndex(address);
+	if (!valid[toBlock(index, 0)]) {
+		return 0;
+	} else if (!valid[toBlock(index, 1)]) {
+		return 1;
+	} else {
+		return -1;
 	}
 }
 
