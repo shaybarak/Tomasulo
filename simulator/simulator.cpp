@@ -16,7 +16,7 @@
 using namespace std;
 
 enum retvals {
-	SUCCESS=0,	// Alles gut!
+	SUCCESS=0,		// Alles gut!
 	BAD_USAGE=1,	// Invalid cmdline invocation
 	FIO_ERROR=2,	// File I/O error
 	BAD_INPUT=3,	// Bad formatting in one or more input files
