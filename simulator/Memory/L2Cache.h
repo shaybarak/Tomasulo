@@ -18,22 +18,13 @@ public:
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
 	int read(int address);
-	
-	/**
-	 * Writes to cache.
-	 * address: memory address to write to.
-	 * value: memory value to write.
-	 * isDirty: whether this write dirties the cache.
-	 * May overwrite previous data.
-	 */
-	void write(int address, int value, bool isDirty);
 
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
 	 * value: memory value to write.
-	 * isDirty: whether this write dirties the cache (when relevant).
 	 * way: destination way.
+	 * isDirty: whether this write dirties the cache (when relevant).
 	 * May overwrite previous data.
 	 */
 	void write(int address, int value, int way, bool isDirty);
