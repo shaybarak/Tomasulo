@@ -67,11 +67,19 @@ int MemorySystem::read(int now, int address, int& value) {
 		return now;
 	}
 
-	// 
-
 	// Else register L2 miss.
-	// If L2-RAM interface busy, delay further.
-	// Delay by RAM access time (note row will always be closed at this time).
+	l2->registerMiss();
+
+	// If L2-RAM interface busy, delay until free
+	if (l2RamInterfaceBusyUntil > now) {
+		now = l1L2InterfaceBusyUntil;
+		applyPendingWrites(now);
+	}
+
+	// Delay by RAM access time (RAM row is guaranteed not to be open when in L2 miss)
+	now += ram->getAccessDelay();
+	applyPendingWrites(now);
+
 	// If L2 conflict, choose way to evict (prefer LRU). TODO make sure that way0IsLru is initialized to true. Alternatively have lru = vector<int>.
 	// If way to evict is valid, immediately invalidate L2 block and any matching L1 blocks.
 	// (memory system is busy anyway, doesn't matter when we apply the invalidation)
