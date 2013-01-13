@@ -13,6 +13,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		now = pending.when;
 		applyPendingWrites(now);
 		value = l1->read(address);
+		// Delay should be L1 access delay
 		return now;
 	}
 
@@ -20,6 +21,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	if (l1->isPresent(address)) {
 		l1->registerHit();
 		value = l1->read(address);
+		// Delay should be L1 access delay
 		return now;
 	}
 
@@ -36,25 +38,37 @@ int MemorySystem::read(int now, int address, int& value) {
 	now += l2->getAccessDelay();
 	applyPendingWrites(now);
 
-	// If pending write then delay until applied, register L2 hit
+	// If pending write then delay until applied
 	PendingWrite pending = findPendingWrite(l2PendingWrites, address);
 	if (pending.when >= 0) {
-		l2->registerHit();
 		now = pending.when;
 		applyPendingWrites(now);
 		value = l2->read(address);
-	} else {
-		// If present in L2, register L2 hit.
-		l2->registerHit();
-		value = l2->read(address);
 	}
 	
-	// Write block from L2 to L1, critical word first
-	//for (int i = 0; i < l1->get
+	// If present in L2 (either because pending writes were applied or regardless) register L2 hit
+	if (l2->isPresent(address)) {
+		l2->registerHit();
+		value = l2->read(address);
+		
+		// Write block from L2 to L1, critical word first
+		for (int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
+			PendingWrite pending;
+			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
+			pending.address = address;
+			pending.value = l2->read(address);
+			address = nextAddress(address, l1->getBlockSize());
+			l1PendingWrites.push_back(pending);
+			// Make sure we know that the L1-L2 interface is busy
+			l1L2InterfaceBusyUntil = pending.when;
+		}
 
-	//   Register pending writes to L1, critical word first.
-	//	 Update time until L1-L2 interface is free (by last word, not by critical word).
-	//   Return (with critical word time which is L1 access + L2 access + pending delay).
+		// Delay is L1 access + L2 access + time waiting for pending writes if relevant
+		return now;
+	}
+
+	// 
+
 	// Else register L2 miss.
 	// If L2-RAM interface busy, delay further.
 	// Delay by RAM access time (note row will always be closed at this time).
@@ -105,4 +119,12 @@ MemorySystem::PendingWrite MemorySystem::findPendingWrite(vector<PendingWrite>& 
 	// Not found, mark as invalid and return
 	out.when = -1;
 	return out;
+}
+
+int MemorySystem::nextAddress(int address, int blockSize) {
+	return
+		// Base of block
+		((address / blockSize) * blockSize) +
+		// New offset, incremented by one word
+		((address + sizeof(int)) % blockSize);
 }

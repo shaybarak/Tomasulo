@@ -56,7 +56,14 @@ private:
 	vector<PendingWrite> l1PendingWrites;
 	vector<PendingWrite> l2PendingWrites;
 
+	/**
+	 * Finds a pending write to an address.
+	 * Returns pending write if found or an invalid pending write (when == -1) otherwise.
+	 */
 	static PendingWrite findPendingWrite(vector<PendingWrite>& pending, int address);
+
+	/** Finds the next address when cycling within a block. */
+	static int nextAddress(int address, int blockSize);
 
 	/**
 	 * Applies pending write operations.
