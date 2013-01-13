@@ -96,7 +96,7 @@ int MemorySystem::read(int now, int address, int& value) {
 }
 
 int MemorySystem::write(int now, int address, int value) {
-	//TODO: dirty, LRU
+
 	// If buffer is not empty, delay by L1 access time
 	if (!isWriteBufferEmpty(now)) {
 		now += l1->getAccessDelay();
