@@ -92,16 +92,50 @@ int MemorySystem::read(int now, int address, int& value) {
 }
 
 int MemorySystem::write(int now, int address, int value) {
-	// Delay by L1 access time
-	now += l1->getAccessDelay();
-	// Apply all pending operations until this time
-	applyPendingWrites(now);
-	// Delay by L1 access time.
-	// If write buffer is busy (evident by L1-L2 interface busy), delay further.
+	//TODO: dirty, LRU
+	// If buffer is not empty, delay by L1 access time
+	if (!isWriteBufferEmpty(now)) {
+		now += l1->getAccessDelay();
+	}
 	// If present in L1, done. Register L1 hit. Apply write.
-	// Else register L1 miss.
+	if (l1->isPresent(address)) {
+		l1->registerHit();
+		// Apply all pending operations until this time
+		applyPendingWrites(now);
+		return now;
+	}
+	// Address is not present in L1. Register L1 miss.
+	l1->registerMiss();
 	// Delay by L2 access time.
-	// If present in L2, register L2 hit. Register pending writes to L1, normal order.
+	now += l2->getAccessDelay();
+	// Search in L2 ways
+	int destinationWay = -1;
+	for (int way = 0; way < l2->getWayCount(); way ++) {
+		if (l2->isPresentInWay(address, 0)) {
+			destinationWay = way;
+			break;
+		}
+	}
+	// If present in L2, register L2 hit. 
+	if (destinationWay != -1) {
+		l2->registerHit();
+		//Register first write
+		PendingWrite pending;
+		pending.address = address;
+		pending.value = value;
+		pending.when = now;
+
+
+		//Register pending writes to L1, Critical Word first
+		int blockBase = address / l2->getBlockSize() * l2->getBlockSize();
+		for (int wordIndex = 0; wordIndex < l1->getBlockSize(); wordIndex += sizeof(int)) {
+			int cyclicAddress = address + wordIndex;
+
+			PendingWrite pending;
+			pending.address = cyclicAddress;
+		}
+	}
+	
 	// Register pending write to L1 and L2 (same time since inclusive) to apply write.
 	// Else check L2 pending, if in pending then additional wait and OH FUCK IT LET'S CODE READ AND TEST IT FIRST.
 	return now;
@@ -135,4 +169,8 @@ int MemorySystem::nextAddress(int address, int blockSize) {
 		((address / blockSize) * blockSize) +
 		// New offset, incremented by one word
 		((address + sizeof(int)) % blockSize);
+}
+
+bool MemorySystem::isWriteBufferEmpty(int now) {
+	return now >= l1L2InterfaceBusyUntil;
 }
