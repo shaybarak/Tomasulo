@@ -12,6 +12,7 @@ void CPU::loadProgram(vector<Instruction*>* instructions, int pc) {
 }
 
 void CPU::onTickUp(int now) {
+	this.now = now;
 	switch (state) {
 	case READY:
 		requestReadInst();
@@ -40,6 +41,7 @@ void CPU::onTickUp(int now) {
 }
 
 void CPU::onTickDown(int now) {
+	this.now = now;
 	switch (state) {
 	case READY:
 		break;

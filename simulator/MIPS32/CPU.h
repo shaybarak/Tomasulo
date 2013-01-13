@@ -45,7 +45,7 @@ public:
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const { return instructionsCommitted; }
 	// Returns the Average Memory Access Time
-	double getAmat() const { return (double)now / memoryAccessCount; }
+	double getAmat() const { return (double)now / (double)memoryAccessCount; }
 	// Returns whether the CPU has halted due to a halt instruction or an exception
 	bool isHalted() const { return state == HALT; }
 
