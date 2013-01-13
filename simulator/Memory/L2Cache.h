@@ -7,14 +7,14 @@ public:
 	L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay);
 
 	// Returns whether address is present in cache
-	virtual bool isPresent(int address) = 0;
+	virtual bool isPresent(int address);
 
 	/**
 	 * Reads from cache.
 	 * address: memory address to read from.
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
-	virtual int read(int address) = 0;
+	virtual int read(int address);
 	
 	/**
 	 * Writes to cache.

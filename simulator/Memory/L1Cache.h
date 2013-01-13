@@ -8,7 +8,7 @@ public:
 		: Cache(memoryType, blockSize, cacheSize, accessDelay) {}
 
 	// Returns whether address is present in cache
-	virtual bool isPresent(int address) = 0;
+	virtual bool isPresent(int address);
 
 	/**
 	 * Reads from cache.
