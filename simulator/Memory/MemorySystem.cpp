@@ -113,7 +113,7 @@ int MemorySystem::write(int now, int address, int value) {
 	now += l2->getAccessDelay();
 	applyPendingWrites(now);
 	// Search in L2 ways
-	int destinationWay = -1; 
+	int destinationWay = l2->getPresentWay(address);
 	//TODO: refactor! add getIsPresentWay(address) and change : destinationWay = getIsPresentWay(address)
 	for (int way = 0; way < l2->getWayCount(); way ++) {
 		if (l2->isPresentInWay(address, 0)) {
@@ -147,7 +147,7 @@ int MemorySystem::write(int now, int address, int value) {
 		l1L2InterfaceBusyUntil = pendingSw.when;
 		return now;
 	}
-	for (int way = 0; way < l2getWayCount(); way ++) {
+	for (int way = 0; way < l2->getWayCount(); way ++) {
 		if (l2->isPresentInWay(address, 0)) {
 			destinationWay = way;
 			break;
