@@ -162,6 +162,7 @@ int main(int argc, char** argv) {
 		return BAD_INPUT;
 	}
 	mem_init.close();
+	
 	// Write instructions to memory
 	addInstructions(instructions, program);
 

@@ -39,16 +39,17 @@ bool HexDump::store(const vector<unsigned char>& buffer, FILE* out) {
 }
 
 bool HexDump::load(vector<unsigned char>& buffer, fstream& in) {
+	unsigned char* ptr = &buffer[0];
 	while (!in.eof()) {
 		// Line is of format:
 		// 00 11 22 33 44 55 66 77
 		int temp;
 		for (int i=0; i<8; i++) {
 			in >> hex >> temp;
-			buffer.push_back(temp);
 			if (in.bad()) {
 				return false;			
 			}
+			*ptr++ = temp;
 		}
 	}
 	return true;
