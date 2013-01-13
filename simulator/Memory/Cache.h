@@ -45,6 +45,8 @@ protected:
 	int toTag(int address);
 	// Builds a memory address out of the tag, index and offset
 	int toAddress(int tag, int index, int offset);
+	// Maps into cache buffer block space
+	int toBlock(int index, int way);
 	// Returns pointer to word from cache
 	int* getWordPtr(int index, int offset, int way = 0);
 	

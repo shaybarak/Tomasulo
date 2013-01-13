@@ -19,9 +19,6 @@ protected:
 	virtual bool invalidate(int address) { return false; }  // Not implemented in L2
 
 private:
-	// Maps to cache block space
-	int toBlock(int index, int way);
-
 	// Returns whether address is present in a given way
 	bool isPresentInWay(int address, int way);
 	
