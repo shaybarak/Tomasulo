@@ -95,7 +95,7 @@ int MemorySystem::read(int now, int address, int& value) {
 }
 
 int MemorySystem::write(int now, int address, int value) {
-	//TODO: dirty, LRU
+/*	//TODO: dirty, LRU
 	// If buffer is not empty, delay by L1 access time
 	if (!isWriteBufferEmpty(now)) {
 		now += l1->getAccessDelay();
@@ -209,7 +209,7 @@ int MemorySystem::write(int now, int address, int value) {
 		l2PendingWrites.push_back(pending);
 		// Make sure we know that the L2-RAM interface is busy
 		l2RamInterfaceBusyUntil = pending.when;
-	}
+	}*/
 	return now;
 }
 
@@ -230,7 +230,7 @@ void MemorySystem::applyPendingWrites(int until) {
 	for (vector<PendingWrite>::iterator it = l2PendingWrites.begin(); it < l2PendingWrites.end(); it++) {
 		write = *it;
 		if (write.when <= until) {
-			l2->write(write.address, write.value);
+			l2->write(write.address, write.value, write.way, write.dirty);
 		}
 	}
 }

@@ -17,17 +17,26 @@ public:
 	 * address: memory address to read from.
 	 * May return uninitialized data. Precede with a call to isPresent.
 	 */
-	virtual int read(int address);
+	int read(int address);
 	
 	/**
 	 * Writes to cache.
 	 * address: memory address to write to.
 	 * value: memory value to write.
-	 * way: destination way (when relevant).
-	 * isDirty: whether this write dirties the cache (when relevant).
+	 * isDirty: whether this write dirties the cache.
 	 * May overwrite previous data.
 	 */
-	virtual void write(int address, int value, int way, bool isDirty);
+	void write(int address, int value, bool isDirty);
+
+	/**
+	 * Writes to cache.
+	 * address: memory address to write to.
+	 * value: memory value to write.
+	 * isDirty: whether this write dirties the cache (when relevant).
+	 * way: destination way.
+	 * May overwrite previous data.
+	 */
+	void write(int address, int value, int way, bool isDirty);
 
 	// Returns LRU way mapped to address
 	int getLruWay(int address);

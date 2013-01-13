@@ -57,6 +57,8 @@ private:
 	typedef struct PendingWrite {
 		int when;  // When to apply the change, -1 for invalid
 		int address;
+		int way;	// Relevant for L2
+		bool dirty;	// Relevant for L2
 		int value;
 	} PendingWrite;
 	vector<PendingWrite> l1PendingWrites;
