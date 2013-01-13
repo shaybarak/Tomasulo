@@ -41,7 +41,7 @@ void CPU::onTickUp(int now) {
 }
 
 void CPU::onTickDown(int now) {
-	this.now = now;
+	this->now = now;
 	switch (state) {
 	case READY:
 		break;
