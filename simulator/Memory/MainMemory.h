@@ -24,6 +24,9 @@ public:
 	//interface for communication with L2
 	MasterSlaveInterface* pL2Master;
 
+	int read(int offset);
+	void write(int offset, int value);
+
 private:
 	// Defines whether type is instructions/data
 	ISA::MemoryType memoryType;
@@ -40,7 +43,6 @@ private:
 
 	int toRow(int address);
 
-	int read(int offset);
-	void write(int offset, int value);
+	
 	bool ready;
 };
