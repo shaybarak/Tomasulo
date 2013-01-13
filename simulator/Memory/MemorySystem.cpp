@@ -115,13 +115,7 @@ int MemorySystem::write(int now, int address, int value) {
 	applyPendingWrites(now);
 	// Search in L2 ways
 	int destinationWay = l2->getPresentWay(address);
-	//TODO: refactor! add getIsPresentWay(address) and change : destinationWay = getIsPresentWay(address)
-	for (int way = 0; way < l2->getWayCount(); way ++) {
-		if (l2->isPresentInWay(address, 0)) {
-			destinationWay = way;
-			break;
-		}
-	}
+	
 	// If address is present in l2
 	if (destinationWay != -1) {
 		//register L2 hit. 
@@ -133,6 +127,8 @@ int MemorySystem::write(int now, int address, int value) {
 			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
 			pending.address = copyAddress;
 			pending.value = l2->read(copyAddress);
+			pending.way = destinationWay;
+			pending.dirty = false;
 			copyAddress += i * sizeof(int);
 			l1PendingWrites.push_back(pending);
 			// Make sure we know that the L1-L2 interface is busy
@@ -142,26 +138,22 @@ int MemorySystem::write(int now, int address, int value) {
 		PendingWrite pendingSw;
 		pendingSw.address = address;
 		pendingSw.value = value;
+		pendingSw.way = destinationWay;
+		pendingSw.dirty = true;
 		pendingSw.when = now + l1->getBlockSize() / sizeof(int);
 		l1PendingWrites.push_back(pendingSw);
 		l2PendingWrites.push_back(pendingSw);
 		l1L2InterfaceBusyUntil = pendingSw.when;
 		return now;
 	}
-	for (int way = 0; way < l2->getWayCount(); way ++) {
-		if (l2->isPresentInWay(address, 0)) {
-			destinationWay = way;
-			break;
-		}
-	}
+	
 	//Oh-no! miss both in L2 and L1! need to call ram for help
 	now += ram->getAccessDelay();
 	applyPendingWrites(now);
 	l2RamInterfaceBusyUntil = now + l2->getBlockSize() / sizeof(int) - 1;
-	// Decide which way:
-	//If exist invalid, take it, prefer 0
+	// Decide which way: first, take the invalid way
 	destinationWay = l2->getInvalidWay(address);
-	//Choose which way to evict, by LRU
+	// Decide which way: second, take LRU way
 	if (destinationWay == -1) {
 		destinationWay = l2->getLruWay(address);
 	}
@@ -169,7 +161,7 @@ int MemorySystem::write(int now, int address, int value) {
 	int baseL2Address = 
 		l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
 	for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
-		l1->invalidateBlock(baseL2Address + i);
+		l1->invalidate(baseL2Address + i);
 	}
 	//Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
 	int baseL1Address = address / l1->getBlockSize() * l1->getBlockSize();
@@ -182,6 +174,8 @@ int MemorySystem::write(int now, int address, int value) {
 		pendingL2.address = baseL2Address + i * sizeof(int);
 		pendingL2.value = ram->read(pendingL1.address);
 		pendingL2.when = now + i;
+		pendingL2.way = destinationWay;
+		pendingL2.dirty = false;
 		l2PendingWrites.push_back(pendingL2);
 	}
 	
@@ -195,6 +189,8 @@ int MemorySystem::write(int now, int address, int value) {
 	pendingL2.address = baseL2Address + l2->getBlockSize();
 	pendingL2.value = value;
 	pendingL2.when = pendingL1.when;
+	pendingL2.way = destinationWay;
+	pendingL2.dirty = true;
 	l2PendingWrites.push_back(pendingL2);
 	l1L2InterfaceBusyUntil = now + l1->getBlockSize() / sizeof(int);
 	
