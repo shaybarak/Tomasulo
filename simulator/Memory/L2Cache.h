@@ -8,9 +8,10 @@ public:
 	L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
 		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave);
 
-private:
 	// Returns whether address is present in a given way
 	bool isPresentInWay(int address, int way);
+
+private:
 	
 	// Returns whether address is a hit
 	bool isHit(int address);
