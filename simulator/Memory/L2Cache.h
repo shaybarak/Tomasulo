@@ -41,6 +41,9 @@ public:
 	// Returns whether a block at an address is dirty (assumes address is present)
 	bool isDirty(int address);
 
+	//returns way where address is present, -1 if not present at all
+	int getPresentWay(int address);
+
 private:
 	vector<bool> dirty;
 	vector<int> lruWay;

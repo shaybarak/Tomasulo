@@ -21,6 +21,15 @@ bool L2Cache::isPresent(int address) {
 	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
 }
 
+int L2Cache::getPresentWay(int address) {
+	for (int way = 0; way < ways; way++) {
+		if (isPresentInWay(address, way)) {
+			return way;
+		}
+	}
+	return -1;
+}
+
 int L2Cache::read(int address) {
 	int tag = toTag(address);
 	int index = toIndex(address);
