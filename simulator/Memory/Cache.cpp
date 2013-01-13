@@ -26,7 +26,7 @@ int Cache::toIndex(int address) {
 	// Divide address by block size to trim offset part.
 	// Compute modulus of how many possible indices there are.
 	// For each index we consume a block times how many ways there are per entry.
-	return (address / sizeof(int)) % (cacheSize / sizeof(int) * ways);
+	return (address / sizeof(int)) % (cacheSize / (sizeof(int) * ways));
 }
 
 int Cache::toTag(int address) {
