@@ -112,14 +112,35 @@ int MemorySystem::read(int now, int address, int& value) {
 	l2->write(address, criticalWord, destinationWay, true);
 
 	// Then critical L1 block,
+	int pendingTime = now;
+	for (int i = 1; i < l1->getBlockSize() / sizeof(int); i++) {
+		pendingTime++;
+		pending.when = pendingTime;
+		address = nextAddress(address, l1->getBlockSize());
+		pending.address = address;
+		pending.value = ram->read(address);
+		pending.dirty = false;
+		pending.way = destinationWay;
+		l1PendingWrites.push_back(pending);
+		l2PendingWrites.push_back(pending);
+	}
+
 	// Then rest of L2 block.
+	address = address / l2->getBlockSize() * l2->getBlockSize() + ((address / l1->getBlockSize() * l1->getBlockSize() + l1->getBlockSize()) % l2->getBlockSize());
+	for (int i = 0; i < (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int); i++) {
+		pendingTime++;
+		pending.when = pendingTime;
+		address = nextAddress(address, l2->getBlockSize());
+		pending.address = address;
+		pending.value = ram->read(address);
+		pending.dirty = false;
+		pending.way = destinationWay;
+		l2PendingWrites.push_back(pending);
+	}
+	// Keep L2-RAM interface busy until done transferring last word
+	l2RamInterfaceBusyUntil = pendingTime;
 
-	// Register pending writes to L1, critical word first. Register same writes to L2 at same times (inclusive).
-	// Register pending writes to L2, rest of L2 block.
-	// Update time until L2-RAM interface is free (by last word).
-	// Return time until critical word first is available.
-
-	value = ram->read(address);
+	value = criticalWord;
 	return now;
 }
 
