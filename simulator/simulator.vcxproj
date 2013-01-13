@@ -15,7 +15,6 @@
     <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\L2Cache.h" />
-    <ClInclude Include="Memory\MasterSlaveInterface.h" />
     <ClInclude Include="Memory\MainMemory.h" />
     <ClInclude Include="Memory\MemorySystem.h" />
     <ClInclude Include="MIPS32\CPU.h" />

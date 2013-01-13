@@ -75,9 +75,6 @@
     <ClInclude Include="Memory\MainMemory.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\MasterSlaveInterface.h">
-      <Filter>Header Files\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Memory\L2Cache.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
