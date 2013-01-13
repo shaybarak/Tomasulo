@@ -85,9 +85,9 @@ int MemorySystem::read(int now, int address, int& value) {
 		int conflictingAddressBase = l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
 		int conflictingAddress = conflictingAddressBase;
 		// Invalidate L2 block and all contained L1 blocks
-		for (int i = 0; i < l2->getBlockSize() / l1->getBlockSize(); i++) {
+		for (int i = 0; i < l2->getBlockSize() / /*l1->getBlockSize()*/ sizeof(int); i++) {
 			l1->invalidate(conflictingAddress);
-			conflictingAddress += l1->getBlockSize();
+			conflictingAddress += /*l1->getBlockSize()*/ sizeof(int);
 		}
 		// If conflicting block is dirty
 		if (l2->isDirty(conflictingAddressBase)) {
@@ -106,9 +106,10 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Bring data from RAM:
 	// Critical word first,
 	int criticalWord = ram->read(address);
+	now += ram->getAccessDelay();
+	applyPendingWrites(now);
 	l1->write(address, criticalWord);
 	l2->write(address, criticalWord, destinationWay, true);
-	now += ram->getAccessDelay();
 
 	// Then critical L1 block,
 	// Then rest of L2 block.
@@ -117,6 +118,8 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Register pending writes to L2, rest of L2 block.
 	// Update time until L2-RAM interface is free (by last word).
 	// Return time until critical word first is available.
+
+	value = ram->read(address);
 	return now;
 }
 
