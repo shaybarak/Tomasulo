@@ -21,7 +21,7 @@ public:
 	MasterSlaveInterface* pL2Master;
 
 private:
-	// Defines if type is data/instructions
+	// Defines whether type is instructions/data
 	ISA::MemoryType memoryType;
 
 	vector<unsigned char> buffer;
@@ -29,9 +29,8 @@ private:
 	int accessDelay;
 	int delay; 
 	int rowSize;
-	int openRow;
 	// For identifying sequential access
-	int lastReadAddress;
+	int openRow;
 	// Busy reading until this time
 	int busyReadingUntil;
 

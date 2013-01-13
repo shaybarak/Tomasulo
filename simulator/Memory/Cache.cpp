@@ -1,7 +1,7 @@
 #include "Cache.h"
 
-Cache::Cache(int blockSize, int cacheSize, int accessDelay, int ways)
-		: blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay), ways(ways),
+Cache::Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int ways)
+		: memoryType(memoryType), blockSize(blockSize), cacheSize(cacheSize), accessDelay(accessDelay), ways(ways),
 		  hits(0), misses(0) {
 	buffer.resize(cacheSize);
 	// Tag and valid bit are per block

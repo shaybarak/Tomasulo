@@ -9,7 +9,7 @@ using namespace std;
 
 class Cache {
 public:
-	Cache(int blockSize, int cacheSize, int accessDelay, int ways = 1);
+	Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int ways = 1);
 	const vector<unsigned char>* getBuffer() const { return &buffer; }
 	int getHitCount() const { return hits; }
 	int getMissCount() const { return misses; }
@@ -33,6 +33,9 @@ public:
 	virtual bool invalidate(int address) = 0;
 
 protected:
+	// Defines whether type is instructions/data
+	ISA::MemoryType memoryType;
+
 	// Returns block offset of address
 	int toOffset(int address);
 	// Returns index of address
