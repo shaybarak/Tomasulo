@@ -129,6 +129,18 @@ int MemorySystem::write(int now, int address, int value) {
 	if (!isWriteBufferEmpty(now)) {
 		now += l1->getAccessDelay();
 	}
+
+	// If pending write then delay until applied, register L1 hit and return
+	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
+	if (pending.when >= 0) {
+		l1->registerHit();
+		now = pending.when;
+		applyPendingWrites(now);
+		value = l1->read(address);
+		// Delay should be L1 access delay
+		return now;
+	}
+
 	// If present in L1, done. Register L1 hit. Apply write.
 	if (l1->isPresent(address)) {
 		l1->registerHit();
@@ -138,9 +150,25 @@ int MemorySystem::write(int now, int address, int value) {
 	}
 	// Address is not present in L1. Register L1 miss.
 	l1->registerMiss();
+	
+	// If L2-RAM interface busy, delay until free
+	if (l2RamInterfaceBusyUntil > now) {
+		now = l1L2InterfaceBusyUntil;
+		applyPendingWrites(now);
+	}
+
 	// Delay by L2 access time.
 	now += l2->getAccessDelay();
 	applyPendingWrites(now);
+	
+	// If pending write then delay until applied
+	pending = findPendingWrite(l2PendingWrites, address);
+	if (pending.when >= 0) {
+		now = pending.when;
+		applyPendingWrites(now);
+		value = l2->read(address);
+	}
+
 	// Search in L2 ways
 	int destinationWay = l2->getPresentWay(address);
 	
@@ -153,11 +181,10 @@ int MemorySystem::write(int now, int address, int value) {
 		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 			PendingWrite pending;
 			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
-			pending.address = copyAddress;
-			pending.value = l2->read(copyAddress);
+			pending.address = copyAddress + i * sizeof(int);
+			pending.value = l2->read(pending.address);
 			pending.way = destinationWay;
 			pending.dirty = false;
-			copyAddress += i * sizeof(int);
 			l1PendingWrites.push_back(pending);
 			// Make sure we know that the L1-L2 interface is busy
 			l1L2InterfaceBusyUntil = pending.when;
@@ -223,6 +250,7 @@ int MemorySystem::write(int now, int address, int value) {
 	l1L2InterfaceBusyUntil = now + l1->getBlockSize() / sizeof(int);
 	
 	now += l1->getBlockSize();
+	applyPendingWrites(now);
 	// Copy rest of L2 block to L2. assumes cyclic.
 	int l2WriteAddress = baseL2Address + l1->getBlockSize();
 	int wordCount = (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
