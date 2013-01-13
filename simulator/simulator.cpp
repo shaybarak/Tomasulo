@@ -211,10 +211,10 @@ int main(int argc, char** argv) {
 	}
 	regs_dump.close();
 	// Write memory dumps
-	if (/*!HexDump::store(*l1Cache.getInstructionsBuffer(), L1i) ||
-		!HexDump::store(*l1Cache.getDataBuffer(), L1d) ||
-		!HexDump::store(*l2Cache.getInstructionsBuffer(), L2i) ||
-		!HexDump::store(*l2Cache.getDataBuffer(), L2d) || */
+	if (!HexDump::store(*l1InstCache.getBuffer(), L1i) ||
+		!HexDump::store(*l1DataCache.getBuffer(), L1d) ||
+		!HexDump::store(*l2InstCache.getBuffer(), L2i) ||
+		!HexDump::store(*l2DataCache.getBuffer(), L2d) || 
 		!HexDump::store(*ramData.getBuffer(), mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
