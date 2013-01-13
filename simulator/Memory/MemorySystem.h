@@ -37,6 +37,11 @@ public:
 	// Applies all pending write operations
 	void applyAllPendingWrites();
 
+	//mm, gonna try with a little help from mny friends
+	friend class Cache;
+	friend class L1Cahce;
+	friend class L2Cahce;
+
 private:
 	// Memory components to use
 	L1Cache* l1;
