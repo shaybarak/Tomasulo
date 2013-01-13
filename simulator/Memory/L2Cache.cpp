@@ -47,7 +47,7 @@ int L2Cache::read(int address) {
 		lruWay[index] = 1;
 		return *getWordPtr(index, offset, 0);
 	} else {
-		assert(isPresentInWay(address, 1));
+		//assert(isPresentInWay(address, 1));
 		lruWay[index] = 0;
 		return *getWordPtr(index, offset, 1);
 	}

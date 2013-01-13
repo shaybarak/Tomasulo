@@ -31,7 +31,7 @@ void CPU::readInstruction() {
 	now = instructionMemory->read(now, pc * sizeof(int), instruction);
 	memoryAccessCount++;
 	// Verify that instruction was correctly read from memory
-	assert(pc == instruction);
+	//assert(pc == instruction);
 }
 
 int CPU::readData(int address) {
