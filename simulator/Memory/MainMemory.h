@@ -6,7 +6,8 @@ using namespace std;
 
 class MainMemory {
 public:
-	MainMemory(ISA::MemoryType memoryType, int accessDelay);
+	MainMemory(ISA::MemoryType memoryType, int* words, int accessDelay)
+		: memoryType(memoryType), words(words), accessDelay(accessDelay) {}
 
 	/**
 	 * Reads from cache.
@@ -22,18 +23,12 @@ public:
 	 * May overwrite previous data.
 	 */
 	void write(int address, int value);
-	
-	// Design flaw: exposes non-const pointer to data member
-	// (required for loading memory initialization)
-	vector<unsigned char>* getBuffer() { return &buffer; }
 
 	int getAccessDelay() { return accessDelay; }
 
 private:
 	// Defines whether type is instructions/data
 	ISA::MemoryType memoryType;
-
-	vector<unsigned char> buffer;
 	int* words;
 	int accessDelay;
 };
