@@ -80,6 +80,9 @@ int MemorySystem::read(int now, int address, int& value) {
 	now += ram->getAccessDelay();
 	applyPendingWrites(now);
 
+	// TODO finish
+	value = ram->read(address);
+
 	// If L2 conflict, choose way to evict (prefer LRU). TODO make sure that way0IsLru is initialized to true. Alternatively have lru = vector<int>.
 	// If way to evict is valid, immediately invalidate L2 block and any matching L1 blocks.
 	// (memory system is busy anyway, doesn't matter when we apply the invalidation)
