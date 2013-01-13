@@ -7,16 +7,6 @@ class L2Cache : public Cache, public Clocked {
 public:
 	L2Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int accessDelay, int l1BlockSize,
 		MasterSlaveInterface* pL1Master, MasterSlaveInterface* pRamSlave);
-	// For reading signals from L1 cache and sending signals to RAM
-	virtual void onTickUp(int now);
-	// For reading signals from RAM and sending signals to L1 cache
-	virtual void onTickDown(int now);
-
-	void setL1Cache(Cache* l1Cache);
-
-protected:
-	virtual void write(int address, int value);
-	virtual bool invalidate(int address) { return false; }  // Not implemented in L2
 
 private:
 	// Returns whether address is present in a given way
