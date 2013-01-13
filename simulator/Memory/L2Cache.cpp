@@ -35,7 +35,6 @@ int L2Cache::getInvalidWay(int address) {
 	return -1;
 }
 
-
 bool L2Cache::isPresent(int address) {
 	return (isPresentInWay(address, 0) || isPresentInWay(address, 1));
 }

@@ -77,17 +77,42 @@ int MemorySystem::read(int now, int address, int& value) {
 		applyPendingWrites(now);
 	}
 
-	// Delay by RAM access time (RAM row is guaranteed not to be open when in L2 miss)
+	// Find destination way (preferably an invalid way so as not to have to evict)
+	int destinationWay = l2->getInvalidWay(address);
+	if (destinationWay < 0) {
+		// Conflict, evict from LRU way
+		destinationWay = l2->getLruWay(address);
+		int conflictingAddressBase = l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
+		int conflictingAddress = conflictingAddressBase;
+		// Invalidate L2 block and all contained L1 blocks
+		for (int i = 0; i < l2->getBlockSize() / l1->getBlockSize(); i++) {
+			l1->invalidate(conflictingAddress);
+			conflictingAddress += l1->getBlockSize();
+		}
+		// If conflicting block is dirty
+		if (l2->isDirty(conflictingAddressBase)) {
+			// Write back to RAM
+			int conflictingAddress = conflictingAddressBase;
+			for (int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
+				ram->write(conflictingAddress, l2->read(conflictingAddress));
+				conflictingAddress += sizeof(int);
+			}
+			// Delay for writing to RAM
+			now += ram->getAccessDelay();  // Initial row access
+			now += l2->getBlockSize() / sizeof(int) - 1;  // One cycle for each additional access
+		}
+	}
+
+	// Bring data from RAM:
+	// Critical word first,
+	int criticalWord = ram->read(address);
+	l1->write(address, criticalWord);
+	l2->write(address, criticalWord, destinationWay, true);
 	now += ram->getAccessDelay();
-	applyPendingWrites(now);
 
-	// TODO finish
-	value = ram->read(address);
+	// Then critical L1 block,
+	// Then rest of L2 block.
 
-	// If L2 conflict, choose way to evict (prefer LRU). TODO make sure that way0IsLru is initialized to true. Alternatively have lru = vector<int>.
-	// If way to evict is valid, immediately invalidate L2 block and any matching L1 blocks.
-	// (memory system is busy anyway, doesn't matter when we apply the invalidation)
-	// If way to evict is valid and dirty, write block to RAM.
 	// Register pending writes to L1, critical word first. Register same writes to L2 at same times (inclusive).
 	// Register pending writes to L2, rest of L2 block.
 	// Update time until L2-RAM interface is free (by last word).
