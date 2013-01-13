@@ -150,11 +150,11 @@ int main(int argc, char** argv) {
 
 	// Initialize RAM
 	vector<unsigned char> instructions;
-	instructions.resize(ISA::DATA_SEG_SIZE);
+	instructions.resize(ISA::CODE_SEG_SIZE);
 	MainMemory ramInst(ISA::INST, (int*)&instructions[0], mem_access_delay);
 	vector<unsigned char> data;
-	data.resize(ISA::CODE_SEG_SIZE);
-	MainMemory ramData(ISA::INST, (int*)&data[0], mem_access_delay);
+	data.resize(ISA::DATA_SEG_SIZE);
+	MainMemory ramData(ISA::DATA, (int*)&data[0], mem_access_delay);
 	
 	// Read memory initialization
 	if (!HexDump::load(data, mem_init)) {
