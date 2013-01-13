@@ -142,25 +142,39 @@ int MemorySystem::write(int now, int address, int value) {
 }
 
 void MemorySystem::applyAllPendingWrites() {
-
+	applyPendingWrites(INT_MAX);
 }
 
 void MemorySystem::applyPendingWrites(int until) {
-
+	PendingWrite write;
+	// Commit all pending writes to L1
+	for (vector<PendingWrite>::iterator it = l1PendingWrites.begin(); it < l1PendingWrites.end(); it++) {
+		write = *it;
+		if (write.when <= until) {
+			l1->write(write.address, write.value);
+		}
+	}
+	// Commit all pending writes to L1
+	for (vector<PendingWrite>::iterator it = l2PendingWrites.begin(); it < l2PendingWrites.end(); it++) {
+		write = *it;
+		if (write.when <= until) {
+			l2->write(write.address, write.value);
+		}
+	}
 }
 
 MemorySystem::PendingWrite MemorySystem::findPendingWrite(vector<PendingWrite>& pending, int address) {
-	PendingWrite out;
+	PendingWrite write;
 	for (vector<PendingWrite>::iterator it = pending.begin(); it < pending.end(); it++) {
-		out = *it;
-		if (out.address == address) {
+		write = *it;
+		if (write.address == address) {
 			// Assumes no more than one pending write per address
-			return out;
+			return write;
 		}
 	}
 	// Not found, mark as invalid and return
-	out.when = -1;
-	return out;
+	write.when = -1;
+	return write;
 }
 
 int MemorySystem::nextAddress(int address, int blockSize) {
