@@ -146,6 +146,18 @@ int MemorySystem::read(int now, int address, int& value) {
 	return now;
 }
 
+void MemorySystem::pushWriteThrough(int address, int value, int way, int now) {
+	PendingWrite pending;
+	pending.address = address;
+	pending.value = value;
+	pending.way = way;
+	assert(pending.way >= 0);
+	pending.when = now;
+	pending.dirty = true;
+	l1PendingWrites.push_back(pending);
+	l2PendingWrites.push_back(pending);
+}
+
 int MemorySystem::write(int now, int address, int value) {
 
 	// If buffer is not empty, delay by L1 access time
@@ -153,22 +165,24 @@ int MemorySystem::write(int now, int address, int value) {
 		now += l1->getAccessDelay();
 	}
 
-	// If pending write then delay until applied, register L1 hit and return
+	//TODO: check
+	// If pending write then delay until applied, register L1 hit, register write, and return
 	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
-	if (pending.when >= 0) {
-		l1->registerHit();
-		now = pending.when;
-		applyPendingWrites(now);
-		value = l1->read(address);
-		// Delay should be L1 access delay
-		return now;
-	}
+	//if (pending.when >= 0) {
+	//	l1->registerHit();
+	//	now = pending.when;
+	//	applyPendingWrites(now);
+	//	pushWriteThrough(address, value, l2->getPresentWay(address), now);
+	//	// Delay should be L1 access delay
+	//	return now;
+	//}
 
 	// If present in L1, done. Register L1 hit. Apply write.
 	if (l1->isPresent(address)) {
 		l1->registerHit();
 		// Apply all pending operations until this time
 		applyPendingWrites(now);
+		pushWriteThrough(address, value, l2->getPresentWay(address), now);
 		return now;
 	}
 	// Address is not present in L1. Register L1 miss.
@@ -184,12 +198,13 @@ int MemorySystem::write(int now, int address, int value) {
 	now += l2->getAccessDelay();
 	applyPendingWrites(now);
 	
+	//TODO: go over this block!!!
+
 	// If pending write then delay until applied
 	pending = findPendingWrite(l2PendingWrites, address);
 	if (pending.when >= 0) {
 		now = pending.when;
 		applyPendingWrites(now);
-		value = l2->read(address);
 	}
 
 	// Search in L2 ways
@@ -213,15 +228,8 @@ int MemorySystem::write(int now, int address, int value) {
 			l1L2InterfaceBusyUntil = pending.when;
 		}
 		//finally, commit the write to both L1 and L2
-		PendingWrite pendingSw;
-		pendingSw.address = address;
-		pendingSw.value = value;
-		pendingSw.way = destinationWay;
-		pendingSw.dirty = true;
-		pendingSw.when = now + l1->getBlockSize() / sizeof(int);
-		l1PendingWrites.push_back(pendingSw);
-		l2PendingWrites.push_back(pendingSw);
-		l1L2InterfaceBusyUntil = pendingSw.when;
+		pushWriteThrough(address, value, destinationWay, now + l1->getBlockSize() / sizeof(int));
+		l1L2InterfaceBusyUntil = now + l1->getBlockSize() / sizeof(int);
 		return now;
 	}
 	
