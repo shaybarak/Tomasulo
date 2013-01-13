@@ -147,7 +147,7 @@ int MemorySystem::write(int now, int address, int value) {
 		l1L2InterfaceBusyUntil = pendingSw.when;
 		return now;
 	}
-	for (int way = 0; way < l2->getWayCount(); way ++) {
+	for (int way = 0; way < l2getWayCount(); way ++) {
 		if (l2->isPresentInWay(address, 0)) {
 			destinationWay = way;
 			break;
@@ -164,9 +164,10 @@ int MemorySystem::write(int now, int address, int value) {
 		destinationWay = l2->getLruWay(address);
 	}
 	//Invalidate all l1 blocks (there is a function) remeber to bring all something.
-	int baseL2Address = l2->getConflictingBaseBlockAddress(address, destinationWay);
+	int baseL2Address = 
+		l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
 	for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
-		l1->invalidatBlock(baseL2Address + i);
+		l1->invalidateBlock(baseL2Address + i);
 	}
 	//Critical L1 Block first : copy to both L1 and L2. 
 	int baseL1Address = l1->getConflictingBaseBlockAddress(address);
