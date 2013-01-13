@@ -39,6 +39,7 @@ void L2Cache::write(int address, int value, bool dirty, int way) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
+	
 	if (isPresentInWay(address, 0)) {
 		way0IsLru[index] = false;
 		// Write is from CPU
