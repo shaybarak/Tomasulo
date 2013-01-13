@@ -40,10 +40,10 @@ int Cache::toAddress(int tag, int index, int offset) {
 int Cache::toBlock(int index, int way) {
 	if (memoryType == ISA::INST) {
 		// The buffer is used such that all of way 0 is saved before way 1
-		return index + (way * way0IsLru.size());
+		return index + (way * cacheSize / blockSize);
 	} else {
 		// The ways are interleaved, for each index first way 0 is saved and then way 1
-		return (index * WAYS) + way;
+		return (index * ways) + way;
 	}
 }
 
