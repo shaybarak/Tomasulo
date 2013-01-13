@@ -246,6 +246,7 @@ void L2Cache::write(int address, int value) {
 	int offset = toOffset(address);
 	if (isPresentInWay(address, 0)) {
 		way0IsLru[index] = false;
+		// Write is from CPU
 		dirty[toBlock(index, 0)] = true;
 		*getWordPtr(index, offset, 0) = value;
 	} else {
@@ -264,6 +265,7 @@ void L2Cache::write(int address, int value, int way) {
 	int block = toBlock(index, way);
 	*getWordPtr(index, offset, way) = value;
 	tags[block] = tag;
+	// Write is from RAM
 	dirty[block] = false;
 	valid[block] = true;
 	if (way == 0) {
@@ -274,5 +276,6 @@ void L2Cache::write(int address, int value, int way) {
 }
 
 int L2Cache::nextAddress(int address, int blockSize) {
+	// Implements the cyclic address iteration
 	return ((address / blockSize) * blockSize) + ((address + sizeof(int)) % blockSize);
 }
