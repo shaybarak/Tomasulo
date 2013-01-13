@@ -37,10 +37,6 @@ int Cache::toAddress(int tag, int index, int offset) {
 	return (tag * (cacheSize / ways)) + (index * blockSize) + offset;
 }
 
-int Cache::toBlock(int index, int way) {
-	return index * ways + way;
-}
-
 int* Cache::getWordPtr(int index, int offset, int way) {
 	return &words[(toBlock(index, way) * blockSize + offset) / sizeof(int)];
 }
