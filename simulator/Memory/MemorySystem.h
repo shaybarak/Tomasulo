@@ -19,9 +19,10 @@ public:
 	 * address: requested address.
 	 * value: output parameter for value read.
 	 * Returns the absolute time when this operation will be fulfilled
-	 * and the value will be returned to the caller.
+	 * and the value will be returned to the caller (even if pending
+	 * operations are still taking place inside the memory system).
 	 */
-	int read(int now, int address, int* value);
+	int read(int now, int address, int& value);
 
 	/**
 	 * Requests a write from the memory system.
@@ -29,15 +30,12 @@ public:
 	 * address: requested address.
 	 * value: word to write to memory.
 	 * Returns the absolute time when the memory system will unblock
-	 * even if the write has not yet been fully committed.
+	 * (even if the write was not fully committed yet).
 	 */
 	int write(int now, int address, int value);
 
-	/**
-	 * Applies pending operations.
-	 * until: applies all pending operations until this time.
-	 */
-	void applyPending(int until);
+	// Applies all pending write operations
+	void applyAllPendingWrites();
 
 private:
 	// Memory components to use
@@ -51,11 +49,18 @@ private:
 
 	// Pending writes
 	typedef struct PendingWrite {
-		int when;  // When to apply the change
+		int when;  // When to apply the change, -1 for invalid
 		int address;
 		int value;
 	} PendingWrite;
 	vector<PendingWrite> l1PendingWrites;
 	vector<PendingWrite> l2PendingWrites;
-	vector<PendingWrite> ramPendingWrites;
+
+	static PendingWrite findPendingWrite(vector<PendingWrite>& pending, int address);
+
+	/**
+	 * Applies pending write operations.
+	 * until: applies all pending operations until this time.
+	 */
+	void applyPendingWrites(int until);
 }
