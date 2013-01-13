@@ -21,7 +21,7 @@ Cache::Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int acces
 int Cache::toOffset(int address) {
 	return address % sizeof(int);
 }
-	
+
 int Cache::toIndex(int address) {
 	// Divide address by block size to trim offset part.
 	// Compute modulus of how many possible indices there are.
@@ -34,7 +34,7 @@ int Cache::toTag(int address) {
 }
 
 int Cache::toAddress(int tag, int index, int offset) {
-	return (tag * (cacheSize / ways)) + (index * blockSize) + offset;
+	return (tag * (cacheSize / ways)) + (index * sizeof(int)) + offset;
 }
 
 int Cache::toBlock(int index, int way) {
