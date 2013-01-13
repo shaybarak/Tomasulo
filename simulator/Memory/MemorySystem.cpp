@@ -2,6 +2,8 @@
 #include <assert.h>
 
 int MemorySystem::read(int now, int address, int& value) {
+	value = ram->read(address);
+
 	// Delay by L1 access time
 	now += l1->getAccessDelay();
 	// Apply all pending operations until this time
@@ -13,7 +15,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		l1->registerHit();
 		now = pending.when;
 		applyPendingWrites(now);
-		value = l1->read(address);
+		//value = l1->read(address);
 		// Delay should be L1 access delay
 		return now;
 	}
@@ -21,7 +23,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	// If present in L1, register L1 hit and return
 	if (l1->isPresent(address)) {
 		l1->registerHit();
-		value = l1->read(address);
+		//value = l1->read(address);
 		// Delay should be L1 access delay
 		return now;
 	}
@@ -44,20 +46,20 @@ int MemorySystem::read(int now, int address, int& value) {
 	if (pending.when >= 0) {
 		now = pending.when;
 		applyPendingWrites(now);
-		value = l2->read(address);
+		//value = l2->read(address);
 	}
 	
 	// If present in L2 (either because pending writes were applied or regardless) register L2 hit
 	if (l2->isPresent(address)) {
 		l2->registerHit();
-		value = l2->read(address);
+		//value = l2->read(address);
 		
 		// Write block from L2 to L1, critical word first
 		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 			PendingWrite pending;
 			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
 			pending.address = address;
-			pending.value = l2->read(address);
+			//pending.value = l2->read(address);
 			address = nextAddress(address, l1->getBlockSize());
 			l1PendingWrites.push_back(pending);
 			// Make sure we know that the L1-L2 interface is busy
@@ -140,7 +142,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Keep L2-RAM interface busy until done transferring last word
 	l2RamInterfaceBusyUntil = pendingTime;
 
-	value = criticalWord;
+	//value = criticalWord;
 	return now;
 }
 
