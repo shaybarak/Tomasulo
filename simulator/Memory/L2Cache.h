@@ -21,10 +21,10 @@ public:
 	 * address: memory address to write to.
 	 * value: memory value to write.
 	 * way: destination way (when relevant).
-	 * dirty: whether this write dirties the cache (when relevant).
+	 * isDirty: whether this write dirties the cache (when relevant).
 	 * May overwrite previous data.
 	 */
-	virtual void write(int address, int value, int way, bool dirty);
+	virtual void write(int address, int value, int way, bool isDirty);
 
 	// Returns LRU way mapped to address
 	int getLruWay(int address);
@@ -44,6 +44,3 @@ private:
 
 	bool isPresentInWay(int address, int way);
 };
-
-// TODO include offset in getConflictingAddress
-// TODO assert present in isDirty

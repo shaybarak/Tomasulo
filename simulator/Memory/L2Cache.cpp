@@ -35,55 +35,42 @@ int L2Cache::read(int address) {
 	}
 }
 
-void L2Cache::write(int address, int value, int way, bool dirty) {
-	int tag = toTag(address);
-	int index = toIndex(address);
-	int offset = toOffset(address);
-	
-	if (isPresentInWay(address, 0)) {
-		way0IsLru[index] = false;
-		// Write is from CPU
-		dirty[toBlock(index, 0)] = true;
-		*getWordPtr(index, offset, 0) = value;
-	} else {
-		assert(isPresentInWay(address, 1));
-		// Assumes present in second way
-		way0IsLru[index] = true;
-		dirty[toBlock(index, 1)] = true;
-		*getWordPtr(index, offset, 1) = value;
-	}
-}
-
-int L2Cache::findVacancy(int address) {
-	int tag = toTag(address);
-	int index = toIndex(address);
-	if (!valid[toBlock(index, 0)]) {
-		return 0;
-	} else if (!valid[toBlock(index, 1)]) {
-		return 1;
-	} else {
-		return -1;
-	}
-}
-
-void L2Cache::write(int address, int value, int way) {
+void L2Cache::write(int address, int value, int way, bool isDirty) {
 	int tag = toTag(address);
 	int index = toIndex(address);
 	int offset = toOffset(address);
 	int block = toBlock(index, way);
+	lruWay[index] = 1 - way;  // The LRU way is not the other one
 	*getWordPtr(index, offset, way) = value;
-	tags[block] = tag;
-	// Write is from RAM
-	dirty[block] = false;
 	valid[block] = true;
-	if (way == 0) {
-		way0IsLru[index] = false;
-	} else {
-		way0IsLru[index] = true;
-	}
+	tags[block] = tag;
+	dirty[block] = isDirty;
 }
 
-int L2Cache::nextAddress(int address, int blockSize) {
-	// Implements the cyclic address iteration
-	return ((address / blockSize) * blockSize) + ((address + sizeof(int)) % blockSize);
+int L2Cache::getLruWay(int address) {
+	return lruWay[toIndex(address)];
+}
+
+bool L2Cache::isValid(int address, int way) {
+	return valid[toBlock(toIndex(address), way)];
+}
+
+int L2Cache::getConflictingAddress(int address, int way) {
+	int offset = toOffset(address);
+	int index = toIndex(address);
+	int block = toBlock(index, way);
+	int tag = tags[block];
+	return toAddress(tag, index, offset);
+}
+
+bool L2Cache::isDirty(int address) {
+	int way;
+	if (isPresentInWay(address, 0)) {
+		way = 0;
+	} else {
+		// Address must be present in one of the ways
+		assert(isPresentInWay(address, 1));
+		way = 1;
+	}
+	return dirty[toBlock(toIndex(address), way)];
 }
