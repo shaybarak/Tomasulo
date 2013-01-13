@@ -41,6 +41,7 @@ public:
 	friend class Cache;
 	friend class L1Cahce;
 	friend class L2Cahce;
+	friend class MainMemory;
 
 private:
 	// Memory components to use
