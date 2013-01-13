@@ -1,4 +1,5 @@
 #include "MemorySystem.h"
+#include <assert.h>
 
 int MemorySystem::read(int now, int address, int& value) {
 	// Delay by L1 access time
@@ -229,6 +230,8 @@ void MemorySystem::applyPendingWrites(int until) {
 	// Commit all pending writes to L2
 	for (vector<PendingWrite>::iterator it = l2PendingWrites.begin(); it < l2PendingWrites.end(); it++) {
 		write = *it;
+		// Validate way
+		assert((write.way == 0) || (write.way == 1));
 		if (write.when <= until) {
 			l2->write(write.address, write.value, write.way, write.dirty);
 		}
