@@ -115,7 +115,9 @@ void L2Cache::onTickDown(int now) {
 					state = WRITE_BACK;
 					wordsLeft = blockSize / sizeof(int);
 					// Start write back at start of L2 block
-					address = (pL1Master->address / blockSize) * blockSize;
+					int evictedTag = tags[toBlock(toIndex(pL1Master->address, destinationWay))];
+					int evictedIndex = toIndex(pL1Master->address);
+					address = toAddress(evictedTag, evictedIndex, 0);  // Start at offset 0
 				} else {
 					address = pL1Master->address;
 					wordsLeft = l1BlockSize / sizeof(int);
@@ -193,6 +195,7 @@ void L2Cache::onTickDown(int now) {
 		if (wordsLeft == 0) {
 			state = READ_L1_BLOCK_FROM_RAM;
 			wordsLeft = l1BlockSize / sizeof(int);
+			address = pL1Master->address;
 		}
 		assert(wordsLeft >= 0);
 		break;
