@@ -204,7 +204,7 @@ int MemorySystem::write(int now, int address, int value) {
 		}
 		now += l2->getBlockSize() / sizeof(int) - 1;
 
-		//INVALIDATRE l1 blocks
+		//INVALIDATE l1 blocks
 		conflictingAddress = conflictingAddress / l2->getBlockSize() * l2->getBlockSize();
 		for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
 			l1->invalidate(conflictingAddress );
