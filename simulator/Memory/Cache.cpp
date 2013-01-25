@@ -5,8 +5,8 @@ Cache::Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int acces
 		  hits(0), misses(0) {
 	buffer.resize(cacheSize);
 	// Tag and valid bit are per block
-	tags.resize(buffer.size() / sizeof(int));
-	valid.resize(buffer.size() / sizeof(int));
+	tags.resize(buffer.size() / blockSize);
+	valid.resize(buffer.size() / blockSize);
 	// Use vector<unsigned char> as scoped int buffer
 	words = (int*)&buffer[0];
 }
@@ -19,14 +19,14 @@ Cache::Cache(ISA::MemoryType memoryType, int blockSize, int cacheSize, int acces
  */
 
 int Cache::toOffset(int address) {
-	return address % sizeof(int);
+	return address % blockSize;
 }
 
 int Cache::toIndex(int address) {
 	// Divide address by block size to trim offset part.
 	// Compute modulus of how many possible indices there are.
 	// For each index we consume a block times how many ways there are per entry.
-	return (address / sizeof(int)) % (cacheSize / (sizeof(int) * ways));
+	return (address / blockSize) % (cacheSize / (blockSize * ways));
 }
 
 int Cache::toTag(int address) {
@@ -34,13 +34,13 @@ int Cache::toTag(int address) {
 }
 
 int Cache::toAddress(int tag, int index, int offset) {
-	return (tag * (cacheSize / ways)) + (index * sizeof(int)) + offset;
+	return (tag * (cacheSize / ways)) + (index * blockSize) + offset;
 }
 
 int Cache::toBlock(int index, int way) {
 	if (memoryType == ISA::INST) {
 		// The buffer is used such that all of way 0 is saved before way 1
-		return index + (way * cacheSize / sizeof(int) / ways);
+		return index + (way * cacheSize / (blockSize * ways));
 	} else {
 		// The ways are interleaved, for each index first way 0 is saved and then way 1
 		return (index * ways) + way;
