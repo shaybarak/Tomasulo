@@ -2,28 +2,13 @@
 #include <assert.h>
 
 int MemorySystem::read(int now, int address, int& value) {
-	value = ram->read(address);
-
 	// Delay by L1 access time
 	now += l1->getAccessDelay();
-	// Apply all pending operations until this time
-	applyPendingWrites(now);
-
-	// If pending write then delay until applied, register L1 hit and return
-	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
-	if (pending.when >= 0) {
-		l1->registerHit();
-		now = pending.when;
-		applyPendingWrites(now);
-		//value = l1->read(address);
-		// Delay should be L1 access delay
-		return now;
-	}
 
 	// If present in L1, register L1 hit and return
 	if (l1->isPresent(address)) {
 		l1->registerHit();
-		//value = l1->read(address);
+		value = l1->read(address);
 		// Delay should be L1 access delay
 		return now;
 	}
@@ -31,40 +16,21 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Else register L1 miss.
 	l1->registerMiss();
 
-	// If L1-L2 interface busy, delay until free
-	if (l1L2InterfaceBusyUntil > now) {
-		now = l1L2InterfaceBusyUntil;
-		applyPendingWrites(now);
-	}
-
 	// Delay by L2 access time
 	now += l2->getAccessDelay();
-	applyPendingWrites(now);
 
-	// If pending write then delay until applied
-	pending = findPendingWrite(l2PendingWrites, address);
-	if (pending.when >= 0) {
-		now = pending.when;
-		applyPendingWrites(now);
-		//value = l2->read(address);
-	}
-
-	// If present in L2 (either because pending writes were applied or regardless) register L2 hit
+	// If present in L2 register L2 hit
 	if (l2->isPresent(address)) {
 		l2->registerHit();
-		//value = l2->read(address);
-
+		value = l2->read(address);
+		
 		// Write block from L2 to L1, critical word first
 		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
-			PendingWrite pending;
-			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
-			pending.address = address;
-			//pending.value = l2->read(address);
+			l1->write(address, l2->read(address));
 			address = nextAddress(address, l1->getBlockSize());
-			l1PendingWrites.push_back(pending);
-			// Make sure we know that the L1-L2 interface is busy
-			l1L2InterfaceBusyUntil = pending.when;
 		}
+		// Pay one cycle penalty for every word except for the first
+		now += l1->getBlockSize() / sizeof(int) - 1;
 
 		// Delay is L1 access + L2 access + time waiting for pending writes if relevant
 		return now;
@@ -73,76 +39,57 @@ int MemorySystem::read(int now, int address, int& value) {
 	// Else register L2 miss.
 	l2->registerMiss();
 
-	// If L2-RAM interface busy, delay until free
-	if (l2RamInterfaceBusyUntil > now) {
-		now = l1L2InterfaceBusyUntil;
-		applyPendingWrites(now);
-	}
-
-	// Find destination way (preferably an invalid way so as not to have to evict)
+	// Find destination way (preferably an invalid way to avoid eviction if possible)
 	int destinationWay = l2->getInvalidWay(address);
 	if (destinationWay < 0) {
 		// Conflict, evict from LRU way
 		destinationWay = l2->getLruWay(address);
 		int conflictingAddressBase = l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
 		int conflictingAddress = conflictingAddressBase;
-		// Invalidate L2 block and all contained L1 blocks
-		for (int i = 0; i < l2->getBlockSize() / /*l1->getBlockSize()*/ sizeof(int); i++) {
+		// Invalidate all contained L1 blocks
+		for (int i = 0; i < l2->getBlockSize() / l1->getBlockSize(); i++) {
 			l1->invalidate(conflictingAddress);
-			conflictingAddress += /*l1->getBlockSize()*/ sizeof(int);
+			conflictingAddress += l1->getBlockSize();
 		}
 		// If conflicting block is dirty
 		if (l2->isDirty(conflictingAddressBase)) {
 			// Write back to RAM
 			int conflictingAddress = conflictingAddressBase;
+			now += ram->getAccessDelay();  // Initial row access
 			for (int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
 				ram->write(conflictingAddress, l2->read(conflictingAddress));
 				conflictingAddress += sizeof(int);
 			}
-			// Delay for writing to RAM
-			now += ram->getAccessDelay();  // Initial row access
-			now += l2->getBlockSize() / sizeof(int) - 1;  // One cycle for each additional access
+			// First L2->RAM transfer was already paid for by RAM access delay
+			now += l2->getBlockSize() / sizeof(int) - 1;
 		}
 	}
 
 	// Bring data from RAM:
 	// Critical word first,
-	int criticalWord = ram->read(address);
+	value = ram->read(address);
 	now += ram->getAccessDelay();
-	applyPendingWrites(now);
-	l1->write(address, criticalWord);
-	l2->write(address, criticalWord, destinationWay, true);
+	l1->write(address, value);
+	l2->write(address, value, destinationWay, false);
 
 	// Then critical L1 block,
-	int pendingTime = now;
 	for (int i = 1; i < l1->getBlockSize() / sizeof(int); i++) {
-		pendingTime++;
-		pending.when = pendingTime;
 		address = nextAddress(address, l1->getBlockSize());
-		pending.address = address;
-		pending.value = ram->read(address);
-		pending.dirty = false;
-		pending.way = destinationWay;
-		l1PendingWrites.push_back(pending);
-		l2PendingWrites.push_back(pending);
+		int data = ram->read(address);
+		l1->write(address, data);
+		l2->write(address, data, destinationWay, false);
 	}
+	now += l1->getBlockSize() / sizeof(int) - 1;
 
-	// Then rest of L2 block.
-	address = address / l2->getBlockSize() * l2->getBlockSize() + ((address / l1->getBlockSize() * l1->getBlockSize() + l1->getBlockSize()) % l2->getBlockSize());
-	for (int i = 0; i < (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int); i++) {
-		pendingTime++;
-		pending.when = pendingTime;
+	// Then entire L2 block
+	address = address / l2->getBlockSize() * l2->getBlockSize();
+	for (int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
+		int data = ram->read(address);
+		l2->write(address, data, destinationWay, false);
 		address = nextAddress(address, l2->getBlockSize());
-		pending.address = address;
-		pending.value = ram->read(address);
-		pending.dirty = false;
-		pending.way = destinationWay;
-		l2PendingWrites.push_back(pending);
 	}
-	// Keep L2-RAM interface busy until done transferring last word
-	l2RamInterfaceBusyUntil = pendingTime;
+	now += (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
 
-	//value = criticalWord;
 	return now;
 }
 
