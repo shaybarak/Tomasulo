@@ -3,6 +3,7 @@
 #include "RTypeInstruction.h"
 #include "ITypeInstruction.h"
 #include "JTypeInstruction.h"
+#include "../MIPS32/ISA.h"
 #include <assert.h>
 
 void CPU::loadProgram(vector<Instruction*>* instructions, int pc) {
@@ -31,7 +32,7 @@ void CPU::readInstruction() {
 	now = instructionMemory->read(now, pc * sizeof(int), instruction);
 	memoryAccessCount++;
 	// Verify that instruction was correctly read from memory
-	assert(pc == instruction);
+	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instruction);
 }
 
 int CPU::readData(int address) {

@@ -53,7 +53,7 @@ bool readConfig(const Configuration& config, const string& key, int* value) {
 void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program) {
 	int* codePtr = (int*)&memory[0];
 	for (unsigned int i = 0; i < program.size(); i++) {
-		codePtr[i] = i;
+		codePtr[i] = ISA::DATA_SEG_SIZE + i * sizeof(int);
 	}
 }
 
