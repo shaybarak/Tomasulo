@@ -38,13 +38,16 @@ int Cache::toAddress(int tag, int index, int offset) {
 }
 
 int Cache::toBlock(int index, int way) {
-	if (memoryType == ISA::INST) {
+	// The exercise instructions state that instruction and data caches are ordered differently
+	// (items #10 and #11 in the part 2 instructions), but this is not the case
+	// as far as the examples that we were given are concerned!
+	//if (memoryType == ISA::INST) {
 		// The buffer is used such that all of way 0 is saved before way 1
 		return index + (way * cacheSize / (blockSize * ways));
-	} else {
-		// The ways are interleaved, for each index first way 0 is saved and then way 1
-		return (index * ways) + way;
-	}
+	//} else {
+	//	// The ways are interleaved, for each index first way 0 is saved and then way 1
+	//	return (index * ways) + way;
+	//}
 }
 
 int* Cache::getWordPtr(int index, int offset, int way) {
