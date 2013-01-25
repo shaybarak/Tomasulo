@@ -94,86 +94,10 @@ int MemorySystem::read(int now, int address, int& value) {
 }
 
 int MemorySystem::write(int now, int address, int value) {
-
-	//TODO: if write buffer is empty?
-	if (!isWriteBufferEmpty(now)) {
-		now += l1->getAccessDelay();
-	}
-
-	/////////////////////////////////////////////
-	//L1 HIT
-	/////////////////////////////////////////////
-	if (l1->isPresent(address)) {
-		l1->registerHit();
-		// Apply all pending operations until this time
-		l1->write(address, value);
-		l2->write(address, value, l2->getPresentWay(address), true); //TODO: do we need isDirty??
-		return now;
-	}
-
-	////////////////////////////////////////////////
-	//L1 MISS
-	///////////////////////////////////////////////
-	l1->registerMiss();
-	now += l2->getAccessDelay();
-	/////////////////////////////////////////////
-	//L2 HIT
-	////////////////////////////////////////////
-	if (l2->isPresent(address)) {
-		l2->registerHit();
-		//write allocate
-		int copyAddress = address / l1->getBlockSize() * l1->getBlockSize();
-		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {			
-			l1->write(copyAddress, l2->read(copyAddress));
-			copyAddress += sizeof(int);
-		}
-		now += l1->getBlockSize()/sizeof(int) - 1;
-		//write data to both l1, l2
-		l1->write(address, value);
-		l2->write(address, value, l2->getPresentWay(address), true);
-		return now;
-	}
-
-	/////////////////////////////////////////////
-	//L2 MISS
-	////////////////////////////////////////////
-	l2->registerMiss();
-	now += ram->getAccessDelay();
-
-	int destinationWay = l2->getInvalidWay(address);
-	if (destinationWay == -1) {
-		//WRITEBACK conflicting L2 block to RAM
-		destinationWay = l2->getLruWay(address);
-		int conflictingAddress = l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
-		for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {			
-			ram->write(conflictingAddress, l2->read(conflictingAddress));
-			conflictingAddress += sizeof(int);
-		}
-		now += l2->getBlockSize() / sizeof(int) - 1;
-
-		//INVALIDATE l1 blocks
-		conflictingAddress = conflictingAddress / l2->getBlockSize() * l2->getBlockSize();
-		for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
-			l1->invalidate(conflictingAddress );
-			conflictingAddress += sizeof(int);
-		}
-	}
-
-	//TODO: Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
-	//Copy L2 Block from RAM
-	int l2CopyAddress = address / l2->getBlockSize() * l2->getBlockSize();
-	for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {			
-		l2->write(l2CopyAddress, ram->read(address), destinationWay, false);
-		l2CopyAddress += sizeof(int);
-	}
-	now += l2->getBlockSize() / sizeof(int) - 1;
-
-	// Copy L1 block from L2
-	int l1CopyAddress = address / l1->getBlockSize() * l1->getBlockSize();
-	for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
-		l1->write(l1CopyAddress, l2->read(l1CopyAddress));
-		address += sizeof(int);
-	}
+	int oldValue;
+	now = read(now, address, oldValue);
+	l1->write(address, value);
+	l2->write(address, value, l2->getPresentWay(address), true);
 	return now;
 }
 
