@@ -48,5 +48,5 @@ int Cache::toBlock(int index, int way) {
 }
 
 int* Cache::getWordPtr(int index, int offset, int way) {
-	return &words[(toBlock(index, way) * sizeof(int) + offset) / sizeof(int)];
+	return &words[(toBlock(index, way) * blockSize + offset) / sizeof(int)];
 }
