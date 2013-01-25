@@ -146,18 +146,6 @@ int MemorySystem::read(int now, int address, int& value) {
 	return now;
 }
 
-void MemorySystem::pushWriteThrough(int address, int value, int way, int now) {
-	PendingWrite pending;
-	pending.address = address;
-	pending.value = value;
-	pending.way = way;
-	assert(pending.way >= 0);
-	pending.when = now;
-	pending.dirty = true;
-	l1PendingWrites.push_back(pending);
-	l2PendingWrites.push_back(pending);
-}
-
 int MemorySystem::write(int now, int address, int value) {
 
 	//TODO: if write buffer is empty?
