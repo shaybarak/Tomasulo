@@ -213,7 +213,7 @@ int MemorySystem::write(int now, int address, int value) {
 	}
 
 	//TODO: Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
-	//Copy L2 Block
+	//Copy L2 Block from RAM
 	int l2CopyAddress = address / l2->getBlockSize() * l2->getBlockSize();
 	for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {			
 		l2->write(l2CopyAddress, ram->read(address), destinationWay, false);
