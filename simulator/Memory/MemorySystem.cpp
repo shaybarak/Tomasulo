@@ -30,7 +30,7 @@ int MemorySystem::read(int now, int address, int& value) {
 			address = nextAddress(address, l1->getBlockSize());
 		}
 		// Pay one cycle penalty for every word except for the first
-		now += l1->getBlockSize() / sizeof(int) - 1;
+		//now += l1->getBlockSize() / sizeof(int) - 1;
 
 		// Delay is L1 access + L2 access + time waiting for pending writes if relevant
 		return now;
@@ -79,7 +79,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		l1->write(address, data);
 		l2->write(address, data, destinationWay, false);
 	}
-	now += l1->getBlockSize() / sizeof(int) - 1;
+	//now += l1->getBlockSize() / sizeof(int) - 1;
 
 	// Then entire L2 block
 	address = address / l2->getBlockSize() * l2->getBlockSize();
@@ -88,7 +88,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		l2->write(address, data, destinationWay, false);
 		address = nextAddress(address, l2->getBlockSize());
 	}
-	now += (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
+	//now += (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
 
 	return now;
 }
