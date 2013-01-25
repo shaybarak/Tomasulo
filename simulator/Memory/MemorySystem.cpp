@@ -48,12 +48,12 @@ int MemorySystem::read(int now, int address, int& value) {
 		applyPendingWrites(now);
 		//value = l2->read(address);
 	}
-	
+
 	// If present in L2 (either because pending writes were applied or regardless) register L2 hit
 	if (l2->isPresent(address)) {
 		l2->registerHit();
 		//value = l2->read(address);
-		
+
 		// Write block from L2 to L1, critical word first
 		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
 			PendingWrite pending;
@@ -160,141 +160,84 @@ void MemorySystem::pushWriteThrough(int address, int value, int way, int now) {
 
 int MemorySystem::write(int now, int address, int value) {
 
-	// If buffer is not empty, delay by L1 access time
+	//TODO: if write buffer is empty?
 	if (!isWriteBufferEmpty(now)) {
 		now += l1->getAccessDelay();
 	}
 
-	//TODO: check
-	// If pending write then delay until applied, register L1 hit, register write, and return
-	PendingWrite pending = findPendingWrite(l1PendingWrites, address);
-	//if (pending.when >= 0) {
-	//	l1->registerHit();
-	//	now = pending.when;
-	//	applyPendingWrites(now);
-	//	pushWriteThrough(address, value, l2->getPresentWay(address), now);
-	//	// Delay should be L1 access delay
-	//	return now;
-	//}
-
-	// If present in L1, done. Register L1 hit. Apply write.
+	/////////////////////////////////////////////
+	//L1 HIT
+	/////////////////////////////////////////////
 	if (l1->isPresent(address)) {
 		l1->registerHit();
 		// Apply all pending operations until this time
-		applyPendingWrites(now);
-		pushWriteThrough(address, value, l2->getPresentWay(address), now);
+		l1->write(address, value);
+		l2->write(address, value, l2->getPresentWay(address), true); //TODO: do we need isDirty??
 		return now;
 	}
-	// Address is not present in L1. Register L1 miss.
+
+	////////////////////////////////////////////////
+	//L1 MISS
+	///////////////////////////////////////////////
 	l1->registerMiss();
-	
-	// If L2-RAM interface busy, delay until free
-	if (l2RamInterfaceBusyUntil > now) {
-		now = l1L2InterfaceBusyUntil;
-		applyPendingWrites(now);
-	}
-
-	// Delay by L2 access time.
 	now += l2->getAccessDelay();
-	applyPendingWrites(now);
-	
-	//TODO: go over this block!!!
-
-	// If pending write then delay until applied
-	pending = findPendingWrite(l2PendingWrites, address);
-	if (pending.when >= 0) {
-		now = pending.when;
-		applyPendingWrites(now);
-	}
-
-	// Search in L2 ways
-	int destinationWay = l2->getPresentWay(address);
-	
-	// If address is present in l2
-	if (destinationWay != -1) {
-		//register L2 hit. 
+	/////////////////////////////////////////////
+	//L2 HIT
+	////////////////////////////////////////////
+	if (l2->isPresent(address)) {
 		l2->registerHit();
-		//WRITE ALLOCATE: first copy block to L1, then write word to both L1 and L2
-		int copyAddress = address;
-		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
-			PendingWrite pending;
-			pending.when = now + i;  // Data is read sequentially from L2 to L1 (one word every cycle)
-			pending.address = copyAddress + i * sizeof(int);
-			pending.value = l2->read(pending.address);
-			pending.way = destinationWay;
-			pending.dirty = false;
-			l1PendingWrites.push_back(pending);
-			// Make sure we know that the L1-L2 interface is busy
-			l1L2InterfaceBusyUntil = pending.when;
+		//write allocate
+		int copyAddress = address / l1->getBlockSize() * l1->getBlockSize();
+		for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {			
+			l1->write(copyAddress, l2->read(copyAddress));
+			copyAddress += sizeof(int);
 		}
-		//finally, commit the write to both L1 and L2
-		pushWriteThrough(address, value, destinationWay, now + l1->getBlockSize() / sizeof(int));
-		l1L2InterfaceBusyUntil = now + l1->getBlockSize() / sizeof(int);
+		now += l1->getBlockSize()/sizeof(int) - 1;
+		//write data to both l1, l2
+		l1->write(address, value);
+		l2->write(address, value, l2->getPresentWay(address), true);
 		return now;
 	}
-	
-	//Oh-no! miss both in L2 and L1! need to call ram for help
+
+	/////////////////////////////////////////////
+	//L2 MISS
+	////////////////////////////////////////////
+	l2->registerMiss();
 	now += ram->getAccessDelay();
-	applyPendingWrites(now);
-	l2RamInterfaceBusyUntil = now + l2->getBlockSize() / sizeof(int) - 1;
-	// Decide which way: first, take the invalid way
-	destinationWay = l2->getInvalidWay(address);
-	// Decide which way: second, take LRU way
+
+	int destinationWay = l2->getInvalidWay(address);
 	if (destinationWay == -1) {
+		//WRITEBACK conflicting L2 block to RAM
 		destinationWay = l2->getLruWay(address);
+		int conflictingAddress = l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
+		for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {			
+			ram->write(conflictingAddress, l2->read(conflictingAddress));
+			conflictingAddress += sizeof(int);
+		}
+		now += l2->getBlockSize() / sizeof(int) - 1;
+
+		//INVALIDATRE l1 blocks
+		conflictingAddress = conflictingAddress / l2->getBlockSize() * l2->getBlockSize();
+		for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
+			l1->invalidate(conflictingAddress );
+			conflictingAddress += sizeof(int);
+		}
 	}
-	//Invalidate all l1 blocks (there is a function) remeber to bring all something.
-	int baseL2Address = 
-		l2->getConflictingAddress(address, destinationWay) / l2->getBlockSize() * l2->getBlockSize();
-	for (int i = 0; i < l2->getBlockSize(); i+=sizeof(int)) {
-		l1->invalidate(baseL2Address + i);
+
+	//TODO: Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
+	//Copy L2 Block
+	int l2CopyAddress = address / l2->getBlockSize() * l2->getBlockSize();
+	for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {			
+		l2->write(l2CopyAddress, ram->read(address), destinationWay, false);
+		l2CopyAddress += sizeof(int);
 	}
-	//Critical L1 Block first : copy to both L1 and L2, every word is written in the same time. 
-	int baseL1Address = address / l1->getBlockSize() * l1->getBlockSize();
+	now += l2->getBlockSize() / sizeof(int) - 1;
+
+	// Copy L1 block from L2
+	int l1CopyAddress = address / l1->getBlockSize() * l1->getBlockSize();
 	for (unsigned int i = 0; i < l1->getBlockSize() / sizeof(int); i++) {
-		PendingWrite pendingL1, pendingL2;
-		pendingL1.address = baseL1Address + i * sizeof(int);
-		pendingL1.value = ram->read(pendingL1.address);
-		pendingL1.when = now + i;
-		l1PendingWrites.push_back(pendingL1);
-		pendingL2.address = baseL2Address + i * sizeof(int);
-		pendingL2.value = ram->read(pendingL1.address);
-		pendingL2.when = now + i;
-		pendingL2.way = destinationWay;
-		pendingL2.dirty = false;
-		l2PendingWrites.push_back(pendingL2);
-	}
-	
-	// finally, commit word to L1, L2
-	PendingWrite pendingL1, pendingL2;
-	pendingL1.address = baseL1Address + l1->getBlockSize();
-	pendingL1.value = value;
-	pendingL1.when = now + l1->getBlockSize() / sizeof(int);
-	l1PendingWrites.push_back(pendingL1);
-	
-	pendingL2.address = baseL2Address + l2->getBlockSize();
-	pendingL2.value = value;
-	pendingL2.when = pendingL1.when;
-	pendingL2.way = destinationWay;
-	pendingL2.dirty = true;
-	l2PendingWrites.push_back(pendingL2);
-	l1L2InterfaceBusyUntil = now + l1->getBlockSize() / sizeof(int);
-	
-	now += l1->getBlockSize();
-	applyPendingWrites(now);
-	// Copy rest of L2 block to L2. assumes cyclic.
-	int l2WriteAddress = baseL2Address + l1->getBlockSize();
-	int wordCount = (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
-	for (int i = 0; i < wordCount; i++) {
-		PendingWrite pending;
-		pending.when = now + i;
-		pending.value = ram->read(l2WriteAddress);
-		pending.address = l2WriteAddress;
-		pending.way = destinationWay;
-		l2PendingWrites.push_back(pending);
-		l2WriteAddress = nextAddress(l2WriteAddress, l2->getBlockSize());
-		// Make sure we know that the L2-RAM interface is busy
-		l2RamInterfaceBusyUntil = pending.when;
+		l1->write(l1CopyAddress, l2->read(l1CopyAddress));
+		address += sizeof(int);
 	}
 	return now;
 }
