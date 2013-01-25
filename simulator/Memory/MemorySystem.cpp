@@ -3,6 +3,9 @@
 
 int MemorySystem::read(int now, int address, int& value) {
 	// Delay by L1 access time
+	bool writeBackOccured = false;
+	int entranceTime = now;
+	int entranceAddress = address;
 	now += l1->getAccessDelay();
 
 	// If present in L1, register L1 hit and return
@@ -10,6 +13,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		l1->registerHit();
 		value = l1->read(address);
 		// Delay should be L1 access delay
+		printf("EXIT read now=%d cycles=%d\taddress=%x\tL1 HIT\n", now, now-entranceTime, entranceAddress);
 		return now;
 	}
 
@@ -33,6 +37,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		//now += l1->getBlockSize() / sizeof(int) - 1;
 
 		// Delay is L1 access + L2 access + time waiting for pending writes if relevant
+		printf("EXIT read now=%d cycles=%d\taddress=%x\tL2 HIT\n", now, now-entranceTime, entranceAddress);
 		return now;
 	}
 
@@ -62,6 +67,7 @@ int MemorySystem::read(int now, int address, int& value) {
 			}
 			// First L2->RAM transfer was already paid for by RAM access delay
 			now += l2->getBlockSize() / sizeof(int) - 1;
+			writeBackOccured = true;
 		}
 	}
 
@@ -89,12 +95,13 @@ int MemorySystem::read(int now, int address, int& value) {
 		address = nextAddress(address, l2->getBlockSize());
 	}
 	//now += (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
-
+	printf("EXIT read now=%d cycles=%d\taddress=%x\tL2 MISS writeBack=%s\n", now, now-entranceTime, entranceAddress, writeBackOccured?"true":"false");
 	return now;
 }
 
 int MemorySystem::write(int now, int address, int value) {
 	int oldValue;
+	printf("WRITE\n");
 	now = read(now, address, oldValue);
 	l1->write(address, value);
 	l2->write(address, value, l2->getPresentWay(address), true);
