@@ -214,7 +214,7 @@ int main(int argc, char** argv) {
 	// Write hit ratios
 	int l1Hits = l1InstCache.getHitCount() + l1DataCache.getHitCount();
 	int l1Misses = l1InstCache.getMissCount() + l1DataCache.getMissCount();
-	int l2Hits = l2InstCache.getMissCount() + l2DataCache.getMissCount();
+	int l2Hits = l2InstCache.getHitCount() + l2DataCache.getHitCount();
 	int l2Misses = l2InstCache.getMissCount() + l2DataCache.getMissCount();
 	hitrate << "L1 " << 100 * l1Hits / (l1Hits + l1Misses) << endl;
 	hitrate << "L2 " << 100 * l2Hits / (l2Hits + l2Misses) << endl;
