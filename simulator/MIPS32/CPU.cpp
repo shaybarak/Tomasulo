@@ -108,12 +108,16 @@ void CPU::execute(Instruction* instruction) {
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		if ((*gpr)[itype->getRs()].value == (*gpr)[itype->getRt()].value) {
 			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
+		} else {
+			instructionQueue->setPc(instructionQueue->getPc());
 		}
 		break;
 	case ISA::bne:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		if ((*gpr)[itype->getRs()].value != (*gpr)[itype->getRt()].value) {
 			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
+		} else {
+			instructionQueue->setPc(instructionQueue->getPc());
 		}
 		break;
 	case ISA::j:
