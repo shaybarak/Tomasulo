@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>cmd_file.txt config_file.txt mem_init.txt regs_dump_actual.txt mem_dump_actual.txt time_actual.txt committed_actual.txt hitrate_actual.txt L1i_actual.txt L1d_actual.txt L2i_actual.txt L2d_actual.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>cmd_file1.txt cmd_file2.txt config_file.txt mem_init.txt regs_dump_actual.txt mem_dump_actual.txt time_actual.txt committed_actual.txt hitrate_actual.txt trace1_actual.txt trace2_actual.txt</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\Tests\Part3\no_speculation_single_thread</LocalDebuggerWorkingDirectory>

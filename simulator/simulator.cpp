@@ -79,21 +79,21 @@ void trimMemory(vector<unsigned char>& memory) {
 int main(int argc, char** argv) {
 	// Handle command line arguments
 	////////////////////////////////
-	if (argc < 13) {
-		cout << "Usage: " << argv[0] << " cmd_file.txt config_file.txt mem_init.txt regs_dump.txt"
-			 << " mem_dump.txt time.txt committed.txt hitrate.txt L1i.txt L1d.txt"
-			 << " L2i.txt L2d.txt" << endl;
+	if (argc < 12) {
+		cout << "Usage: " << argv[0] << " cmd_file1.txt cmd_file2.txt config_file.txt mem_init.txt " 
+			<< "regs_dump.txt mem_dump.txt time.txt committed.txt  hitrate.txt  trace1.txt trace2.txt" << endl;
 		return BAD_USAGE;
 	}
-	fstream cmd_file, config_file, regs_dump, mem_dump, mem_init, 
-			time_txt, committed_txt, hitrate, L1i, L1d, L2i, L2d;
+	fstream cmd_file1, cmd_file2, config_file, regs_dump, mem_dump, mem_init, 
+			time_txt, committed_txt, hitrate, trace1, trace2;
 	
-	if (!openFileRead(cmd_file, argv[1]) || !openFileRead(config_file, argv[2]) ||
-		!openFileRead(mem_init, argv[3]) || !openFileWrite(regs_dump, argv[4]) ||
-		!openFileWrite(mem_dump, argv[5]) || !openFileWrite(time_txt, argv[6]) ||
-		!openFileWrite(committed_txt, argv[7]) || !openFileWrite(hitrate, argv[8]) ||
-		!openFileWrite(L1i, argv[9]) || !openFileWrite(L1d, argv[10]) ||
-		!openFileWrite(L2i, argv[11]) || !openFileWrite(L2d, argv[12])) {
+	if (!openFileRead(cmd_file1, argv[1]) || !openFileRead(cmd_file2, argv[2]) ||
+		!openFileRead(config_file, argv[3]) || !openFileRead(mem_init, argv[4]) || 
+		!openFileWrite(regs_dump, argv[5]) || !openFileWrite(mem_dump, argv[6]) || 
+		!openFileWrite(time_txt, argv[7]) || !openFileWrite(committed_txt, argv[8]) || 
+		!openFileWrite(hitrate, argv[9]) || !openFileWrite(trace1, argv[10]) || 
+		!openFileWrite(trace2, argv[11])) {
+		
 		return FIO_ERROR;
 	}
 
@@ -101,19 +101,21 @@ int main(int argc, char** argv) {
 	//////////////
 	Labeler labeler;
 	// First pass on code: find and process labels
-	while (cmd_file) {
+
+	//TODO: change to handle both cmd_files
+	while (cmd_file1) {
 		string line;
-		getline(cmd_file, line);
+		getline(cmd_file1, line);
 		labeler.parse(line);
 	}
 	InstructionFactory instructionFactory(labeler.getLabels());
-	cmd_file.clear();
-	cmd_file.seekg(0);
+	cmd_file1.clear();
+	cmd_file1.seekg(0);
 	// Second pass on code: process instructions
 	vector<Instruction*> program;
-	while (cmd_file) {
+	while (cmd_file1) {
 		string line;
-		getline(cmd_file, line);
+		getline(cmd_file1, line);
 		Instruction* instruction = instructionFactory.parse(line);
 		if (instruction != NULL) {
 			program.push_back(instruction);
@@ -121,7 +123,7 @@ int main(int argc, char** argv) {
 			// Consider using a scoped container ptr deleter to automate this
 		}
 	}
-	cmd_file.close();
+	cmd_file1.close();
 	// Read configuration
 	Configuration config;
 	config.load(config_file);  // Configuration not used in part 1
@@ -198,11 +200,7 @@ int main(int argc, char** argv) {
 	// Write memory dumps
 	// Trim trailing zeroes from memory
 	trimMemory(data);
-	if (!HexDump::store(*l1InstCache.getBuffer(), L1i) ||
-		!HexDump::store(*l1DataCache.getBuffer(), L1d) ||
-		!HexDump::store(*l2InstCache.getBuffer(), L2i) ||
-		!HexDump::store(*l2DataCache.getBuffer(), L2d) || 
-		!HexDump::store(data, mem_dump)) {
+	if (!HexDump::store(data, mem_dump)) {
 		cerr << "Error writing memory dumps" << endl;
 	}
 	mem_dump.close();
