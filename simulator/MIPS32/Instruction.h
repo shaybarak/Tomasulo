@@ -11,8 +11,10 @@ using namespace std;
 /** Instruction abstract base class. */
 class Instruction {
 public:
-	Instruction(int pc, ISA::Opcode opcode) : pc(pc), opcode(opcode) {}
+	Instruction(const string& stringRepr, int pc, ISA::Opcode opcode)
+		: stringRepr(stringRepr), pc(pc), opcode(opcode) {}
 	virtual ~Instruction() {}
+	const string toString() const { return stringRepr; }
 	ISA::Opcode getOpcode() const { return opcode; }
 	int getPc() const { return pc; }
 	int issue;
@@ -20,6 +22,7 @@ public:
 	int writeCDB;
 
 private:
-	ISA::Opcode opcode;
+	const string stringRepr;
 	int pc;
+	ISA::Opcode opcode;
 };

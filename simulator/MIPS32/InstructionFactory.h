@@ -49,11 +49,11 @@ private:
 	static const regex emptyLine;
 	
 	// Specialized methods for parsing different types of instructions
-	RTypeInstruction* parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
-	ITypeInstruction* parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const;
-	ITypeInstruction* parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const;
-	ITypeInstruction* parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const;
-	JTypeInstruction* parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const;
+	RTypeInstruction* parseRegisterArithmeticInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseImmediateArithmeticInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseMemoryInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const;
+	ITypeInstruction* parseBranchInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const;
+	JTypeInstruction* parseJumpInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const;
 	
 	// Keep a copy of the symbolic names mapping
 	const Labeler::Labels& labels;

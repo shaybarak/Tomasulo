@@ -7,8 +7,8 @@
 #include "GPR.h"
 #include <stdlib.h>
 
-const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*)$");
-const regex InstructionFactory::unlabeledInstruction("^\\s*(\\w*)\\s*(.*)$");
+const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*((\\w*)\\s*(.*))$");
+const regex InstructionFactory::unlabeledInstruction("^\\s*((\\w*)\\s*(.*))$");
 const regex InstructionFactory::emptyLine("^\\s*$");
 
 Instruction* InstructionFactory::parse(string& line) {
@@ -25,7 +25,7 @@ Instruction* InstructionFactory::parse(string& line) {
 		cerr << "Cannot parse command line " << line << endl;
 		return NULL;
 	}
-	ISA::Opcode opcode = ISA::toOpcode(match[1]);
+	ISA::Opcode opcode = ISA::toOpcode(match[2]);
 	Instruction* instruction = NULL;
 	switch (opcode) {
 	case ISA::add:
@@ -33,27 +33,27 @@ Instruction* InstructionFactory::parse(string& line) {
 	case ISA::mul:
 	case ISA::div:
 	case ISA::slt:
-		instruction = parseRegisterArithmeticInstruction(opcode, match[2]);
+		instruction = parseRegisterArithmeticInstruction(match[1], opcode, match[3]);
 		break;
 	case ISA::addi:
 	case ISA::subi:
 	case ISA::slti:
-		instruction = parseImmediateArithmeticInstruction(opcode, match[2]);
+		instruction = parseImmediateArithmeticInstruction(match[1], opcode, match[3]);
 		break;
 	case ISA::lw:
 	case ISA::sw:
-		instruction = parseMemoryInstruction(opcode, match[2]);
+		instruction = parseMemoryInstruction(match[1], opcode, match[3]);
 		break;
 	case ISA::beq:
 	case ISA::bne:
-		instruction = parseBranchInstruction(opcode, match[2]);
+		instruction = parseBranchInstruction(match[1], opcode, match[3]);
 		break;
 	case ISA::j:
-		instruction = parseJumpInstruction(opcode, match[2]);
+		instruction = parseJumpInstruction(match[1], opcode, match[3]);
 		break;
 	case ISA::halt:
 		// Handle special instruction
-		instruction = new Instruction(pc, opcode);
+		instruction = new Instruction(match[1].str(), pc, opcode);
 		break;
 	default:
 		// Unidentified instruction (bug? error?)
@@ -69,7 +69,7 @@ Instruction* InstructionFactory::parse(string& line) {
 	}
 }
 
-RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
+RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt, rd;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d $%d", &rd, &rs, &rt) != 3) &&
 		(sscanf_s(arguments.c_str(), "$%d,$%d,$%d", &rd, &rs, &rt) != 3)) {
@@ -78,10 +78,10 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 	if (!(GPR::isValid(rs) && GPR::isValid(rt) && GPR::isValid(rd))) {
 		return NULL;
 	}
-	return new RTypeInstruction(pc, opcode, rs, rt, rd);
+	return new RTypeInstruction(inst, pc, opcode, rs, rt, rd);
 }
 
-ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt;
 	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rt, &rs, &immediate) != 3) &&
@@ -91,20 +91,20 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 		return NULL;
 	}
-	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
+	return new ITypeInstruction(inst, pc, opcode, rs, rt, immediate);
 }
 
-ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseMemoryInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt;
 	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d (%hd)$%d", &rt, &immediate, &rs) != 3) && 
 		(sscanf_s(arguments.c_str(), "$%d,(%hd)$%d", &rt, &immediate, &rs) != 3)) {
 		return NULL;
 	}
-	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
+	return new ITypeInstruction(inst, pc, opcode, rs, rt, immediate);
 }
 
-ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
+ITypeInstruction* InstructionFactory::parseBranchInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const {
 	int rs, rt;
 	short immediate;
 	if ((sscanf_s(arguments.c_str(), "$%d $%d %hd", &rs, &rt, &immediate) == 3) &&
@@ -132,17 +132,17 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 		return NULL;
 	}
-	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
+	return new ITypeInstruction(inst, pc, opcode, rs, rt, immediate);
 }
 
-JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
+JTypeInstruction* InstructionFactory::parseJumpInstruction(const string& inst, ISA::Opcode opcode, const string& arguments) const {
 	int literalTarget;
 	if (sscanf_s(arguments.c_str(), "%d", &literalTarget) == 1) {
 		// Jump target is 26 bits
 		if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
 			return NULL;
 		}
-		return new JTypeInstruction(pc, opcode, literalTarget);
+		return new JTypeInstruction(inst, pc, opcode, literalTarget);
 	} else {
 		// Literal target not identified, try labeled target
 		char labeledTarget[101];
@@ -154,6 +154,6 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		return new JTypeInstruction(pc, opcode, labelValue->second);
+		return new JTypeInstruction(inst, pc, opcode, labelValue->second);
 	}
 }

@@ -7,8 +7,8 @@
  */
 class JTypeInstruction : public Instruction {
 public:
-	JTypeInstruction(int pc, ISA::Opcode opcode, int target) :
-	  Instruction(pc, opcode), target(target) {}
+	JTypeInstruction(const string& stringRepr, int pc, ISA::Opcode opcode, int target) :
+	  Instruction(stringRepr, pc, opcode), target(target) {}
 	int getTarget() const;
 
 private:
