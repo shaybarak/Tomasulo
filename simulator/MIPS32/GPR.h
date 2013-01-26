@@ -12,8 +12,7 @@ public:
 
 	typedef struct {
 		int value;
-		ISA::TagType tagType;
-		int tagIndex;
+		ISA::Tag tag;
 	} Reg;
 	// Returns whether GPR index is valid
 	static bool isValid(int index);

@@ -20,6 +20,11 @@ public:
 		NONE, ADD, MUL, LOAD, STORE,
 	};
 
+	typedef struct {
+		TagType type;
+		int index;
+	} Tag;
+
 	// Convert opcode by name to enum value
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	
