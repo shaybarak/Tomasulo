@@ -56,5 +56,6 @@ Instruction* InstructionQueue::tryGetNextInstruction(int now) {
 		// Still busy reading from memory
 		return NULL;
 	}
+	q.pop();
 	return front.get();
 }
