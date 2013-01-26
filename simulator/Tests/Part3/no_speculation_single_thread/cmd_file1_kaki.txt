@@ -15,4 +15,5 @@ l1:	addi $2,$2,1
 	addi $4,$4,1
 	addi $5,$5,1
 	addi $6,$6,1
+	bne $2,$7,l1
 	halt
