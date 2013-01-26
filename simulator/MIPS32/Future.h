@@ -10,4 +10,4 @@ private:
 	T value;
 	// Value is available not before given time
 	int notBefore;
-}
+};
