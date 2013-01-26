@@ -4,7 +4,7 @@
     <LocalDebuggerCommandArguments>cmd_file.txt config_file.txt mem_init.txt regs_dump_actual.txt mem_dump_actual.txt time_actual.txt committed_actual.txt hitrate_actual.txt L1i_actual.txt L1d_actual.txt L2i_actual.txt L2d_actual.txt</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerWorkingDirectory>$(ProjectDir)\Tests\Part2\testdata1</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)\Tests\Part3\no_speculation_single_thread</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
