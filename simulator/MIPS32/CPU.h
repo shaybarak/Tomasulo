@@ -3,6 +3,7 @@
 #include "Instruction.h"
 #include "GPR.h"
 #include "../Memory/MemorySystem.h"
+#include "InstructionQueue.h"
 #include <vector>
 using namespace std;
 
@@ -17,9 +18,9 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(GPR* gpr, MemorySystem* instructionMemory, MemorySystem* dataMemory) :
+	CPU(GPR* gpr, MemorySystem* dataMemory, InstructionQueue* instructionQueue) :
 		gpr(gpr),
-		instructionMemory(instructionMemory),
+		instructionQueue(instructionQueue),
 		dataMemory(dataMemory),
 		now(0),
 		instructionsCommitted(0),
@@ -64,8 +65,11 @@ private:
 	// General Purpose Registers
 	GPR* gpr;
 	// Memory systems
-	MemorySystem* instructionMemory;
 	MemorySystem* dataMemory;
+
+	// Instruction queue
+	InstructionQueue* instructionQueue;
+
 	// Current cycle
 	int now;
 	// Count of instructions committed
