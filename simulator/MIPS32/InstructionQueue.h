@@ -9,8 +9,13 @@ using namespace std;
 
 class InstructionQueue {
 public:
-	InstructionQueue(int depth, MemorySystem* instructionMemory, vector<Instruction*>* instructions)
-		: depth(depth), instructionMemory(instructionMemory), instructions(instructions), pc(0), branched(false), halted(false) {}
+	InstructionQueue(int depth, MemorySystem* instructionMemory, vector<Instruction*>* instructions) :
+		depth(depth),
+		instructionMemory(instructionMemory),
+		instructions(instructions),
+		pc(0),
+		branched(false),
+		halted(false) {}
 	/** Try to read a new instruction from the instruction memory. */
 	bool tryReadNewInstruction(int now);
 	/**
