@@ -1,6 +1,6 @@
 #pragma once
 
-template<T> class Future {
+template<typename T> class Future {
 public:
 	Future(T& value, int notBefore) : value(value), notBefore(notBefore) {}
 	bool isReady(int now) { return now >= notBefore; }
