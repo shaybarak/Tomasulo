@@ -16,6 +16,10 @@ public:
 		INST, DATA,
 	};
 
+	enum TagType {
+		NONE, ADD, MUL, LOAD, STORE,
+	};
+
 	// Convert opcode by name to enum value
 	static ISA::Opcode toOpcode(const string& opcodeName);
 	
