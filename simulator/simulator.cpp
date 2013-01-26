@@ -174,9 +174,15 @@ int main(int argc, char** argv) {
 	/////////////
 	// Initialize GPR
 	GPR gpr;
+
+	// Initialize instrcution queue
+	int iQDepth;
+	if (!readConfig(config, "instruction_q_depth", &iQDepth)) {
+		return BAD_CONFIG;
+	}
+	InstructionQueue instructionQueue(iQDepth, &instructionMemory, &program);
 	// Initialize CPU
-	CPU cpu(&gpr, &instructionMemory, &dataMemory);
-	cpu.loadProgram(&program);
+	CPU cpu(&gpr, &dataMemory, &instructionQueue);
 	// Run the program until halt is encountered
 	while (!cpu.isHalted()) {
 		cpu.runOnce();
