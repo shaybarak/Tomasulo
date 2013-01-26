@@ -6,11 +6,6 @@
 #include "../MIPS32/ISA.h"
 #include <assert.h>
 
-void CPU::loadProgram(vector<Instruction*>* instructions, int pc) {
-	this->instructions = instructions;
-	this->pc = pc;
-}
-
 void CPU::runOnce() {
 	// Don't execute if halted or if no instructions present
 	if (halted || (instructions == NULL)) {
@@ -18,21 +13,24 @@ void CPU::runOnce() {
 	}
 	// Validate program counter
 	assert(pc >= 0);
-	#pragma warning(disable:4018)  // pc is known to be non-negative at this time
+#pragma warning(disable:4018)  // pc is known to be non-negative at this time
 	assert(pc < instructions->size());
-	readInstruction();
-	pc++;
-	execute(instructions->at(pc-1));
-	instructionsCommitted++;
+	//readInstruction();
+	Instruction* nextInstruction = instructionQueue->tryGetNextInstruction(now);
+	fetch();
+	if (nextInstruction != NULL) {
+		pc++;
+		execute(nextInstruction);
+		//TODO mode to correct place
+		instructionsCommitted++;
+	}
+	now++;
 }
 
-void CPU::readInstruction() {
-	int instruction;
-	// Read from instruction memory
-	now = instructionMemory->read(now, pc * sizeof(int), instruction);
-	memoryAccessCount++;
-	// Verify that instruction was correctly read from memory
-	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instruction);
+void CPU::fetch() {
+	if (instructionQueue->tryReadNewInstruction(now)) {
+		memoryAccessCount++;
+	}
 }
 
 int CPU::readData(int address) {
@@ -62,58 +60,58 @@ void CPU::execute(Instruction* instruction) {
 	switch (instruction->getOpcode()) {
 	case ISA::add:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] + (*gpr)[rtype->getRt()];
+		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value + (*gpr)[rtype->getRt()].value;
 		break;
 	case ISA::sub:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] - (*gpr)[rtype->getRt()];
+		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value - (*gpr)[rtype->getRt()].value;
 		break;
 	case ISA::mul:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] * (*gpr)[rtype->getRt()];
+		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value * (*gpr)[rtype->getRt()].value;
 		break;
 	case ISA::div:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		if ((*gpr)[rtype->getRt()] == 0) {
+		if ((*gpr)[rtype->getRt()].value == 0) {
 			cerr << "CPU exception: division by zero!" << endl;
 			halted = true;
 			break;
 		}
-		(*gpr)[rtype->getRd()] = (*gpr)[rtype->getRs()] / (*gpr)[rtype->getRt()];
+		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value / (*gpr)[rtype->getRt()].value;
 		break;
 	case ISA::slt:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()] = ((*gpr)[rtype->getRs()] < (*gpr)[rtype->getRt()]) ? 1 : 0;
+		(*gpr)[rtype->getRd()].value = ((*gpr)[rtype->getRs()].value < (*gpr)[rtype->getRt()].value) ? 1 : 0;
 		break;
 	case ISA::addi:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] + itype->getImmediate();
+		(*gpr)[itype->getRt()].value = (*gpr)[itype->getRs()].value + itype->getImmediate();
 		break;
 	case ISA::subi:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()] = (*gpr)[itype->getRs()] - itype->getImmediate();
+		(*gpr)[itype->getRt()].value = (*gpr)[itype->getRs()].value - itype->getImmediate();
 		break;
 	case ISA::slti:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()] = ((*gpr)[itype->getRs()] < itype->getImmediate()) ? 1 : 0;
+		(*gpr)[itype->getRt()].value = ((*gpr)[itype->getRs()].value < itype->getImmediate()) ? 1 : 0;
 		break;
 	case ISA::lw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()] = readData((*gpr)[itype->getRs()] + itype->getImmediate());
+		(*gpr)[itype->getRt()].value = readData((*gpr)[itype->getRs()].value + itype->getImmediate());
 		break;
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		writeData((*gpr)[itype->getRs()] + itype->getImmediate(), (*gpr)[itype->getRt()]);
+		writeData((*gpr)[itype->getRs()].value + itype->getImmediate(), (*gpr)[itype->getRt()].value);
 		break;
 	case ISA::beq:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		if ((*gpr)[itype->getRs()] == (*gpr)[itype->getRt()]) {
+		if ((*gpr)[itype->getRs()].value == (*gpr)[itype->getRt()].value) {
 			pc += itype->getImmediate();
 		}
 		break;
 	case ISA::bne:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		if ((*gpr)[itype->getRs()] != (*gpr)[itype->getRt()]) {
+		if ((*gpr)[itype->getRs()].value != (*gpr)[itype->getRt()].value) {
 			pc += itype->getImmediate();
 		}
 		break;
