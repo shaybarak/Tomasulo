@@ -1,3 +1,5 @@
+#pragma once
+
 template<T> class Future {
 public:
 	Future(T& value, int notBefore) : value(value), notBefore(notBefore) {}
