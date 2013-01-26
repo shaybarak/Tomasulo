@@ -8,7 +8,7 @@
 
 void CPU::runOnce() {
 	// Don't execute if halted or if no instructions present
-	if (halted || (instructions == NULL)) {
+	if (halted) {
 		return;
 	}
 	//readInstruction();

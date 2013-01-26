@@ -25,7 +25,6 @@ public:
 		now(0),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
-		instructions(NULL),		
 		halted(false) {}
 	
 	// Executes one instruction
@@ -77,6 +76,4 @@ private:
 	int memoryAccessCount;
 	// Whether halted (by HALT instruction)
 	bool halted;
-	// Program to execute
-	vector<Instruction*>* instructions;
 };
