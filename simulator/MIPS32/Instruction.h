@@ -16,6 +16,9 @@ public:
 	Instruction(ISA::Opcode opcode) : opcode(opcode) {}
 	virtual ~Instruction() {}
 	ISA::Opcode getOpcode() const;
+	int issue;
+	int exectue;
+	int writeCDB;
 
 private:
 	ISA::Opcode opcode;
