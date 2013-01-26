@@ -7,8 +7,8 @@
  */
 class RTypeInstruction : public Instruction {
 public:
-	RTypeInstruction(ISA::Opcode opcode, char rs, char rt, char rd) :
-	  Instruction(opcode), rs(rs), rt(rt), rd(rd) {}
+	RTypeInstruction(int pc, ISA::Opcode opcode, char rs, char rt, char rd) :
+	  Instruction(pc, opcode), rs(rs), rt(rt), rd(rd) {}
 	char getRs() const;
 	char getRt() const;
 	char getRd() const;

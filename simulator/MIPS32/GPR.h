@@ -14,7 +14,7 @@ public:
 		ISA::Tag tag;
 	} Reg;
 	// Returns whether GPR index is valid
-	bool isValid(int index);
+	static bool isValid(int index);
 	// Initializes all registers to zero
 	#pragma warning(disable:4351)  // gpr array init to zero is the desired behavior
 	GPR() : gpr() {}

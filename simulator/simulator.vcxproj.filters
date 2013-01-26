@@ -104,9 +104,6 @@
     <ClCompile Include="Configuration\Configuration.cpp">
       <Filter>Source Files\Configuration</Filter>
     </ClCompile>
-    <ClCompile Include="MIPS32\Instruction.cpp">
-      <Filter>Source Files\MIPS32</Filter>
-    </ClCompile>
     <ClCompile Include="MIPS32\InstructionFactory.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>

@@ -40,7 +40,6 @@
     <ClCompile Include="Memory\MemorySystem.cpp" />
     <ClCompile Include="MIPS32\CPU.cpp" />
     <ClCompile Include="MIPS32\GPR.cpp" />
-    <ClCompile Include="MIPS32\Instruction.cpp" />
     <ClCompile Include="MIPS32\InstructionFactory.cpp" />
     <ClCompile Include="MIPS32\InstructionQueue.cpp" />
     <ClCompile Include="MIPS32\ISA.cpp" />

@@ -53,7 +53,7 @@ Instruction* InstructionFactory::parse(string& line) {
 		break;
 	case ISA::halt:
 		// Handle special instruction
-		instruction = new Instruction(opcode);
+		instruction = new Instruction(pc, opcode);
 		break;
 	default:
 		// Unidentified instruction (bug? error?)
@@ -78,7 +78,7 @@ RTypeInstruction* InstructionFactory::parseRegisterArithmeticInstruction(ISA::Op
 	if (!(GPR::isValid(rs) && GPR::isValid(rt) && GPR::isValid(rd))) {
 		return NULL;
 	}
-	return new RTypeInstruction(opcode, rs, rt, rd);
+	return new RTypeInstruction(pc, opcode, rs, rt, rd);
 }
 
 ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::Opcode opcode, const string& arguments) const {
@@ -91,7 +91,7 @@ ITypeInstruction* InstructionFactory::parseImmediateArithmeticInstruction(ISA::O
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 		return NULL;
 	}
-	return new ITypeInstruction(opcode, rs, rt, immediate);
+	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
 }
 
 ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode, const string& arguments) const {
@@ -101,7 +101,7 @@ ITypeInstruction* InstructionFactory::parseMemoryInstruction(ISA::Opcode opcode,
 		(sscanf_s(arguments.c_str(), "$%d,(%hd)$%d", &rt, &immediate, &rs) != 3)) {
 		return NULL;
 	}
-	return new ITypeInstruction(opcode, rs, rt, immediate);
+	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
 }
 
 ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode, const string& arguments) const {
@@ -132,7 +132,7 @@ ITypeInstruction* InstructionFactory::parseBranchInstruction(ISA::Opcode opcode,
 	if (!(GPR::isValid(rs) && GPR::isValid(rt))) {
 		return NULL;
 	}
-	return new ITypeInstruction(opcode, rs, rt, immediate);
+	return new ITypeInstruction(pc, opcode, rs, rt, immediate);
 }
 
 JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, const string& arguments) const {
@@ -142,7 +142,7 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 		if (!(-33554432 <= literalTarget && literalTarget <= 33554431)) {
 			return NULL;
 		}
-		return new JTypeInstruction(opcode, literalTarget);
+		return new JTypeInstruction(pc, opcode, literalTarget);
 	} else {
 		// Literal target not identified, try labeled target
 		char labeledTarget[101];
@@ -154,6 +154,6 @@ JTypeInstruction* InstructionFactory::parseJumpInstruction(ISA::Opcode opcode, c
 		if (labelValue == labels.end()) {
 			return NULL;
 		}
-		return new JTypeInstruction(opcode, labelValue->second);
+		return new JTypeInstruction(pc, opcode, labelValue->second);
 	}
 }

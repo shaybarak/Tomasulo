@@ -7,8 +7,8 @@
  */
 class ITypeInstruction : public Instruction {
 public:
-	ITypeInstruction(ISA::Opcode opcode, char rs, char rt, short immediate) :
-	  Instruction(opcode), rs(rs), rt(rt), immediate(immediate) {}
+	ITypeInstruction(int pc, ISA::Opcode opcode, char rs, char rt, short immediate) :
+	  Instruction(pc, opcode), rs(rs), rt(rt), immediate(immediate) {}
 	char getRs() const;
 	char getRt() const;
 	short getImmediate() const;

@@ -8,18 +8,18 @@
 #include "ISA.h"
 using namespace std;
 
-/**
- * Instruction abstract base class.
- */
+/** Instruction abstract base class. */
 class Instruction {
 public:
-	Instruction(ISA::Opcode opcode) : opcode(opcode) {}
+	Instruction(int pc, ISA::Opcode opcode) : pc(pc), opcode(opcode) {}
 	virtual ~Instruction() {}
-	ISA::Opcode getOpcode() const;
+	ISA::Opcode getOpcode() const { return opcode; }
+	int getPc() const { return pc; }
 	int issue;
 	int exectue;
 	int writeCDB;
 
 private:
 	ISA::Opcode opcode;
+	int pc;
 };

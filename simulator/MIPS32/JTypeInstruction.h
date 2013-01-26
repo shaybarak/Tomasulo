@@ -7,8 +7,8 @@
  */
 class JTypeInstruction : public Instruction {
 public:
-	JTypeInstruction(ISA::Opcode opcode, int target) :
-	  Instruction(opcode), target(target) {}
+	JTypeInstruction(int pc, ISA::Opcode opcode, int target) :
+	  Instruction(pc, opcode), target(target) {}
 	int getTarget() const;
 
 private:
