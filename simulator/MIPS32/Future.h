@@ -4,7 +4,7 @@ template<typename T> class Future {
 public:
 	Future(T& value, int notBefore) : value(value), notBefore(notBefore) {}
 	bool isReady(int now) { return now >= notBefore; }
-	T& get() { return T; }
+	T& get() { return value; }
 private:
 	// Future value to keep
 	T value;
