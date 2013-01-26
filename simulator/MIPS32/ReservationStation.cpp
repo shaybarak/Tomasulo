@@ -2,5 +2,13 @@
 #include "../MIPS32/ISA.h"
 
 ReservationStation::ReservationStation(ISA::TagType tagType, int size, int delay): tagType(tagType), delay(delay) {
-	instructions.resize(size);
+	entries.resize(size);
+}
+
+ReservationStation::Entry& ReservationStation::operator[](int index) {
+	return entries[index];
+}
+
+const ReservationStation::Entry& ReservationStation::operator[](int index) const{
+	return entries[index];
 }

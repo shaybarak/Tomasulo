@@ -16,7 +16,7 @@ public:
 		ISA::Tag qj;
 		ISA::Tag qk;
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
-	} InstructionStatus;
+	} Entry;
 
 	ReservationStation(ISA::TagType tagType, int size, int delay);
 
@@ -26,9 +26,14 @@ public:
 	//Returns the delay of functional unit
 	int getDelay() { return delay; }
 
+	// Assumes index is in range
+	Entry& operator[](int index);
+	// Assumes index is in range
+	const Entry& operator[](int index) const;
+
 private:
 	//Holds data on instructions
-	vector<InstructionStatus> instructions;
+	vector<Entry> entries;
 
 	int delay;
 
