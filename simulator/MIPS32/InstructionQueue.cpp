@@ -13,20 +13,20 @@ bool InstructionQueue::tryReadNewInstruction(int now, int pc) {
 	instructionsRead++;
 	// Verify that instruction was correctly read from memory
 	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instructionIndex);
-	Future<int> futureInstruction(instructionIndex, notBefore);
+	Future<Instruction*> futureInstruction(instructions->at(instructionIndex), notBefore);
 	q.push(futureInstruction);
 	return true;
 }
 
-int InstructionQueue::tryGetNextInstruction(int now) {
+Instruction* InstructionQueue::tryGetNextInstruction(int now) {
 	if (q.empty()) {
 		// Queue is empty
-		return -1;
+		return NULL;
 	}
-	Future<int> front = q.front();
+	Future<Instruction*> front = q.front();
 	if (!front.isReady(now)) {
 		// Still busy reading from memory
-		return -1;
+		return NULL;
 	}
 	return front.get();
 }
