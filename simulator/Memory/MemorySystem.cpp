@@ -56,7 +56,7 @@ int MemorySystem::read(int now, int address, int& value) {
 			// Write back to RAM
 			int conflictingAddress = conflictingAddressBase;
 			now += ram->getAccessDelay();  // Initial row access
-			for (int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
+			for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
 				ram->write(conflictingAddress, l2->read(conflictingAddress));
 				conflictingAddress += sizeof(int);
 			}
@@ -73,7 +73,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	l2->write(address, value, destinationWay, false);
 
 	// Then critical L1 block,
-	for (int i = 1; i < l1->getBlockSize() / sizeof(int); i++) {
+	for (unsigned int i = 1; i < l1->getBlockSize() / sizeof(int); i++) {
 		address = nextAddress(address, l1->getBlockSize());
 		int data = ram->read(address);
 		l1->write(address, data);
@@ -83,7 +83,7 @@ int MemorySystem::read(int now, int address, int& value) {
 
 	// Then entire L2 block
 	address = address / l2->getBlockSize() * l2->getBlockSize();
-	for (int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
+	for (unsigned int i = 0; i < l2->getBlockSize() / sizeof(int); i++) {
 		int data = ram->read(address);
 		l2->write(address, data, destinationWay, false);
 		address = nextAddress(address, l2->getBlockSize());
