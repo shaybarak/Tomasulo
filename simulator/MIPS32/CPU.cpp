@@ -7,6 +7,7 @@
 #include <assert.h>
 
 void CPU::runOnce() {
+	bool issued = false;
 	// Don't execute if halted or if no instructions present
 	if (halted) {
 		return;
@@ -16,8 +17,9 @@ void CPU::runOnce() {
 	if (nextInstruction != NULL) {
 		execute(nextInstruction); // TODO change this to issue, execute later
 		instructionsCommitted++;  // TODO count instructions committed elsewhere
+		issued = true;
 	}
-	fetch(true);
+	fetch(issued);
 	now++;
 }
 
