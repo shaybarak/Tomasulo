@@ -22,7 +22,7 @@ bool InstructionQueue::tryReadNewInstruction(int now) {
 	// Translate instruction encoding
 	instructionIndex = ISA::decodeInstruction(instructionIndex);
 	// Verify that instruction was correctly read from memory
-	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instructionIndex);
+	assert(pc == instructionIndex);
 	Instruction* instruction = instructions->at(instructionIndex);
 	Future<Instruction*> futureInstruction(instruction, notBefore);
 	q.push(futureInstruction);
