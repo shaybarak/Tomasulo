@@ -4,6 +4,10 @@
 #include <assert.h>
 
 bool InstructionQueue::tryReadNewInstruction(int now) {
+	if (halted) {
+		// Halt!
+		return false;
+	}
 	if (branched) {
 		// Throttled due to branch (waiting for beq/bne to finish execution to decide)
 		return false;
@@ -31,6 +35,9 @@ bool InstructionQueue::tryReadNewInstruction(int now) {
 		// Need to evaluate condition; no prediction so just wait
 		branched = true;
 		break;
+	case ISA::halt:
+		// Halt!
+		halted = true;
 	default:
 		break;
 	}
