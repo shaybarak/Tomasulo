@@ -1,8 +1,13 @@
 #include "InstructionQueue.h"
 #include "ISA.h"
+#include "JTypeInstruction.h"
 #include <assert.h>
 
-bool InstructionQueue::tryReadNewInstruction(int now, int pc) {
+bool InstructionQueue::tryReadNewInstruction(int now) {
+	if (branched) {
+		// Throttled due to branch (waiting for beq/bne to finish execution to decide)
+		return false;
+	}
 	if (q.size() >= (unsigned int)depth) {
 		// Queue depth exceeded
 		return false;
@@ -10,11 +15,25 @@ bool InstructionQueue::tryReadNewInstruction(int now, int pc) {
 	int instructionIndex;
 	// Read from instruction memory
 	int notBefore = instructionMemory->read(now, pc * sizeof(int), instructionIndex);
-	instructionsRead++;
 	// Verify that instruction was correctly read from memory
 	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instructionIndex);
-	Future<Instruction*> futureInstruction(instructions->at(instructionIndex), notBefore);
+	Instruction* instruction = instructions->at(instructionIndex);
+	Future<Instruction*> futureInstruction(instruction, notBefore);
 	q.push(futureInstruction);
+	// Update PC
+	switch (instruction->getOpcode()) {
+	case ISA::j:
+		// Jump to next instruction
+		pc = ((JTypeInstruction*)instruction)->getTarget();
+	case ISA::beq:
+	case ISA::bne:
+		// Need to evaluate condition; no prediction so just wait
+		branched = true;
+		break;
+	default:
+		// Advance PC normally
+		pc++;
+	}
 	return true;
 }
 
