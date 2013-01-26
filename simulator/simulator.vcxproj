@@ -12,17 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
-    <ClInclude Include="Future.h" />
-    <ClInclude Include="InstructionQueue.h" />
     <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\L2Cache.h" />
     <ClInclude Include="Memory\MainMemory.h" />
     <ClInclude Include="Memory\MemorySystem.h" />
     <ClInclude Include="MIPS32\CPU.h" />
+    <ClInclude Include="MIPS32\Future.h" />
     <ClInclude Include="MIPS32\GPR.h" />
     <ClInclude Include="MIPS32\Instruction.h" />
     <ClInclude Include="MIPS32\InstructionFactory.h" />
+    <ClInclude Include="MIPS32\InstructionQueue.h" />
     <ClInclude Include="MIPS32\ISA.h" />
     <ClInclude Include="MIPS32\ITypeInstruction.h" />
     <ClInclude Include="MIPS32\JTypeInstruction.h" />
@@ -41,6 +41,7 @@
     <ClCompile Include="MIPS32\GPR.cpp" />
     <ClCompile Include="MIPS32\Instruction.cpp" />
     <ClCompile Include="MIPS32\InstructionFactory.cpp" />
+    <ClCompile Include="MIPS32\InstructionQueue.cpp" />
     <ClCompile Include="MIPS32\ISA.cpp" />
     <ClCompile Include="MIPS32\ITypeInstruction.cpp" />
     <ClCompile Include="MIPS32\JTypeInstruction.cpp" />
