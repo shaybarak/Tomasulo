@@ -11,18 +11,12 @@ void CPU::runOnce() {
 	if (halted || (instructions == NULL)) {
 		return;
 	}
-	// Validate program counter
-	assert(pc >= 0);
-#pragma warning(disable:4018)  // pc is known to be non-negative at this time
-	assert(pc < instructions->size());
 	//readInstruction();
-	Instruction* nextInstruction = instructionQueue->tryGetNextInstruction(now);
+	Instruction* nextInstruction = decode();
 	fetch();
 	if (nextInstruction != NULL) {
-		pc++;
-		execute(nextInstruction);
-		//TODO mode to correct place
-		instructionsCommitted++;
+		execute(nextInstruction); // TODO change this to issue, execute later
+		instructionsCommitted++;  // TODO count instructions committed elsewhere
 	}
 	now++;
 }
@@ -31,6 +25,10 @@ void CPU::fetch() {
 	if (instructionQueue->tryReadNewInstruction(now)) {
 		memoryAccessCount++;
 	}
+}
+
+Instruction* CPU::decode() {
+	return instructionQueue->tryGetNextInstruction(now);
 }
 
 int CPU::readData(int address) {
@@ -106,18 +104,17 @@ void CPU::execute(Instruction* instruction) {
 	case ISA::beq:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		if ((*gpr)[itype->getRs()].value == (*gpr)[itype->getRt()].value) {
-			pc += itype->getImmediate();
+			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 		}
 		break;
 	case ISA::bne:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		if ((*gpr)[itype->getRs()].value != (*gpr)[itype->getRt()].value) {
-			pc += itype->getImmediate();
+			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 		}
 		break;
 	case ISA::j:
-		jtype = dynamic_cast<JTypeInstruction*>(instruction);
-		pc = jtype->getTarget();
+		// No handling is required since instruction queue takes care of jumps
 		break;
 	case ISA::halt:
 		halted = true;

@@ -41,8 +41,11 @@ public:
 
 private:
 
-	//try to read new instruction from memory to instruction queue
+	// Try to read new instruction from memory to instruction queue
 	void fetch();
+
+	// Pop instruction from queue
+	Instruction* decode();
 
 	// Reads data
 	int readData(int address);
@@ -76,6 +79,4 @@ private:
 	bool halted;
 	// Program to execute
 	vector<Instruction*>* instructions;
-	// Program Counter
-	int pc;
 };

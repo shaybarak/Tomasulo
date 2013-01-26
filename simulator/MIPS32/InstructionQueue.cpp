@@ -21,18 +21,18 @@ bool InstructionQueue::tryReadNewInstruction(int now) {
 	Future<Instruction*> futureInstruction(instruction, notBefore);
 	q.push(futureInstruction);
 	// Update PC
+	pc++;
 	switch (instruction->getOpcode()) {
 	case ISA::j:
 		// Jump to next instruction
-		pc = ((JTypeInstruction*)instruction)->getTarget();
+		pc = dynamic_cast<JTypeInstruction*>(instruction)->getTarget();
 	case ISA::beq:
 	case ISA::bne:
 		// Need to evaluate condition; no prediction so just wait
 		branched = true;
 		break;
 	default:
-		// Advance PC normally
-		pc++;
+		break;
 	}
 	return true;
 }

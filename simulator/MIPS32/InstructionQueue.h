@@ -18,6 +18,8 @@ public:
 	 * Returns instruction in program on success, NULL on failure.
 	 */
 	Instruction* tryGetNextInstruction(int now);
+	/** Returns the current program counter */
+	int getPc() { return pc; }
 	/** Manually sets the PC (after branch execution). */
 	void setPc(int newPc) { pc = newPc; branched = false; }
 
