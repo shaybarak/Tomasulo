@@ -41,7 +41,7 @@ public:
 private:
 
 	// Try to read new instruction from memory to instruction queue
-	void fetch();
+	void fetch(bool issued);
 
 	// Pop instruction from queue
 	Instruction* decode();

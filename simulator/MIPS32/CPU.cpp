@@ -13,16 +13,19 @@ void CPU::runOnce() {
 	}
 	//readInstruction();
 	Instruction* nextInstruction = decode();
-	fetch();
 	if (nextInstruction != NULL) {
 		execute(nextInstruction); // TODO change this to issue, execute later
 		instructionsCommitted++;  // TODO count instructions committed elsewhere
 	}
+	fetch(true);
 	now++;
 }
 
-void CPU::fetch() {
-	if (instructionQueue->tryReadNewInstruction(now)) {
+void CPU::fetch(bool issued) {
+	if (issued) {
+		instructionQueue->popNextInstruction();
+	}
+	if (instructionQueue->tryFetch(now)) {
 		memoryAccessCount++;
 	}
 }

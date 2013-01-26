@@ -17,12 +17,14 @@ public:
 		branched(false),
 		halted(false) {}
 	/** Try to read a new instruction from the instruction memory. */
-	bool tryReadNewInstruction(int now);
+	bool tryFetch(int now);
 	/**
-	 * Try to get the next instruction.
-	 * Returns instruction in program on success, NULL on failure.
+	 * Try to get the next instruction to execute.
+	 * Returns instruction on success, NULL on failure.
 	 */
 	Instruction* tryGetNextInstruction(int now);
+	/** Pops the next instruction to execute (post-issue) */
+	void popNextInstruction();
 	/** Returns the current program counter */
 	int getPc() { return pc; }
 	/** Manually sets the PC (after branch execution). */

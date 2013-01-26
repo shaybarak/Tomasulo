@@ -3,7 +3,7 @@
 #include "JTypeInstruction.h"
 #include <assert.h>
 
-bool InstructionQueue::tryReadNewInstruction(int now) {
+bool InstructionQueue::tryFetch(int now) {
 	if (halted) {
 		// Halt!
 		return false;
@@ -56,6 +56,9 @@ Instruction* InstructionQueue::tryGetNextInstruction(int now) {
 		// Still busy reading from memory
 		return NULL;
 	}
-	q.pop();
 	return front.get();
+}
+
+void InstructionQueue::popNextInstruction() {
+	q.pop();
 }
