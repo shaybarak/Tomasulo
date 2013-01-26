@@ -87,6 +87,12 @@
     <ClInclude Include="Memory\MemorySystem.h">
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Future.h">
+      <Filter>Header Files\MIPS32</Filter>
+    </ClInclude>
+    <ClInclude Include="InstructionQueue.h">
+      <Filter>Header Files\MIPS32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">

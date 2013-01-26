@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Configuration\Configuration.h" />
+    <ClInclude Include="Future.h" />
+    <ClInclude Include="InstructionQueue.h" />
     <ClInclude Include="Memory\Cache.h" />
     <ClInclude Include="Memory\L1Cache.h" />
     <ClInclude Include="Memory\L2Cache.h" />
