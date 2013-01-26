@@ -18,14 +18,19 @@ public:
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
 	} InstructionStatus;
 
-	ReservationStation(ISA::TagType tagType, int size);
+	ReservationStation(ISA::TagType tagType, int size, int delay);
 
 	//Returns the type of the station
-	ISA::TagType getTagType() {return tagType;}
+	ISA::TagType getTagType() { return tagType; }
+
+	//Returns the delay of functional unit
+	int getDelay() { return delay; }
 
 private:
 	//Holds data on instructions
 	vector<InstructionStatus> instructions;
+
+	int delay;
 
 	//The type of the station
 	ISA::TagType tagType;
