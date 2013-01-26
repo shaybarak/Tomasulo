@@ -88,9 +88,12 @@
       <Filter>Header Files\Memory</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\Future.h">
-      <Filter>Header Files\MIPS32</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MIPS32\InstructionQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MIPS32\ReservationStation.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
   </ItemGroup>
@@ -147,6 +150,9 @@
       <Filter>Source Files\Memory</Filter>
     </ClCompile>
     <ClCompile Include="MIPS32\InstructionQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MIPS32\ReservationStation.cpp">
       <Filter>Source Files\MIPS32</Filter>
     </ClCompile>
   </ItemGroup>

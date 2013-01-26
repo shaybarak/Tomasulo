@@ -27,6 +27,7 @@
     <ClInclude Include="MIPS32\ITypeInstruction.h" />
     <ClInclude Include="MIPS32\JTypeInstruction.h" />
     <ClInclude Include="MIPS32\Labeler.h" />
+    <ClInclude Include="MIPS32\ReservationStation.h" />
     <ClInclude Include="MIPS32\RTypeInstruction.h" />
     <ClInclude Include="Output\HexDump.h" />
   </ItemGroup>
@@ -46,6 +47,7 @@
     <ClCompile Include="MIPS32\ITypeInstruction.cpp" />
     <ClCompile Include="MIPS32\JTypeInstruction.cpp" />
     <ClCompile Include="MIPS32\Labeler.cpp" />
+    <ClCompile Include="MIPS32\ReservationStation.cpp" />
     <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="Output\HexDump.cpp" />
     <ClCompile Include="simulator.cpp" />
