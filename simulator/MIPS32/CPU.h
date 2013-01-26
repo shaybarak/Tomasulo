@@ -27,12 +27,7 @@ public:
 		memoryAccessCount(0),
 		instructions(NULL),		
 		halted(false) {}
-	/**
-	 * Loads a program.
-	 * instructions: a program represented as a series of instructions
-	 * pc: value of Program Counter at start of execution, default of zero
-	 */
-	void loadProgram(vector<Instruction*>* instructions, int pc = 0);
+	
 	// Executes one instruction
 	virtual void runOnce();
 	// Returns elapsed execution time
@@ -45,8 +40,9 @@ public:
 	bool isHalted() const { return halted; }
 
 private:
-	// Reads an instruction from the PC
-	void readInstruction();
+
+	//try to read new instruction from memory to instruction queue
+	void fetch();
 
 	// Reads data
 	int readData(int address);
