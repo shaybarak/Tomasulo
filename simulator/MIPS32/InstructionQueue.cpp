@@ -19,6 +19,8 @@ bool InstructionQueue::tryReadNewInstruction(int now) {
 	int instructionIndex;
 	// Read from instruction memory
 	int notBefore = instructionMemory->read(now, pc * sizeof(int), instructionIndex);
+	// Translate instruction encoding
+	instructionIndex = ISA::decodeInstruction(instructionIndex);
 	// Verify that instruction was correctly read from memory
 	assert(ISA::DATA_SEG_SIZE + pc * sizeof(int) == instructionIndex);
 	Instruction* instruction = instructions->at(instructionIndex);

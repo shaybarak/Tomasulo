@@ -8,6 +8,12 @@ using namespace std;
  */
 class ISA {
 public:
+	// Encode an instruction
+	static int encodeInstruction(int pc) { return DATA_SEG_SIZE + pc * sizeof(int); }
+
+	// Decode an instruction
+	static int decodeInstruction(int instruction) { return (instruction - DATA_SEG_SIZE) / sizeof(int); }
+
 	enum Opcode {
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};
