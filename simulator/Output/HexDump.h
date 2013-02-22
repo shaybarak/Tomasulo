@@ -16,9 +16,7 @@ using namespace std;
 class HexDump {
 public:
 	// Reads formatted bytes into buffer, returns whether successful
-	static bool load(vector<unsigned char>& buffer, FILE* in); //TODO: remove old version
 	static bool load(vector<unsigned char>& buffer, fstream& in);
 	// Writes bytes according to format, returns whether successful
-	static bool store(const vector<unsigned char>& buffer, FILE* out); //TODO: remove old version
 	static bool store(const vector<unsigned char>& buffer, fstream& out);
 };
