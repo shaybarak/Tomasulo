@@ -12,3 +12,12 @@ ReservationStation::Entry& ReservationStation::operator[](int index) {
 const ReservationStation::Entry& ReservationStation::operator[](int index) const{
 	return entries[index];
 }
+
+int ReservationStation::getFreeIndex() {
+	for (int i = 0; i < entries.size(); i++) {
+		if (!entries[i].busy) {
+			return i;
+		}
+		return -1;
+	}
+}

@@ -32,6 +32,9 @@ public:
 	// Assumes index is in range
 	const Entry& operator[](int index) const;
 
+	//returns first free index, -1 if no free index available(rs is full)
+	int getFreeIndex();
+
 private:
 	//Holds data on instructions
 	vector<Entry> entries;

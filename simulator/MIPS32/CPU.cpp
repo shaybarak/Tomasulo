@@ -23,11 +23,14 @@ void CPU::runOnce() {
 	now++;
 }
 void CPU::issue(Instruction* nextInstraction) {
+	int index;
 	switch (nextInstraction->getOpcode()) {
-	/*case 
+	case ISA::MUL :
+	case ISA::div :
+		//index = rsMulDiv.getF
 
 
-*/
+
 	}
 }
 
