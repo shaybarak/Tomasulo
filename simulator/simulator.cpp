@@ -242,6 +242,7 @@ int main(int argc, char** argv) {
 	hitrate << "L1 " << 100 * l1Hits / (l1Hits + l1Misses) << endl;
 	hitrate << "L2 " << 100 * l2Hits / (l2Hits + l2Misses) << endl;
 	hitrate << "AMAT " << setprecision(2) << fixed << cpu.getAmat() << endl;
+	hitrate.close();
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	//Cache dump for debuggiong. TODO: remove
