@@ -41,6 +41,29 @@ bool openFileWrite(fstream& file, const char* filename) {
 	return true;
 };
 
+void readProgram(fstream& cmd_file, vector<Instruction*>& program) {
+	Labeler labeler;
+	// First pass on code: find and process labels
+	while (cmd_file) {
+		string line;
+		getline(cmd_file, line);
+		labeler.parse(line);
+	}
+	InstructionFactory instructionFactory(labeler.getLabels());
+	cmd_file.seekg(0);
+	// Second pass on code: process instructions
+	while (cmd_file) {
+		string line;
+		getline(cmd_file, line);
+		Instruction* instruction = instructionFactory.parse(line);
+		if (instruction != NULL) {
+			program.push_back(instruction);
+			// BUGBUG instruction pointer never deleted
+			// Consider using a scoped container ptr deleter to automate this
+		}
+	}
+}
+
 bool readConfig(const Configuration& config, const string& key, int* value) {
 	if (!config.get(key, value)) {
 		cerr << "Missing configuration " << key << endl;
@@ -99,32 +122,12 @@ int main(int argc, char** argv) {
 
 	// Read inputs
 	//////////////
-	Labeler labeler;
-	// First pass on code: find and process labels
-
-	//TODO: change to handle both cmd_files
-	while (cmd_file1) {
-		string line;
-		getline(cmd_file1, line);
-		labeler.parse(line);
-	}
-	InstructionFactory instructionFactory(labeler.getLabels());
-	cmd_file1.clear();
-	cmd_file1.seekg(0);
-	// Second pass on code: process instructions
 	vector<Instruction*> program1;
-	vector<Instruction*> program2;
-	while (cmd_file1) {
-		string line;
-		getline(cmd_file1, line);
-		Instruction* instruction = instructionFactory.parse(line);
-		if (instruction != NULL) {
-			program1.push_back(instruction);
-			// BUGBUG instruction pointer never deleted
-			// Consider using a scoped container ptr deleter to automate this
-		}
-	}
+	readProgram(cmd_file1, program1);
 	cmd_file1.close();
+	vector<Instruction*> program2;
+	readProgram(cmd_file2, program2);
+	cmd_file2.close();
 	
 	// Read configuration
 	Configuration config;
