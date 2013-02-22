@@ -27,6 +27,7 @@ public:
 	};
 
 	typedef struct {
+		bool valid;
 		TagType type;
 		int index;
 	} Tag;
