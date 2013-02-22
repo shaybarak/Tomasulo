@@ -30,6 +30,7 @@
     <ClInclude Include="MIPS32\ReservationStation.h" />
     <ClInclude Include="MIPS32\RTypeInstruction.h" />
     <ClInclude Include="Output\HexDump.h" />
+    <ClInclude Include="Output\Trace.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Configuration\Configuration.cpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="MIPS32\ReservationStation.cpp" />
     <ClCompile Include="MIPS32\RTypeInstruction.cpp" />
     <ClCompile Include="Output\HexDump.cpp" />
+    <ClCompile Include="Output\Trace.cpp" />
     <ClCompile Include="simulator.cpp" />
   </ItemGroup>
   <ItemGroup>

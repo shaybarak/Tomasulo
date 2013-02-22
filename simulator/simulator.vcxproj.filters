@@ -96,6 +96,9 @@
     <ClInclude Include="MIPS32\InstructionQueue.h">
       <Filter>Header Files\MIPS32</Filter>
     </ClInclude>
+    <ClInclude Include="Output\Trace.h">
+      <Filter>Header Files\Output</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Output\HexDump.cpp">
@@ -151,6 +154,9 @@
     </ClCompile>
     <ClCompile Include="MIPS32\InstructionQueue.cpp">
       <Filter>Source Files\MIPS32</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Trace.cpp">
+      <Filter>Source Files\Output</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
