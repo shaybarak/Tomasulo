@@ -73,8 +73,8 @@ bool readConfig(const Configuration& config, const string& key, int* value) {
 }
 
 // Add instructions to memory
-void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program) {
-	int* codePtr = (int*)&memory[0];
+void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program, int base = 0) {
+	int* codePtr = (int*)&memory[base / sizeof(int)];
 	for (unsigned int i = 0; i < program.size(); i++) {
 		codePtr[i] = ISA::encodeInstruction(i);
 	}
@@ -186,6 +186,7 @@ int main(int argc, char** argv) {
 	
 	// Write instructions to memory
 	addInstructions(instructions, program1);
+	addInstructions(instructions, program2, ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
 
 	// Build memory systems
 	MemorySystem instructionMemory(&l1InstCache, &l2InstCache, &ramInst);
@@ -204,7 +205,6 @@ int main(int argc, char** argv) {
 	ReservationStation rsMulDiv(ISA::MUL, muldiv_rs, muldiv_delay);
 	ReservationStation rsLoad(ISA::MUL, load_q_depth, 1); //TODO delay??
 	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
-
 
 	// Initialize CPU
 	CPU cpu(&gpr, &dataMemory, &instructionQueue, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
