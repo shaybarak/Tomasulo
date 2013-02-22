@@ -4,6 +4,7 @@
 #include "GPR.h"
 #include "../Memory/MemorySystem.h"
 #include "InstructionQueue.h"
+#include "ReservationStation.h"
 #include <vector>
 using namespace std;
 
@@ -18,9 +19,16 @@ public:
 	  * Initialize with a given memory block and GPR.
 	  * Shares memory & GPR with caller.
 	  */
-	CPU(GPR* gpr, MemorySystem* dataMemory, InstructionQueue* instructionQueue) :
+	CPU(GPR* gpr, MemorySystem* dataMemory, InstructionQueue* instructionQueue, 
+		ReservationStation* rsAddSub, ReservationStation* rsMulDiv, 
+		ReservationStation* rsLoad, ReservationStation* rsStore) :
 		gpr(gpr),
 		instructionQueue(instructionQueue),
+		rsAddSub(rsAddSub),
+		rsMulDiv(rsMulDiv),
+		rsLoad(rsLoad),
+		rsStore(rsStore),
+
 		dataMemory(dataMemory),
 		now(0),
 		instructionsCommitted(0),
@@ -42,6 +50,9 @@ private:
 
 	// Try to read new instruction from memory to instruction queue
 	void fetch(bool issued);
+
+	//Try to issue the instruction just poped from instruction queue
+	void issue(Instruction* nextInstruction);
 
 	// Pop instruction from queue
 	Instruction* decode();
@@ -67,6 +78,12 @@ private:
 
 	// Instruction queue
 	InstructionQueue* instructionQueue;
+
+	//Reservation stations
+	ReservationStation* rsAddSub;
+	ReservationStation* rsMulDiv;
+	ReservationStation* rsLoad;
+	ReservationStation* rsStore;
 
 	// Current cycle
 	int now;

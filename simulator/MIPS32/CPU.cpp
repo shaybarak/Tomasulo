@@ -12,15 +12,18 @@ void CPU::runOnce() {
 	if (halted) {
 		return;
 	}
-	//readInstruction();
 	Instruction* nextInstruction = decode();
 	if (nextInstruction != NULL) {
+		issue(nextInstruction);
 		execute(nextInstruction); // TODO change this to issue, execute later
 		instructionsCommitted++;  // TODO count instructions committed elsewhere
 		issued = true;
 	}
 	fetch(issued);
 	now++;
+}
+void CPU::issue(Instruction* nextInstraction) {
+	
 }
 
 void CPU::fetch(bool issued) {

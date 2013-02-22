@@ -124,25 +124,40 @@ int main(int argc, char** argv) {
 		}
 	}
 	cmd_file1.close();
+	
 	// Read configuration
 	Configuration config;
 	config.load(config_file);  // Configuration not used in part 1
 	config_file.close();
 	
-	// Set up memory levels
-	/////////////////////////////
+	//Memory Configurations
 	int l1_block_size, l1_access_delay, l1_cache_size,
 		l2_block_size, l2_access_delay, l2_cache_size,
 		mem_access_delay;
+		
+	//Pipeline Configurations
+	int addsub_delay, muldiv_delay, instruction_q_depth, addsub_rs, muldiv_rs, load_q_depth, store_q_depth;
+
 	if (!readConfig(config, "l1_block_size", &l1_block_size) ||
 		!readConfig(config, "l1_access_delay", &l1_access_delay) ||
 		!readConfig(config, "l1_cache_size", &l1_cache_size) ||
 		!readConfig(config, "l2_block_size", &l2_block_size) ||
 		!readConfig(config, "l2_access_delay", &l2_access_delay) ||
 		!readConfig(config, "l2_cache_size", &l2_cache_size) ||
-		!readConfig(config, "mem_access_delay", &mem_access_delay)) {
+		!readConfig(config, "mem_access_delay", &mem_access_delay) ||
+
+		!readConfig(config, "addsub_delay", &addsub_delay) ||
+		!readConfig(config, "muldiv_delay", &muldiv_delay) ||
+		!readConfig(config, "instruction_q_depth", &instruction_q_depth) ||
+		!readConfig(config, "addsub_rs", &addsub_rs) ||
+		!readConfig(config, "muldiv_rs", &muldiv_rs) ||
+		!readConfig(config, "load_q_depth", &load_q_depth) ||
+		!readConfig(config, "store_q_depth", &store_q_depth)) {
 		return BAD_CONFIG;
 	}
+
+	// Set up memory levels
+	/////////////////////////////
 
 	// Split cache buffer space 50%/50% between instruction and data caches
 	L1Cache l1InstCache(ISA::INST, l1_block_size, l1_cache_size / 2, l1_access_delay);
@@ -178,13 +193,17 @@ int main(int argc, char** argv) {
 	GPR gpr;
 
 	// Initialize instrcution queue
-	int iQDepth;
-	if (!readConfig(config, "instruction_q_depth", &iQDepth)) {
-		return BAD_CONFIG;
-	}
-	InstructionQueue instructionQueue(iQDepth, &instructionMemory, &program);
+	InstructionQueue instructionQueue(instruction_q_depth, &instructionMemory, &program);
+	
+	//Initialize reservation stations
+	ReservationStation rsAddSub(ISA::MUL, addsub_rs, addsub_delay);
+	ReservationStation rsMulDiv(ISA::MUL, muldiv_rs, muldiv_delay);
+	ReservationStation rsLoad(ISA::MUL, load_q_depth, 1); //TODO delay??
+	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
+
+
 	// Initialize CPU
-	CPU cpu(&gpr, &dataMemory, &instructionQueue);
+	CPU cpu(&gpr, &dataMemory, &instructionQueue, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
 	// Run the program until halt is encountered
 	while (!cpu.isHalted()) {
 		cpu.runOnce();
