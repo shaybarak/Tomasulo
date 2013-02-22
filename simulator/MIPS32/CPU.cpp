@@ -23,7 +23,12 @@ void CPU::runOnce() {
 	now++;
 }
 void CPU::issue(Instruction* nextInstraction) {
-	
+	switch (nextInstraction->getOpcode()) {
+	/*case 
+
+
+*/
+	}
 }
 
 void CPU::fetch(bool issued) {
