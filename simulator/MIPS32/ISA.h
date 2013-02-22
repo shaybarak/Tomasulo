@@ -11,9 +11,6 @@ public:
 	// Encode an instruction
 	static int encodeInstruction(int pc) { return DATA_SEG_SIZE + pc * sizeof(int); }
 
-	// Decode an instruction
-	static int decodeInstruction(int instruction) { return (instruction - DATA_SEG_SIZE) / sizeof(int); }
-
 	enum Opcode {
 		add, sub, mul, div, addi, subi, lw, sw, beq, bne, slt, slti, j, halt, unknown,
 	};
@@ -42,4 +39,8 @@ public:
 
 	// Size of RAM code segment
 	static const int CODE_SEG_SIZE = 1024 * 1024;
+
+	// Program base addresses
+	static const int FIRST_PROGRAM_BASE = 0xF0000;
+	static const int SECOND_PROGRAM_BASE = 0xF8000;
 };
