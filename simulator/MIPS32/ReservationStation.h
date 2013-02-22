@@ -15,6 +15,7 @@ public:
 		int vk;
 		ISA::Tag qj;
 		ISA::Tag qk;
+		int timeIssued;
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
 	} Entry;
 
