@@ -79,9 +79,9 @@ int InstructionQueue::pcToAddress(int pc) {
 
 Instruction* InstructionQueue::getInstruction(int instructionIndex) {
 	if (executing1) {
-		program1->at(instructionIndex);
+		return program1->at(instructionIndex);
 	} else {
-		program2->at(instructionIndex);
+		return program2->at(instructionIndex);
 	}
 }
 
