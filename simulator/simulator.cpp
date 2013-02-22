@@ -112,13 +112,14 @@ int main(int argc, char** argv) {
 	cmd_file1.clear();
 	cmd_file1.seekg(0);
 	// Second pass on code: process instructions
-	vector<Instruction*> program;
+	vector<Instruction*> program1;
+	vector<Instruction*> program2;
 	while (cmd_file1) {
 		string line;
 		getline(cmd_file1, line);
 		Instruction* instruction = instructionFactory.parse(line);
 		if (instruction != NULL) {
-			program.push_back(instruction);
+			program1.push_back(instruction);
 			// BUGBUG instruction pointer never deleted
 			// Consider using a scoped container ptr deleter to automate this
 		}
@@ -181,7 +182,7 @@ int main(int argc, char** argv) {
 	mem_init.close();
 	
 	// Write instructions to memory
-	addInstructions(instructions, program);
+	addInstructions(instructions, program1);
 
 	// Build memory systems
 	MemorySystem instructionMemory(&l1InstCache, &l2InstCache, &ramInst);
@@ -192,8 +193,8 @@ int main(int argc, char** argv) {
 	// Initialize GPR
 	GPR gpr;
 
-	// Initialize instrcution queue
-	InstructionQueue instructionQueue(instruction_q_depth, &instructionMemory, &program);
+	// Initialize instruction queue
+	InstructionQueue instructionQueue(instruction_q_depth, &instructionMemory, &program1, &program2);
 	
 	//Initialize reservation stations
 	ReservationStation rsAddSub(ISA::MUL, addsub_rs, addsub_delay);
