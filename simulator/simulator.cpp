@@ -191,6 +191,10 @@ int main(int argc, char** argv) {
 	// Build memory systems
 	MemorySystem instructionMemory(&l1InstCache, &l2InstCache, &ramInst);
 	MemorySystem dataMemory(&l1DataCache, &l2DataCache, &ramData);
+
+	// Prepare logging
+	Trace traceProgram1(trace1);
+	Trace traceProgram2(trace2);
 	
 	// Set up CPU
 	/////////////
@@ -210,8 +214,8 @@ int main(int argc, char** argv) {
 	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
 
 	// Initialize CPU threads
-	CPU cpu1(&gpr, &dataMemory, &instructionQueue1, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
-	CPU cpu2(&gpr, &dataMemory, &instructionQueue2, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
+	CPU cpu1(&gpr, &dataMemory, &instructionQueue1, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore, &traceProgram1);
+	CPU cpu2(&gpr, &dataMemory, &instructionQueue2, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore, &traceProgram2);
 	// Run each program until halt is encountered
 	while (!cpu1.isHalted()) {
 		cpu1.runOnce();
@@ -221,6 +225,9 @@ int main(int argc, char** argv) {
 		cpu2.runOnce();
 	}
 	cpu2.flush();
+
+	trace1.close();
+	trace2.close();
 
 	// Write outputs
 	////////////////

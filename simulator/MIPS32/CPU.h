@@ -5,6 +5,7 @@
 #include "../Memory/MemorySystem.h"
 #include "InstructionQueue.h"
 #include "ReservationStation.h"
+#include "../Output/Trace.h"
 #include <vector>
 using namespace std;
 
@@ -21,13 +22,14 @@ public:
 	  */
 	CPU(GPR* gpr, MemorySystem* dataMemory, InstructionQueue* instructionQueue, 
 		ReservationStation* rsAddSub, ReservationStation* rsMulDiv, 
-		ReservationStation* rsLoad, ReservationStation* rsStore) :
+		ReservationStation* rsLoad, ReservationStation* rsStore, Trace* trace) :
 		gpr(gpr),
 		instructionQueue(instructionQueue),
 		rsAddSub(rsAddSub),
 		rsMulDiv(rsMulDiv),
 		rsLoad(rsLoad),
 		rsStore(rsStore),
+		trace(trace),
 
 		dataMemory(dataMemory),
 		now(0),
@@ -106,6 +108,9 @@ private:
 	ReservationStation* rsMulDiv;
 	ReservationStation* rsLoad;
 	ReservationStation* rsStore;
+
+	// For logging purposes
+	Trace* trace;
 
 	// Current cycle
 	int now;
