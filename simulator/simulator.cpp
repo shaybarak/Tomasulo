@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
 		ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
 	
 	//Initialize reservation stations
-	ReservationStation rsAddSub(ISA::MUL, addsub_rs, addsub_delay);
+	ReservationStation rsAddSub(ISA::ADD, addsub_rs, addsub_delay);
 	ReservationStation rsMulDiv(ISA::MUL, muldiv_rs, muldiv_delay);
 	ReservationStation rsLoad(ISA::MUL, load_q_depth, 1); //TODO delay??
 	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
