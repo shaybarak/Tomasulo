@@ -38,7 +38,7 @@ ReservationStation* CPU::getRs(ISA::Opcode opcode) {
 
 	default:
 		assert(false);
-		break; 
+		return NULL; 
 	}
 }
 
@@ -258,7 +258,7 @@ int CPU::computeValue(ReservationStation* rs, int index) {
 	default:
 		// Unexpected instruction!
 		assert(false);
-		break;
+		return 0;
 	}
 }
 
