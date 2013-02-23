@@ -3,12 +3,8 @@
 #include "JTypeInstruction.h"
 #include <assert.h>
 
-bool InstructionQueue::isDone() {
-	return halted2;
-}
-
 bool InstructionQueue::tryFetch(int now) {
-	if (halted2) {
+	if (halted) {
 		// Halt!
 		return false;
 	}
@@ -22,12 +18,12 @@ bool InstructionQueue::tryFetch(int now) {
 	}
 	int instructionIndex;
 	// Read from instruction memory
-	int notBefore = instructionMemory->read(now, pcToAddress(pc), instructionIndex);
+	int notBefore = instructionMemory->read(now, pc * sizeof(int) + base, instructionIndex);
 	// Translate instruction encoding
 	instructionIndex = ISA::decodeInstruction(instructionIndex);
 	// Verify that instruction was correctly read from memory
 	assert(pc == instructionIndex);
-	Instruction* instruction = getInstruction(instructionIndex);
+	Instruction* instruction = instructions->at(instructionIndex);
 	Future<Instruction*> futureInstruction(instruction, notBefore);
 	q.push(futureInstruction);
 	// Update PC
@@ -43,7 +39,7 @@ bool InstructionQueue::tryFetch(int now) {
 		break;
 	case ISA::halt:
 		// Halt!
-		halt();
+		halted = true;
 	default:
 		break;
 	}
@@ -65,33 +61,4 @@ Instruction* InstructionQueue::tryGetNextInstruction(int now) {
 
 void InstructionQueue::popNextInstruction() {
 	q.pop();
-}
-
-int InstructionQueue::pcToAddress(int pc) {
-	int address = pc * sizeof(int);
-	if (!executing1) {
-		// Add offset to base of second program
-		address += ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE;
-	}
-	// Addressing is based at start of code segment
-	return address;
-}
-
-Instruction* InstructionQueue::getInstruction(int instructionIndex) {
-	if (executing1) {
-		return program1->at(instructionIndex);
-	} else {
-		return program2->at(instructionIndex);
-	}
-}
-
-void InstructionQueue::halt() {
-	// If currently executing program 1
-	if (executing1 && !program2->empty()) {
-		// Switch to program 2
-		executing1 = false;
-	} else {
-		// Finished all programs, halt
-		halted2 = true;
-	}
 }

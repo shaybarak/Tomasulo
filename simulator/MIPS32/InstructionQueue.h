@@ -3,24 +3,20 @@
 #include "../Memory/MemorySystem.h"
 #include "Instruction.h"
 #include "Future.h"
-#include "ISA.h"
 #include <queue>
 
 using namespace std;
 
 class InstructionQueue {
 public:
-	InstructionQueue(int depth, MemorySystem* instructionMemory, vector<Instruction*>* program1, vector<Instruction*>* program2) :
+	InstructionQueue(int depth, MemorySystem* instructionMemory, vector<Instruction*>* instructions, int base = 0) :
 		depth(depth),
 		instructionMemory(instructionMemory),
-		program1(program1),
-		program2(program2),
-		pc(ISA::FIRST_PROGRAM_BASE),
+		instructions(instructions),
+		base(base),
+		pc(0),
 		branched(false),
-		executing1(true),
-		halted2(false) {}
-	/** Whether there are no additional instructions to execute. */
-	bool isDone();
+		halted(false) {}
 	/** Try to read a new instruction from the instruction memory. */
 	bool tryFetch(int now);
 	/**
@@ -36,17 +32,12 @@ public:
 	void setPc(int newPc) { pc = newPc; branched = false; }
 
 private:
-	int pcToAddress(int pc);
-	Instruction* getInstruction(int instructionINdex);
-	void halt();
-
 	int depth;
 	MemorySystem* instructionMemory;
-	vector<Instruction*>* program1;
-	vector<Instruction*>* program2;
+	vector<Instruction*>* instructions;
+	int base;
 	queue<Future<Instruction*>> q;	
 	int pc;
 	bool branched;
-	bool executing1;
-	bool halted2;
+	bool halted;
 };
