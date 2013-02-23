@@ -146,7 +146,12 @@ bool CPU::issue() {
 }
 
 bool CPU::execute() {
-	// TODO
+
+	//TODO support multiple executions
+	rsAddSub->execute(now);
+	rsMulDiv->execute(now);
+	rsLoad->execute(now);
+	rsStore->execute(now);
 	return false;
 }
 

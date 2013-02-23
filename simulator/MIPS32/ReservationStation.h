@@ -43,6 +43,8 @@ public:
 
 	bool hasPendingInstructions();
 
+	void execute(int now);
+
 private:
 	//Holds data on instructions
 	vector<Entry> entries;
