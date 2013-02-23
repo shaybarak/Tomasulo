@@ -36,6 +36,8 @@ public:
 	//returns first free index, -1 if no free index available(rs is full)
 	int getFreeIndex();
 
+	int getSize() {return entries.size(); }
+
 
 private:
 	//Holds data on instructions
