@@ -56,8 +56,8 @@ public:
 	// Returns whether the CPU has halted due to a halt instruction or an exception
 	bool isHalted() const { return halted; }
 
-	// Flushes all pending operations
-	void flush() {  assert(false); }  // TODO: implement
+	// Are there pending instructions in the reservation stations?
+	bool hasPendingInstructions();
 
 private:
 

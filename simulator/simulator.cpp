@@ -220,11 +220,15 @@ int main(int argc, char** argv) {
 	while (!cpu1.isHalted()) {
 		cpu1.runOnce();
 	}
-	cpu1.flush();
+	while (cpu1.hasPendingInstructions()) {
+		cpu1.runOnce();
+	}
 	while (!cpu2.isHalted()) {
 		cpu2.runOnce();
 	}
-	cpu2.flush();
+	while (cpu2.hasPendingInstructions()) {
+		cpu2.runOnce();
+	}
 
 	trace1.close();
 	trace2.close();

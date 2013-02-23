@@ -16,6 +16,11 @@ void CPU::runOnce() {
 	now++;
 }
 
+bool CPU::hasPendingInstructions() {
+	// TODO
+	return false;
+}
+
 ReservationStation* CPU::getRs(ISA::Opcode opcode) {
 	switch (opcode) {
 	
