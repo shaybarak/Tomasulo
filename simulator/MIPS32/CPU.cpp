@@ -98,22 +98,26 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 }
 
 //TODO multiple issue?
-bool CPU::issue(Instruction* instruction) {
+bool CPU::issue() {
+	Instruction* instruction = instructionQueue->tryGetNextInstruction(now);
+	if (instruction == NULL) {
+		// No pending instruction, fetch next and retry issuing next time
+		if (instructionQueue->tryFetch(now)) {
+			memoryAccessCount++;
+		}
+		return false;
+	}
+
 	ReservationStation* chosenRs = getRs(instruction->getOpcode());
 	int index = chosenRs->getFreeIndex();
 	if (index == -1) {
+		// Reservation station is busy
 		return false;
 	}
-	addInstructionToRs(chosenRs,index, instruction);
-}
-
-void CPU::fetch(bool issued) {
-	if (issued) {
-		instructionQueue->popNextInstruction();
-	}
-	if (instructionQueue->tryFetch(now)) {
-		memoryAccessCount++;
-	}
+	// Issue to reservation station
+	addInstructionToRs(chosenRs, index, instruction);
+	instructionQueue->popNextInstruction();
+	return true;
 }
 
 bool CPU::writeCDB(ReservationStation* rs) {

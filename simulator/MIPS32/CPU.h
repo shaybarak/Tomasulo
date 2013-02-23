@@ -60,11 +60,8 @@ public:
 
 private:
 
-	// Try to read new instruction from memory to instruction queue
-	void fetch(bool issued);
-
 	//Try to issue the instruction just poped from instruction queue
-	bool issue(Instruction* instruction);
+	bool issue();
 
 	//Add an instruction to rs (and updates gpr with new tag)
 	void addInstructionToRs(ReservationStation* rs, int index, Instruction* instruction);
