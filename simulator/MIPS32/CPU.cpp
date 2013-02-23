@@ -123,7 +123,6 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	}
 }
 
-//TODO multiple issue?
 bool CPU::issue() {
 	Instruction* instruction = instructionQueue->tryGetNextInstruction(now);
 	if (instruction == NULL) {
