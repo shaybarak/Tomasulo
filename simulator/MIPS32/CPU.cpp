@@ -131,6 +131,7 @@ bool CPU::writeCDB(ReservationStation* rs) {
 			cdbTag.type = rs->getTagType();
 			cdbTag.valid = true;
 			(*rs)[index].busy = false;
+			instructionsCommitted++;
 			return true;
 		}
 	}
@@ -145,6 +146,7 @@ void CPU::writeCDB() {
 
 	//TODO load/store
 	if (cdbOccupied) {
+
 		gpr->updateTags(cdbTag, cdbValue);
 		rsAddSub->updateTags(cdbTag, cdbValue);
 		rsMulDiv->updateTags(cdbTag, cdbValue);
