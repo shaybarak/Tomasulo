@@ -98,12 +98,9 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 		(*gpr)[itype->getRt()].tag = newTag;
 		break;
 
-	// Special handling for lw, sw
+	// Special handling for memory instructions
 	case ISA::lw:
-		break;
-
 	case ISA::sw:
-		//t->k, s->j
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		jReg = (*gpr)[itype->getRs()];
 		(*rs)[index].vj = jReg.value;
@@ -159,16 +156,11 @@ bool CPU::issue() {
 	return true;
 }
 
-bool CPU::execute() {
-	int index;
-	//TODO support multiple executions for addsub
-	rsAddSub->execute(now);
-	rsMulDiv->execute(now);
-	
-	//TODO dataforward from store units
-	index = rsLoad->findIndexToExecute(now);
+void CPU::executeLoad() {
+	int index = rsLoad->findIndexToExecute(now);
 	if (index != -1) {
-		int address = (*rsLoad)[index].vj + (*rsLoad)[index].vk;
+		int address = (*rsLoad)[index].vj + 
+			dynamic_cast<ITypeInstruction*>((*rsLoad)[index].instruction)->getImmediate();
 		assert(address >= 0);
 		assert(address < ISA::DATA_SEG_SIZE);
 		int data;
@@ -176,23 +168,29 @@ bool CPU::execute() {
 		(*rsLoad)[index].memValue = data;
 		memoryAccessCount++;
 	}
-	
-	index = rsLoad->findIndexToExecute(now);
+}
+
+void CPU::executeStore() {
+	int index = rsStore->findIndexToExecute(now);
 	if (index != -1) {
-		int address = (*rsLoad)[index].vj + (*rsLoad)[index].vk;
+		int address = (*rsLoad)[index].vj + 
+			dynamic_cast<ITypeInstruction*>((*rsStore)[index].instruction)->getImmediate();
 		assert(address >= 0);
 		assert(address < ISA::DATA_SEG_SIZE);
-		(*rsLoad)[index].timeWriteCDB = dataMemory->write(now + 1, address, (*rsLoad)[index].memValue);
+		(*rsLoad)[index].timeWriteCDB = dataMemory->write(now + 1, address, (*rsLoad)[index].vk);
 		memoryAccessCount++;
 	}
+}
 
-	/*case ISA::sw:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		writeData((*gpr)[itype->getRs()].value + itype->getImmediate(), (*gpr)[itype->getRt()].value);
-		break;*/
+bool CPU::execute() {
+	//TODO support multiple executions for addsub
+	rsAddSub->execute(now);
+	rsMulDiv->execute(now);
+	
+	//TODO dataforward from store units, coherency etc.
+	executeLoad();
+	executeStore();
 
-	//rsLoad->execute(now);
-	rsStore->execute(now);
 	return false;
 }
 
@@ -259,20 +257,6 @@ void CPU::writeCdb() {
 	}
 }
 
-int CPU::readData(int address) {
-	
-}
-
-void CPU::writeData(int address, int data) {
-	// Verify address is within range
-	assert(address >= 0);
-	assert(address < ISA::DATA_SEG_SIZE);
-	// Write to data memory
-	now = dataMemory->write(now, address, data);
-	memoryAccessCount++;
-}
-
-
 int CPU::computeValue(ReservationStation* rs, int index) {
 	ReservationStation::Entry entry = (*rs)[index];
 	switch (entry.instruction->getOpcode()) {
@@ -303,84 +287,5 @@ int CPU::computeValue(ReservationStation* rs, int index) {
 		// Unexpected instruction!
 		assert(false);
 		return 0;
-	}
-}
-
-void CPU::execute(Instruction* instruction) {
-	RTypeInstruction* rtype = NULL;
-	ITypeInstruction* itype = NULL;
-	JTypeInstruction* jtype = NULL;
-	switch (instruction->getOpcode()) {
-	case ISA::add:
-		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value + (*gpr)[rtype->getRt()].value;
-		break;
-	case ISA::sub:
-		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value - (*gpr)[rtype->getRt()].value;
-		break;
-	case ISA::mul:
-		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value * (*gpr)[rtype->getRt()].value;
-		break;
-	case ISA::div:
-		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		if ((*gpr)[rtype->getRt()].value == 0) {
-			cerr << "CPU exception: division by zero!" << endl;
-			halted = true;
-			break;
-		}
-		(*gpr)[rtype->getRd()].value = (*gpr)[rtype->getRs()].value / (*gpr)[rtype->getRt()].value;
-		break;
-	case ISA::slt:
-		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		(*gpr)[rtype->getRd()].value = ((*gpr)[rtype->getRs()].value < (*gpr)[rtype->getRt()].value) ? 1 : 0;
-		break;
-	case ISA::addi:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()].value = (*gpr)[itype->getRs()].value + itype->getImmediate();
-		break;
-	case ISA::subi:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()].value = (*gpr)[itype->getRs()].value - itype->getImmediate();
-		break;
-	case ISA::slti:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()].value = ((*gpr)[itype->getRs()].value < itype->getImmediate()) ? 1 : 0;
-		break;
-	case ISA::lw:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		(*gpr)[itype->getRt()].value = readData((*gpr)[itype->getRs()].value + itype->getImmediate());
-		break;
-	case ISA::sw:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		writeData((*gpr)[itype->getRs()].value + itype->getImmediate(), (*gpr)[itype->getRt()].value);
-		break;
-	case ISA::beq:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		if ((*gpr)[itype->getRs()].value == (*gpr)[itype->getRt()].value) {
-			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
-		} else {
-			instructionQueue->setPc(instructionQueue->getPc());
-		}
-		break;
-	case ISA::bne:
-		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		if ((*gpr)[itype->getRs()].value != (*gpr)[itype->getRt()].value) {
-			instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
-		} else {
-			instructionQueue->setPc(instructionQueue->getPc());
-		}
-		break;
-	case ISA::j:
-		// No handling is required since instruction queue takes care of jumps
-		break;
-	case ISA::halt:
-		halted = true;
-		break;
-	default:
-		// Unexpected instruction!
-		assert(false);
-		break;
 	}
 }

@@ -70,6 +70,11 @@ private:
 	// Execute a ready instruction from the reservation station
 	bool execute();
 
+	//helper methods for load/store
+	void executeLoad();
+	void executeStore();
+
+
 	//Writes value computed by execution units to gpr and reservation stations
 	void writeCdb();
 
@@ -78,18 +83,6 @@ private:
 
 	//compute return value from reservation station
 	int computeValue(ReservationStation* rs, int index);
-
-	// Reads data
-	int readData(int address);
-
-	// Writes data
-	void writeData(int address, int data);
-
-	/**
-	 * Executes an instruction. May stall on memory.
-	 * instruction: instruction to execute
-	 */
-	void execute(Instruction* instruction);
 	
 	//returns the reservation station matching for the opcode
 	ReservationStation* getRs(ISA::Opcode opcode);
