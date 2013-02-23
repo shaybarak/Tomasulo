@@ -36,17 +36,25 @@ public:
 		halted(false) {}
 	
 	// Executes one instruction
-	virtual void runOnce();
+	void runOnce();
+	
 	// Returns elapsed execution time
 	int getTime() { return now; }
+	
 	// Returns count of instructions committed so far
 	int getInstructionsCommitted() const { return instructionsCommitted; }
+	
 	// Returns count of memory accesses so far
 	int getMemoryAccessCount() const { return memoryAccessCount; }
+	
 	// Returns the Average Memory Access Time
 	double getAmat() const { return (double)now / (double)memoryAccessCount; }
+	
 	// Returns whether the CPU has halted due to a halt instruction or an exception
 	bool isHalted() const { return halted; }
+
+	// Flushes all pending operations
+	void flush() {  0 / 0; }  // TODO: implement
 
 private:
 

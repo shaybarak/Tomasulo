@@ -216,9 +216,11 @@ int main(int argc, char** argv) {
 	while (!cpu1.isHalted()) {
 		cpu1.runOnce();
 	}
+	cpu1.flush();
 	while (!cpu2.isHalted()) {
 		cpu2.runOnce();
 	}
+	cpu2.flush();
 
 	// Write outputs
 	////////////////
