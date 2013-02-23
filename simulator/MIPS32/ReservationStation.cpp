@@ -47,7 +47,7 @@ bool ReservationStation::hasPendingInstructions() {
 }
 
 bool ReservationStation::hasExecutingInstruction(int now) {
-	for (int index = 0; index < entries.size(); index++) {
+	for (unsigned int index = 0; index < entries.size(); index++) {
 		if (entries[index].busy && 
 			(entries[index].timeWriteCDB > -1) && (entries[index].timeWriteCDB < now)) {
 			return true;
