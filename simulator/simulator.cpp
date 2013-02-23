@@ -197,8 +197,11 @@ int main(int argc, char** argv) {
 	// Initialize GPR
 	GPR gpr;
 
-	// Initialize instruction queue
-	InstructionQueue instructionQueue(instruction_q_depth, &instructionMemory, &program1, &program2);
+	// Initialize instruction queues
+	InstructionQueue instructionQueue1(instruction_q_depth, &instructionMemory, &program1);
+	InstructionQueue instructionQueue2(instruction_q_depth, &instructionMemory, &program1,
+		// Rebase second program within code segment
+		ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
 	
 	//Initialize reservation stations
 	ReservationStation rsAddSub(ISA::MUL, addsub_rs, addsub_delay);
@@ -206,11 +209,15 @@ int main(int argc, char** argv) {
 	ReservationStation rsLoad(ISA::MUL, load_q_depth, 1); //TODO delay??
 	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
 
-	// Initialize CPU
-	CPU cpu(&gpr, &dataMemory, &instructionQueue, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
-	// Run the program until halt is encountered
-	while (!cpu.isHalted()) {
-		cpu.runOnce();
+	// Initialize CPU threads
+	CPU cpu1(&gpr, &dataMemory, &instructionQueue1, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
+	CPU cpu2(&gpr, &dataMemory, &instructionQueue2, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore);
+	// Run each program until halt is encountered
+	while (!cpu1.isHalted()) {
+		cpu1.runOnce();
+	}
+	while (!cpu2.isHalted()) {
+		cpu2.runOnce();
 	}
 
 	// Write outputs
@@ -227,13 +234,13 @@ int main(int argc, char** argv) {
 		cerr << "Error writing memory dumps" << endl;
 	}
 	mem_dump.close();
-	time_txt << cpu.getTime() << endl;
+	time_txt << cpu1.getTime() + cpu2.getTime() << endl;
 	if (time_txt.fail()) {
 		cerr << "Error writing time" << endl;
 	}
 	time_txt.close();
 	// Write instructions count
-	committed_txt << cpu.getInstructionsCommitted() << endl;
+	committed_txt << cpu1.getInstructionsCommitted() + cpu2.getInstructionsCommitted() << endl;
 	if (committed_txt.fail()) {
 		cerr << "Error writing instructions committed count" << endl;
 	}
@@ -245,7 +252,10 @@ int main(int argc, char** argv) {
 	int l2Misses = l2InstCache.getMissCount() + l2DataCache.getMissCount();
 	hitrate << "L1 " << 100 * l1Hits / (l1Hits + l1Misses) << endl;
 	hitrate << "L2 " << 100 * l2Hits / (l2Hits + l2Misses) << endl;
-	hitrate << "AMAT " << setprecision(2) << fixed << cpu.getAmat() << endl;
+	hitrate << "AMAT " << setprecision(2) << fixed <<
+		// AMAT = cycles_elapsed / memory_access_count
+		(double)(cpu1.getTime() + cpu2.getTime()) / (double)(cpu1.getMemoryAccessCount() + cpu2.getMemoryAccessCount())
+		<< endl;
 	hitrate.close();
 
 	///////////////////////////////////////////////////////////////////////////////////////
