@@ -7,24 +7,12 @@
 #include <assert.h>
 
 void CPU::runOnce() {
-	bool issued = false;
-	// Don't execute if halted or if no instructions present
-	if (halted) {
-		return;
-	}
-	Instruction* instructionToIssue = decode();
-
-	//try to issue to instruction
-	if (instructionToIssue != NULL) {
-		issue(instructionToIssue);
-	}
-
-	//update values in reservation stations
-	//execute(instructionToIssue); // TODO change this to issue, execute later
-	instructionsCommitted++;  // TODO count instructions committed elsewhere
-	issued = true;
-	
-	fetch(issued);
+	// Try to execute any instructions that are in reservation and ready
+	execute();
+	// Issue the next instruction to a reservation station, if possible
+	issue();
+	// If any instructions have finished execution, write them on the CDB
+	writeCdb();
 	now++;
 }
 
