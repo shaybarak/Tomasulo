@@ -17,6 +17,7 @@ public:
 		ISA::Tag qk;
 		int timeIssued;
 		int timeWriteCDB;
+		bool InEx;
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
 	} Entry;
 
