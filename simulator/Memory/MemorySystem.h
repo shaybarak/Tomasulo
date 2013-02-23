@@ -11,7 +11,7 @@ class MemorySystem {
 public:
 	MemorySystem(L1Cache* l1, L2Cache* l2, MainMemory* ram) :
 		l1(l1), l2(l2), ram(ram),
-		l1L2InterfaceBusyUntil(-1), l2RamInterfaceBusyUntil(-1) {}
+		l1BusyUntil(-1), l1L2InterfaceBusyUntil(-1), l2RamInterfaceBusyUntil(-1) {}
 
 	/**
 	 * Requests a read from the memory system.
