@@ -21,3 +21,18 @@ int ReservationStation::getFreeIndex() {
 	}
 	return -1;
 }
+
+void ReservationStation::updateTags(ISA::Tag tag, int value) {
+	for (int index = 0; index < entries.size(); index++) {
+		if (entries[index].busy == true && entries[index].timeWriteCDB == -1) {
+			if (entries[index].qj == tag) {
+				entries[index].qj.valid = false;
+				entries[index].vj = value;
+			}
+			if (entries[index].qk == tag) {
+				entries[index].qk.valid = false;
+				entries[index].vk = value;
+			}
+		}
+	}
+}

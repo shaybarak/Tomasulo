@@ -38,6 +38,9 @@ public:
 
 	int getSize() {return entries.size(); }
 
+	//update tags to values in response to CPU::writeCDB
+	void updateTags(ISA::Tag tag, int value);
+
 
 private:
 	//Holds data on instructions
