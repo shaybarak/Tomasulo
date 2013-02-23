@@ -128,22 +128,36 @@ void CPU::fetch(bool issued) {
 	}
 }
 
-void CPU::WriteCDB() {
+bool CPU::writeCDB(ReservationStation* rs) {
 	bool cdbOccupied = false;
-	int value;
 	ReservationStation::Entry entry;
-	for (int index = 0; index < rsAddSub->getSize(); index++) {
-		entry = (*rsAddSub)[index];
-		if ((entry.inEx) && (entry.timeWriteCDB >= now)) {
-			value = computeValue(rsAddSub, index);
-			cdbOccupied = true;
-			break;
+	for (int index = 0; index < rs->getSize(); index++) {
+		entry = (*rs)[index];
+		if (entry.timeWriteCDB >= now) {
+			cdbValue = computeValue(rs, index);
+			cdbTag.index = index;
+			cdbTag.type = rs->getTagType();
+			cdbTag.valid = true;
+			(*rs)[index].busy = false;
+			return true;
 		}
 	}
-	if (cdbOccupied) {
-		//updateRegisterFile;
-		//updateReservationStations;
+}
 
+void CPU::writeCDB() {
+	bool cdbOccupied = false;
+	cdbOccupied = writeCDB(rsAddSub);	
+	if (!cdbOccupied) {
+		cdbOccupied = writeCDB(rsMulDiv);
+	}
+
+	//TODO load/store
+	if (cdbOccupied) {
+		gpr->updateTags(cdbTag, cdbValue);
+		rsAddSub->updateTags(cdbTag, cdbValue);
+		rsMulDiv->updateTags(cdbTag, cdbValue);
+		rsLoad->updateTags(cdbTag, cdbValue);
+		rsStore->updateTags(cdbTag, cdbValue);
 	}
 }
 
@@ -171,6 +185,7 @@ void CPU::writeData(int address, int data) {
 	memoryAccessCount++;
 }
 
+
 int CPU::computeValue(ReservationStation* rs, int index) {
 	ReservationStation::Entry entry = (*rs)[index];
 	switch (entry.instruction->getOpcode()) {
@@ -189,7 +204,7 @@ int CPU::computeValue(ReservationStation* rs, int index) {
 		if (entry.vk == 0) {
 			cerr << "CPU exception: division by zero!" << endl;
 			halted = true;
-			break;
+			return 0;
 		}
 		return entry.vj / entry.vk;
 	case ISA::lw:

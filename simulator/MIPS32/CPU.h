@@ -73,9 +73,12 @@ private:
 	Instruction* decode();
 
 	//Writes value computed by execution units to gpr and reservation stations
-	void WriteCDB();
+	void writeCDB();
 
-	//compute the return value from reservation station
+	bool writeCDB(ReservationStation* rs);
+
+
+	//compute return value from reservation station
 	int computeValue(ReservationStation* rs, int index);
 
 	// Reads data
@@ -120,4 +123,7 @@ private:
 	int memoryAccessCount;
 	// Whether halted (by HALT instruction)
 	bool halted;
+
+	int cdbValue;
+	ISA::Tag cdbTag;
 };
