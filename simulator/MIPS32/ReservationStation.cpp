@@ -57,4 +57,9 @@ void ReservationStation::execute(int now) {
 			}
 		}
 	}
+	entries[selectedIndex].timeWriteCDB = now + delay;
+}
+
+void ReservationStation::load(int now) {
+
 }
