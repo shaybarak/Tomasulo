@@ -49,16 +49,6 @@ bool ReservationStation::hasPendingInstructions() {
 	return false;
 }
 
-bool ReservationStation::hasExecutingInstruction(int now) {
-	for (unsigned int index = 0; index < entries.size(); index++) {
-		if (entries[index].busy && 
-			(entries[index].timeWriteCDB > -1) && (entries[index].timeWriteCDB < now)) {
-			return true;
-		}
-	}
-	return false;
-}
-
 int ReservationStation::findIndexToExecute(int now) {
 	int minTimeIssued = now;
 	int selectedIndex = -1;

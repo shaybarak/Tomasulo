@@ -48,9 +48,6 @@ public:
 	//returns index for entry with minimal issue time
 	int findIndexToExecute(int now);
 
-	//returns whether there is at least one slot executing
-	bool hasExecutingInstruction(int now);
-
 	void execute(int now);
 
 private:
