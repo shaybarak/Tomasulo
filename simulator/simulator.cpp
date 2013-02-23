@@ -271,26 +271,5 @@ int main(int argc, char** argv) {
 		<< endl;
 	hitrate.close();
 
-	///////////////////////////////////////////////////////////////////////////////////////
-	//Cache dump for debuggiong. TODO: remove
-	if (argc == 16) {
-		fstream cmd_file, config_file, regs_dump, mem_dump, mem_init, L1i, L1d, L2i, L2d;
-		if (!openFileWrite(L1i, argv[12]) || !openFileWrite(L1d, argv[13]) ||
-			!openFileWrite(L2i, argv[14]) || !openFileWrite(L2d, argv[15])) {
-				return FIO_ERROR;
-		}
-		if (!HexDump::store(*l1InstCache.getBuffer(), L1i) ||
-			!HexDump::store(*l1DataCache.getBuffer(), L1d) ||
-			!HexDump::store(*l2InstCache.getBuffer(), L2i) ||
-			!HexDump::store(*l2DataCache.getBuffer(), L2d)) {
-				cerr << "Error writing memory dumps" << endl;
-		}
-		L1d.close();
-		L1i.close();
-		L2d.close();
-		L2i.close();
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////
-
 	return SUCCESS;
 }
