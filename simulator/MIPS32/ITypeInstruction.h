@@ -9,7 +9,7 @@ class ITypeInstruction : public Instruction {
 public:
 	ITypeInstruction(const string& stringRepr, int pc, ISA::Opcode opcode, char rs, char rt, short immediate) :
 	  Instruction(stringRepr, pc, opcode), rs(rs), rt(rt), immediate(immediate) {}
-	char getRs() const;
+	virtual char getRs() const;
 	char getRt() const;
 	short getImmediate() const;
 

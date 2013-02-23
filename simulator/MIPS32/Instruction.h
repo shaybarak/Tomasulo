@@ -17,6 +17,7 @@ public:
 	const string toString() const { return stringRepr; }
 	ISA::Opcode getOpcode() const { return opcode; }
 	int getPc() const { return pc; }
+	virtual char getRs() const { return 0; }
 	int issue;
 	int exectue;
 	int writeCDB;
