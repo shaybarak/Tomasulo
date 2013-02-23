@@ -14,7 +14,7 @@ const ReservationStation::Entry& ReservationStation::operator[](int index) const
 }
 
 int ReservationStation::getFreeIndex() {
-	for (int i = 0; i < entries.size(); i++) {
+	for (unsigned int i = 0; i < entries.size(); i++) {
 		if (!entries[i].busy) {
 			return i;
 		}
