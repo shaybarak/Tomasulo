@@ -211,8 +211,8 @@ int main(int argc, char** argv) {
 	//Initialize reservation stations
 	ReservationStation rsAddSub(ISA::ADD, addsub_rs, addsub_delay);
 	ReservationStation rsMulDiv(ISA::MUL, muldiv_rs, muldiv_delay);
-	ReservationStation rsLoad(ISA::MUL, load_q_depth, 1); //TODO delay??
-	ReservationStation rsStore(ISA::MUL, store_q_depth, 1); //TODO delay??
+	ReservationStation rsLoad(ISA::LOAD, load_q_depth, 1); //TODO delay??
+	ReservationStation rsStore(ISA::STORE, store_q_depth, 1); //TODO delay??
 
 	// Initialize CPU threads
 	CPU cpu1(&gpr, &dataMemory, &instructionQueue1, &rsAddSub, &rsMulDiv, &rsLoad, &rsStore, &traceProgram1);
