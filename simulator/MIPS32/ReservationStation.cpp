@@ -23,7 +23,7 @@ int ReservationStation::getFreeIndex() {
 }
 
 void ReservationStation::updateTags(ISA::Tag tag, int value) {
-	for (int index = 0; index < entries.size(); index++) {
+	for (unsigned int index = 0; index < entries.size(); index++) {
 		if (entries[index].busy == true && entries[index].timeWriteCDB == -1) {
 			if (entries[index].qj == tag) {
 				entries[index].qj.valid = false;
@@ -38,7 +38,7 @@ void ReservationStation::updateTags(ISA::Tag tag, int value) {
 }
 
 bool ReservationStation::hasPendingInstructions() {
-	for (int index = 0; index < entries.size(); index++) {
+	for (unsigned int index = 0; index < entries.size(); index++) {
 		if (entries[index].busy) {
 			return true;
 		}
@@ -49,7 +49,7 @@ bool ReservationStation::hasPendingInstructions() {
 void ReservationStation::execute(int now) {
 	int minTimeIssued = now;
 	int selectedIndex = -1;
-	for (int index = 0; index < entries.size(); index++ ) {
+	for (unsigned int index = 0; index < entries.size(); index++ ) {
 		if (entries[index].busy && (!entries[index].qj.valid) && (!entries[index].qj.valid)) {
 			if (entries[index].timeIssued < minTimeIssued) {
 				minTimeIssued = entries[index].timeIssued;
