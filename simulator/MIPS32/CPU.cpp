@@ -133,8 +133,10 @@ bool CPU::writeCDB(ReservationStation* rs) {
 			(*rs)[index].busy = false;
 			instructionsCommitted++;
 			trace->write((*rs)[index].instruction->toString(), 
-				(*rs)[index].timeIssued,(*rs)[index].timeWriteCDB - (*rs).getDelay(),
-				(*rs)[index].timeWriteCDB, now);
+				(*rs)[index].timeIssued,
+				(*rs)[index].timeWriteCDB - (*rs).getDelay(),
+				(*rs)[index].timeWriteCDB,
+				now);
 			return true;
 		}
 	}
