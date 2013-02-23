@@ -46,7 +46,17 @@ bool ReservationStation::hasPendingInstructions() {
 	return false;
 }
 
-void ReservationStation::execute(int now) {
+bool ReservationStation::hasExecutingInstruction(int now) {
+	for (int index = 0; index < entries.size(); index++) {
+		if (entries[index].busy && 
+			(entries[index].timeWriteCDB > -1) && (entries[index].timeWriteCDB < now)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+int ReservationStation::findIndexToExecute(int now) {
 	int minTimeIssued = now;
 	int selectedIndex = -1;
 	for (unsigned int index = 0; index < entries.size(); index++ ) {
@@ -57,9 +67,14 @@ void ReservationStation::execute(int now) {
 			}
 		}
 	}
-	entries[selectedIndex].timeWriteCDB = now + delay;
+	return selectedIndex;
 }
 
-void ReservationStation::load(int now) {
 
+void ReservationStation::execute(int now) {
+	int selectedIndex = findIndexToExecute(now);
+	if (selectedIndex == -1) {
+		return;
+	}
+	entries[selectedIndex].timeWriteCDB = now + delay;
 }

@@ -17,6 +17,7 @@ public:
 		ISA::Tag qk;
 		int timeIssued;
 		int timeWriteCDB;
+		int memValue;
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
 	} Entry;
 
@@ -41,7 +42,14 @@ public:
 	//update tags to values in response to CPU::writeCDB
 	void updateTags(ISA::Tag tag, int value);
 
+	//returns whether there is at least one slot busy
 	bool hasPendingInstructions();
+
+	//returns index for entry with minimal issue time
+	int findIndexToExecute(int now);
+
+	//returns whether there is at least one slot executing
+	bool hasExecutingInstruction(int now);
 
 	void execute(int now);
 

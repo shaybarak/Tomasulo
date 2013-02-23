@@ -89,8 +89,6 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	case ISA::addi:
 	case ISA::subi:
 	case ISA::slti:
-	case ISA::lw:
-	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
 		jReg = (*gpr)[itype->getRs()];
 		(*rs)[index].vj = jReg.value;
@@ -99,6 +97,22 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 		(*rs)[index].qk.valid = false;
 		(*gpr)[itype->getRt()].tag = newTag;
 		break;
+
+	// Special handling for lw, sw
+	case ISA::lw:
+		break;
+
+	case ISA::sw:
+		//t->k, s->j
+		itype = dynamic_cast<ITypeInstruction*>(instruction);
+		jReg = (*gpr)[itype->getRs()];
+		(*rs)[index].vj = jReg.value;
+		(*rs)[index].qj = jReg.tag;
+		kReg = (*gpr)[itype->getRt()];
+		(*rs)[index].vj = kReg.value;
+		(*rs)[index].qj = kReg.tag;
+		break;
+
 
 	// Special handling for branches
 	case ISA::beq:
@@ -146,11 +160,38 @@ bool CPU::issue() {
 }
 
 bool CPU::execute() {
-
-	//TODO support multiple executions
+	int index;
+	//TODO support multiple executions for addsub
 	rsAddSub->execute(now);
 	rsMulDiv->execute(now);
-	rsLoad->execute(now);
+	
+	//TODO dataforward from store units
+	index = rsLoad->findIndexToExecute(now);
+	if (index != -1) {
+		int address = (*rsLoad)[index].vj + (*rsLoad)[index].vk;
+		assert(address >= 0);
+		assert(address < ISA::DATA_SEG_SIZE);
+		int data;
+		(*rsLoad)[index].timeWriteCDB = dataMemory->read(now + 1, address, data);
+		(*rsLoad)[index].memValue = data;
+		memoryAccessCount++;
+	}
+	
+	index = rsLoad->findIndexToExecute(now);
+	if (index != -1) {
+		int address = (*rsLoad)[index].vj + (*rsLoad)[index].vk;
+		assert(address >= 0);
+		assert(address < ISA::DATA_SEG_SIZE);
+		(*rsLoad)[index].timeWriteCDB = dataMemory->write(now + 1, address, (*rsLoad)[index].memValue);
+		memoryAccessCount++;
+	}
+
+	/*case ISA::sw:
+		itype = dynamic_cast<ITypeInstruction*>(instruction);
+		writeData((*gpr)[itype->getRs()].value + itype->getImmediate(), (*gpr)[itype->getRt()].value);
+		break;*/
+
+	//rsLoad->execute(now);
 	rsStore->execute(now);
 	return false;
 }
@@ -162,6 +203,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 		entry = (*rs)[index];
 		if ((entry.busy) && (entry.timeWriteCDB <= now)) {
 			bool cdbWrite;
+			(*rs)[index].busy = false;
 			switch (entry.instruction->getOpcode()) {
 			// Special handling for instructions that don't produce a value
 			case ISA::bne:
@@ -186,7 +228,6 @@ bool CPU::writeCdb(ReservationStation* rs) {
 				cdbTag.index = index;
 				cdbTag.type = rs->getTagType();
 				cdbTag.valid = true;
-				(*rs)[index].busy = false;
 				cdbWrite = true;
 			}
 			instructionsCommitted++;
@@ -219,14 +260,7 @@ void CPU::writeCdb() {
 }
 
 int CPU::readData(int address) {
-	// Verify address is within range
-	assert(address >= 0);
-	assert(address < ISA::DATA_SEG_SIZE);
-	// Read from data memory
-	int data;
-	now = dataMemory->read(now, address, data);
-	memoryAccessCount++;
-	return data;
+	
 }
 
 void CPU::writeData(int address, int data) {
