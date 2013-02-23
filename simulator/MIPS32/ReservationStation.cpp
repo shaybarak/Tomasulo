@@ -60,7 +60,7 @@ int ReservationStation::findIndexToExecute(int now) {
 	int minTimeIssued = now;
 	int selectedIndex = -1;
 	for (unsigned int index = 0; index < entries.size(); index++ ) {
-		if (entries[index].busy && (!entries[index].qj.valid) && (!entries[index].qj.valid)) {
+		if (entries[index].busy && (!entries[index].qj.valid) && (!entries[index].qk.valid)) {
 			if (entries[index].timeIssued < minTimeIssued) {
 				minTimeIssued = entries[index].timeIssued;
 				selectedIndex = index;
