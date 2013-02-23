@@ -64,6 +64,7 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	(*rs)[index].busy = true;
 	(*rs)[index].instruction = instruction;
 	(*rs)[index].timeIssued = now;
+	(*rs)[index].timeWriteCDB = -1;
 
 	newTag.index = index;
 	newTag.type = rs->getTagType();
@@ -127,9 +128,24 @@ void CPU::fetch(bool issued) {
 	}
 }
 
-//void CPU::WriteCDB() {
-//	for (int i = 0; i < 
-//}
+void CPU::WriteCDB() {
+	bool cdbOccupied = false;
+	int value;
+	ReservationStation::Entry entry;
+	for (int index = 0; index < rsAddSub->getSize(); index++) {
+		entry = (*rsAddSub)[index];
+		if ((entry.inEx) && (entry.timeWriteCDB >= now)) {
+			value = computeValue(rsAddSub, index);
+			cdbOccupied = true;
+			break;
+		}
+	}
+	if (cdbOccupied) {
+		//updateRegisterFile;
+		//updateReservationStations;
+
+	}
+}
 
 Instruction* CPU::decode() {
 	return instructionQueue->tryGetNextInstruction(now);
@@ -153,6 +169,37 @@ void CPU::writeData(int address, int data) {
 	// Write to data memory
 	now = dataMemory->write(now, address, data);
 	memoryAccessCount++;
+}
+
+int CPU::computeValue(ReservationStation* rs, int index) {
+	ReservationStation::Entry entry = (*rs)[index];
+	switch (entry.instruction->getOpcode()) {
+	case ISA::add:
+	case ISA::addi:
+		return entry.vj + entry.vk;
+	case ISA::sub:
+	case ISA::subi:
+		return entry.vj - entry.vk;
+	case ISA::slt:
+	case ISA::slti:
+		return entry.vj < entry.vk ? 1 : 0;
+	case ISA::mul:
+		return entry.vj * entry.vk;
+	case ISA::div:
+		if (entry.vk == 0) {
+			cerr << "CPU exception: division by zero!" << endl;
+			halted = true;
+			break;
+		}
+		return entry.vj / entry.vk;
+	case ISA::lw:
+	case ISA::sw:
+		//TODO
+	default:
+		// Unexpected instruction!
+		assert(false);
+		break;
+	}
 }
 
 void CPU::execute(Instruction* instruction) {

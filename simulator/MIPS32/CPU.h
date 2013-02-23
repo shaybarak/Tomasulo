@@ -62,7 +62,11 @@ private:
 	// Pop instruction from queue
 	Instruction* decode();
 
+	//Writes value computed by execution units to gpr and reservation stations
 	void WriteCDB();
+
+	//compute the return value from reservation station
+	int computeValue(ReservationStation* rs, int index);
 
 	// Reads data
 	int readData(int address);
