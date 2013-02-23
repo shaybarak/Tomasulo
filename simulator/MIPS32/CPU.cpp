@@ -125,7 +125,7 @@ bool CPU::writeCDB(ReservationStation* rs) {
 	ReservationStation::Entry entry;
 	for (int index = 0; index < rs->getSize(); index++) {
 		entry = (*rs)[index];
-		if (entry.timeWriteCDB <= now) {
+		if ((entry.busy) && (entry.timeWriteCDB <= now)) {
 			cdbValue = computeValue(rs, index);
 			cdbTag.index = index;
 			cdbTag.type = rs->getTagType();
