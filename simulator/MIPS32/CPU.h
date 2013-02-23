@@ -66,9 +66,6 @@ private:
 	//Add an instruction to rs (and updates gpr with new tag)
 	void addInstructionToRs(ReservationStation* rs, int index, Instruction* instruction);
 
-	// Pop instruction from queue
-	Instruction* decode();
-
 	//Writes value computed by execution units to gpr and reservation stations
 	void writeCDB();
 

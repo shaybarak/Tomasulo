@@ -58,6 +58,9 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	newTag.type = rs->getTagType();
 	newTag.valid = true;
 
+	GPR::Reg jReg;
+	GPR::Reg kReg;
+
 	switch (instruction->getOpcode()) {
 	
 	//RType
@@ -67,10 +70,10 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	case ISA::div: 
 	case ISA::slt:
 		rtype = dynamic_cast<RTypeInstruction*>(instruction);
-		GPR::Reg jReg = (*gpr)[rtype->getRs()];
+		jReg = (*gpr)[rtype->getRs()];
 		(*rs)[index].vj = jReg.value;
 		(*rs)[index].qj = jReg.tag;
-		GPR::Reg kReg = (*gpr)[rtype->getRt()];
+		kReg = (*gpr)[rtype->getRt()];
 		(*rs)[index].vk = kReg.value;
 		(*rs)[index].qk = kReg.tag;	
 		(*gpr)[rtype->getRd()].tag = newTag;
@@ -83,12 +86,29 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	case ISA::lw:
 	case ISA::sw:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		GPR::Reg jReg = (*gpr)[itype->getRs()];
+		jReg = (*gpr)[itype->getRs()];
 		(*rs)[index].vj = jReg.value;
 		(*rs)[index].qj = jReg.tag;
 		(*rs)[index].vk = itype->getImmediate();
 		(*rs)[index].qk.valid = false;
 		(*gpr)[itype->getRt()].tag = newTag;
+		break;
+
+	// Special handling for branches
+	case ISA::beq:
+	case ISA::bne:
+		itype = dynamic_cast<ITypeInstruction*>(instruction);
+		jReg = (*gpr)[rtype->getRs()];
+		(*rs)[index].vj = jReg.value;
+		(*rs)[index].qj = jReg.tag;
+		kReg = (*gpr)[rtype->getRt()];
+		(*rs)[index].vk = kReg.value;
+		(*rs)[index].qk = kReg.tag;	
+		(*gpr)[rtype->getRd()].tag = newTag;
+		break;
+
+	case ISA::j:
+		// No handling is required since instruction queue takes care of jumps
 		break;
 
 	default:
@@ -134,7 +154,7 @@ bool CPU::writeCDB(ReservationStation* rs) {
 			instructionsCommitted++;
 			trace->write((*rs)[index].instruction->toString(), 
 				(*rs)[index].timeIssued,
-				(*rs)[index].timeWriteCDB - (*rs).getDelay(),
+				(*rs)[index].timeWriteCDB - rs->getDelay(),
 				(*rs)[index].timeWriteCDB,
 				now);
 			return true;
@@ -158,10 +178,6 @@ void CPU::writeCDB() {
 		rsLoad->updateTags(cdbTag, cdbValue);
 		rsStore->updateTags(cdbTag, cdbValue);
 	}
-}
-
-Instruction* CPU::decode() {
-	return instructionQueue->tryGetNextInstruction(now);
 }
 
 int CPU::readData(int address) {
@@ -209,6 +225,8 @@ int CPU::computeValue(ReservationStation* rs, int index) {
 	case ISA::lw:
 	case ISA::sw:
 		//TODO
+	case ISA::j:
+		// Not expecting jump instructions
 	default:
 		// Unexpected instruction!
 		assert(false);
