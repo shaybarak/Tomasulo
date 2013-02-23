@@ -146,18 +146,41 @@ bool CPU::writeCDB(ReservationStation* rs) {
 	for (int index = 0; index < rs->getSize(); index++) {
 		entry = (*rs)[index];
 		if ((entry.busy) && (entry.timeWriteCDB <= now)) {
-			cdbValue = computeValue(rs, index);
-			cdbTag.index = index;
-			cdbTag.type = rs->getTagType();
-			cdbTag.valid = true;
-			(*rs)[index].busy = false;
+			bool cdbWrite;
+			switch (entry.instruction->getOpcode()) {
+			// Special handling for instructions that don't produce a value
+			case ISA::bne:
+				if (entry.vj == entry.vk) {
+					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
+					instructionQueue->setPc(itype->getImmediate());
+				} else {
+					instructionQueue->setPc(instructionQueue->getPc() + 1);
+				}
+				cdbWrite = false;
+			case ISA::beq:
+				if (entry.vj != entry.vk) {
+					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
+					instructionQueue->setPc(itype->getImmediate());
+				} else {
+					instructionQueue->setPc(instructionQueue->getPc() + 1);
+				}
+				cdbWrite = false;
+			default:
+				// All other instructions produce a value
+				cdbValue = computeValue(rs, index);
+				cdbTag.index = index;
+				cdbTag.type = rs->getTagType();
+				cdbTag.valid = true;
+				(*rs)[index].busy = false;
+				cdbWrite = true;
+			}
 			instructionsCommitted++;
 			trace->write((*rs)[index].instruction->toString(), 
 				(*rs)[index].timeIssued,
 				(*rs)[index].timeWriteCDB - rs->getDelay(),
 				(*rs)[index].timeWriteCDB,
 				now);
-			return true;
+			return cdbWrite;
 		}
 	}
 	return false;
