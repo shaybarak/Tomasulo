@@ -20,7 +20,7 @@ bool GPR::dump(ostream& out) {
 }
 
 void GPR::updateTags(ISA::Tag tag, int value) {
-	for (int index = 0; index < ISA::REG_COUNT; index++) {
+	for (int index = 1; index < ISA::REG_COUNT; index++) {
 		if (gpr[index].tag == tag) {
 			gpr[index].tag.valid = false;
 			gpr[index].value = value;

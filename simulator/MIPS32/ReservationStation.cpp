@@ -53,7 +53,7 @@ int ReservationStation::findIndexToExecute(int now) {
 	int minTimeIssued = now;
 	int selectedIndex = -1;
 	for (unsigned int index = 0; index < entries.size(); index++ ) {
-		if (entries[index].busy && (!entries[index].qj.valid) && (!entries[index].qk.valid)) {
+		if (entries[index].busy && (entries[index].timeWriteCDB < 0) && (!entries[index].qj.valid) && (!entries[index].qk.valid)) {
 			if (entries[index].timeIssued < minTimeIssued) {
 				minTimeIssued = entries[index].timeIssued;
 				selectedIndex = index;
@@ -68,5 +68,5 @@ void ReservationStation::execute(int now) {
 	if (selectedIndex == -1) {
 		return;
 	}
-	entries[selectedIndex].timeWriteCDB = now + delay;
+	entries[selectedIndex].timeWriteCDB = now + delay - 1;
 }

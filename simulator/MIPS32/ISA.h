@@ -30,7 +30,7 @@ public:
 		bool valid;
 		TagType type;
 		int index;
-		bool operator==(const Tag& other) {return (type == other.type) && (index == other.index);}
+		bool operator==(const Tag& other) {return (type == other.type) && (index == other.index) && (valid == other.valid);}
 	} Tag;
 
 	

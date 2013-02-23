@@ -31,9 +31,8 @@ public:
 		rsLoad(rsLoad),
 		rsStore(rsStore),
 		trace(trace),
-
 		dataMemory(dataMemory),
-		now(0),
+		now(1),
 		instructionsCommitted(0),
 		memoryAccessCount(0),
 		halted(false) {}

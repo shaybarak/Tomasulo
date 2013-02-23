@@ -108,8 +108,8 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 		(*rs)[index].vj = jReg.value;
 		(*rs)[index].qj = jReg.tag;
 		kReg = (*gpr)[itype->getRt()];
-		(*rs)[index].vj = kReg.value;
-		(*rs)[index].qj = kReg.tag;
+		(*rs)[index].vk = kReg.value;
+		(*rs)[index].qk = kReg.tag;
 		break;
 
 
@@ -145,6 +145,12 @@ bool CPU::issue() {
 		return false;
 	}
 
+	if (instruction->getOpcode() == ISA::halt) {
+		// HALT!!
+		halted = true;
+		return true;
+	}
+
 	ReservationStation* chosenRs = getRs(instruction->getOpcode());
 	int index = chosenRs->getFreeIndex();
 	if (index == -1) {
@@ -174,11 +180,11 @@ void CPU::executeLoad() {
 void CPU::executeStore() {
 	int index = rsStore->findIndexToExecute(now);
 	if (index != -1) {
-		int address = (*rsLoad)[index].vj + 
+		int address = (*rsStore)[index].vj + 
 			dynamic_cast<ITypeInstruction*>((*rsStore)[index].instruction)->getImmediate();
 		assert(address >= 0);
 		assert(address < ISA::DATA_SEG_SIZE);
-		(*rsLoad)[index].timeWriteCDB = dataMemory->write(now + 1, address, (*rsLoad)[index].vk);
+		(*rsStore)[index].timeWriteCDB = dataMemory->write(now + 1, address, (*rsStore)[index].vk);
 		memoryAccessCount++;
 	}
 }
@@ -235,7 +241,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 			instructionsCommitted++;
 			trace->write((*rs)[index].instruction->toString(), 
 				(*rs)[index].timeIssued,
-				(*rs)[index].timeWriteCDB - rs->getDelay(),
+				(*rs)[index].timeWriteCDB - rs->getDelay() + 1,
 				(*rs)[index].timeWriteCDB,
 				now);
 			return cdbWrite;
