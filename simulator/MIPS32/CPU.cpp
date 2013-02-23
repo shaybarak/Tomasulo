@@ -140,6 +140,7 @@ bool CPU::writeCDB(ReservationStation* rs) {
 			return true;
 		}
 	}
+	return false;
 }
 
 void CPU::writeCDB() {
