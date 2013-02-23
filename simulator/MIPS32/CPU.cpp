@@ -244,7 +244,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 	return false;
 }
 
-void CPU::writeCdb() {
+bool CPU::writeCdb() {
 	bool cdbOccupied = false;
 	cdbOccupied = writeCdb(rsAddSub);	
 	if (!cdbOccupied) {
@@ -259,6 +259,8 @@ void CPU::writeCdb() {
 		rsLoad->updateTags(cdbTag, cdbValue);
 		rsStore->updateTags(cdbTag, cdbValue);
 	}
+
+	return cdbOccupied;
 }
 
 int CPU::computeValue(ReservationStation* rs, int index) {

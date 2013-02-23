@@ -76,7 +76,7 @@ private:
 
 
 	//Writes value computed by execution units to gpr and reservation stations
-	void writeCdb();
+	bool writeCdb();
 
 	bool writeCdb(ReservationStation* rs);
 
