@@ -50,6 +50,7 @@ void readProgram(fstream& cmd_file, vector<Instruction*>& program) {
 		labeler.parse(line);
 	}
 	InstructionFactory instructionFactory(labeler.getLabels());
+	cmd_file.clear();
 	cmd_file.seekg(0);
 	// Second pass on code: process instructions
 	while (cmd_file) {
@@ -203,7 +204,7 @@ int main(int argc, char** argv) {
 
 	// Initialize instruction queues
 	InstructionQueue instructionQueue1(instruction_q_depth, &instructionMemory, &program1);
-	InstructionQueue instructionQueue2(instruction_q_depth, &instructionMemory, &program1,
+	InstructionQueue instructionQueue2(instruction_q_depth, &instructionMemory, &program2,
 		// Rebase second program within code segment
 		ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
 	
