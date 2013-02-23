@@ -35,6 +35,8 @@ ReservationStation* CPU::getRs(ISA::Opcode opcode) {
 	case ISA::subi:
 	case ISA::slt:
 	case ISA::slti:
+	case ISA::bne:
+	case ISA::beq:
 		return rsAddSub;
 	
 	case ISA::lw:
@@ -115,13 +117,12 @@ void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* ins
 	case ISA::beq:
 	case ISA::bne:
 		itype = dynamic_cast<ITypeInstruction*>(instruction);
-		jReg = (*gpr)[rtype->getRs()];
+		jReg = (*gpr)[itype->getRs()];
 		(*rs)[index].vj = jReg.value;
 		(*rs)[index].qj = jReg.tag;
-		kReg = (*gpr)[rtype->getRt()];
+		kReg = (*gpr)[itype->getRt()];
 		(*rs)[index].vk = kReg.value;
-		(*rs)[index].qk = kReg.tag;	
-		(*gpr)[rtype->getRd()].tag = newTag;
+		(*rs)[index].qk = kReg.tag;
 		break;
 
 	case ISA::j:
@@ -212,6 +213,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 					instructionQueue->setPc(instructionQueue->getPc() + 1);
 				}
 				cdbWrite = false;
+				break;
 			case ISA::beq:
 				if (entry.vj != entry.vk) {
 					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
@@ -220,6 +222,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 					instructionQueue->setPc(instructionQueue->getPc() + 1);
 				}
 				cdbWrite = false;
+				break;
 			default:
 				// All other instructions produce a value
 				cdbValue = computeValue(rs, index);
@@ -227,6 +230,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 				cdbTag.type = rs->getTagType();
 				cdbTag.valid = true;
 				cdbWrite = true;
+				break;
 			}
 			instructionsCommitted++;
 			trace->write((*rs)[index].instruction->toString(), 
@@ -282,6 +286,8 @@ int CPU::computeValue(ReservationStation* rs, int index) {
 	case ISA::sw:
 		//TODO
 	case ISA::j:
+	case ISA::beq:
+	case ISA::bne:
 		// Not expecting jump instructions
 	default:
 		// Unexpected instruction!
