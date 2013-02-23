@@ -42,12 +42,12 @@ public:
 	static const int REG_COUNT = 32;
 	
 	// Size of RAM data segment
-	static const int DATA_SEG_SIZE = 0xF0000;
+	static const int DATA_SEG_SIZE = 0xF00000;
 
 	// Size of RAM code segment
-	static const int CODE_SEG_SIZE = 0x10000;
+	static const int CODE_SEG_SIZE = 0x100000;
 
 	// Program base addresses
-	static const int FIRST_PROGRAM_BASE = 0xF0000;
-	static const int SECOND_PROGRAM_BASE = 0xF8000;
+	static const int FIRST_PROGRAM_BASE = 0xF00000;
+	static const int SECOND_PROGRAM_BASE = 0xF80000;
 };
