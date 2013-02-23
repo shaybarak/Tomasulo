@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 	////////////////////////////////
 	if (argc < 12) {
 		cout << "Usage: " << argv[0] << " cmd_file1.txt cmd_file2.txt config_file.txt mem_init.txt " 
-			<< "regs_dump.txt mem_dump.txt time.txt committed.txt  hitrate.txt  trace1.txt trace2.txt" << endl;
+			<< "regs_dump.txt mem_dump.txt time.txt committed.txt trace1.txt trace2.txt" << endl;
 		return BAD_USAGE;
 	}
 	fstream cmd_file1, cmd_file2, config_file, regs_dump, mem_dump, mem_init, 
