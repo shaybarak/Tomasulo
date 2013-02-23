@@ -208,18 +208,18 @@ bool CPU::writeCdb(ReservationStation* rs) {
 			case ISA::bne:
 				if (entry.vj == entry.vk) {
 					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
-					instructionQueue->setPc(itype->getImmediate());
+					instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 				} else {
-					instructionQueue->setPc(instructionQueue->getPc() + 1);
+					instructionQueue->setPc(instructionQueue->getPc());
 				}
 				cdbWrite = false;
 				break;
 			case ISA::beq:
 				if (entry.vj != entry.vk) {
 					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
-					instructionQueue->setPc(itype->getImmediate());
+					instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 				} else {
-					instructionQueue->setPc(instructionQueue->getPc() + 1);
+					instructionQueue->setPc(instructionQueue->getPc());
 				}
 				cdbWrite = false;
 				break;
