@@ -26,11 +26,14 @@ public:
 		NONE, ADD, MUL, LOAD, STORE,
 	};
 
-	typedef struct {
+	typedef struct Tag{
 		bool valid;
 		TagType type;
 		int index;
+		bool operator==(const Tag& other) {return (type == other.type) && (index == other.index);}
 	} Tag;
+
+	
 
 	// Convert opcode by name to enum value
 	static ISA::Opcode toOpcode(const string& opcodeName);
