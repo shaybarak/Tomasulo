@@ -75,7 +75,7 @@ bool readConfig(const Configuration& config, const string& key, int* value) {
 
 // Add instructions to memory
 void addInstructions(vector<unsigned char>& memory, const vector<Instruction*>& program, int base = 0) {
-	int* codePtr = (int*)&memory[base / sizeof(int)];
+	int* codePtr = (int*)&memory[base];
 	for (unsigned int i = 0; i < program.size(); i++) {
 		codePtr[i] = ISA::encodeInstruction(i);
 	}
@@ -187,7 +187,9 @@ int main(int argc, char** argv) {
 	
 	// Write instructions to memory
 	addInstructions(instructions, program1);
-	addInstructions(instructions, program2, ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
+	addInstructions(instructions, program2,
+		// Rebase second program within code segment
+		ISA::SECOND_PROGRAM_BASE - ISA::FIRST_PROGRAM_BASE);
 
 	// Build memory systems
 	MemorySystem instructionMemory(&l1InstCache, &l2InstCache, &ramInst);
@@ -224,6 +226,9 @@ int main(int argc, char** argv) {
 	while (cpu1.hasPendingInstructions()) {
 		cpu1.runOnce();
 	}
+	// Reset memory timings between CPU thread switching
+	instructionMemory.resetTiming();
+	dataMemory.resetTiming();
 	while (!cpu2.isHalted()) {
 		cpu2.runOnce();
 	}

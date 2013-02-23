@@ -114,6 +114,12 @@ void MemorySystem::applyAllPendingWrites() {
 	applyPendingWrites(INT_MAX);
 }
 
+void MemorySystem::resetTiming() {
+	l1BusyUntil = -1;
+	l1L2InterfaceBusyUntil = -1;
+	l2RamInterfaceBusyUntil = -1;
+}
+
 void MemorySystem::applyPendingWrites(int until) {
 	PendingWrite write;
 	// Commit all pending writes to L1

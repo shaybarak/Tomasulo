@@ -7,8 +7,8 @@
 #include "GPR.h"
 #include <stdlib.h>
 
-const regex InstructionFactory::labeledInstruction("^\\s*\\w*\\s*:\\s*((\\w*)\\s*(.*))$");
-const regex InstructionFactory::unlabeledInstruction("^\\s*((\\w*)\\s*(.*))$");
+const regex InstructionFactory::labeledInstruction("^(\\s*\\w*\\s*:\\s*(\\w*)\\s*(.*))$");
+const regex InstructionFactory::unlabeledInstruction("^(\\s*(\\w*)\\s*(.*))$");
 const regex InstructionFactory::emptyLine("^\\s*$");
 
 Instruction* InstructionFactory::parse(string& line) {

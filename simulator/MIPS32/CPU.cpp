@@ -148,6 +148,8 @@ bool CPU::issue() {
 	if (instruction->getOpcode() == ISA::halt) {
 		// HALT!!
 		halted = true;
+		instructionsCommitted++;
+		trace->write(instruction->toString(), now, now, -1, -1);
 		return true;
 	}
 
@@ -209,24 +211,31 @@ bool CPU::writeCdb(ReservationStation* rs) {
 		if ((entry.busy) && (entry.timeWriteCDB >= 0) && (entry.timeWriteCDB <= now)) {
 			bool cdbWrite;
 			(*rs)[index].busy = false;
+			int timeWriteCdb;
 			switch (entry.instruction->getOpcode()) {
 			// Special handling for instructions that don't produce a value
-			case ISA::bne:
+			case ISA::beq:
 				if (entry.vj == entry.vk) {
 					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
 					instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 				} else {
 					instructionQueue->setPc(instructionQueue->getPc());
 				}
+				timeWriteCdb = -1;
 				cdbWrite = false;
 				break;
-			case ISA::beq:
+			case ISA::bne:
 				if (entry.vj != entry.vk) {
 					ITypeInstruction* itype = dynamic_cast<ITypeInstruction*>(entry.instruction);
 					instructionQueue->setPc(instructionQueue->getPc() + itype->getImmediate());
 				} else {
 					instructionQueue->setPc(instructionQueue->getPc());
 				}
+				timeWriteCdb = -1;
+				cdbWrite = false;
+				break;
+			case ISA::sw:
+				timeWriteCdb = -1;
 				cdbWrite = false;
 				break;
 			default:
@@ -235,6 +244,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 				cdbTag.index = index;
 				cdbTag.type = rs->getTagType();
 				cdbTag.valid = true;
+				timeWriteCdb = (*rs)[index].timeWriteCDB;
 				cdbWrite = true;
 				break;
 			}
@@ -242,8 +252,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 			trace->write((*rs)[index].instruction->toString(), 
 				(*rs)[index].timeIssued,
 				(*rs)[index].timeWriteCDB - rs->getDelay() + 1,
-				(*rs)[index].timeWriteCDB,
-				now);
+				timeWriteCdb, timeWriteCdb);
 			return cdbWrite;
 		}
 	}
@@ -252,10 +261,15 @@ bool CPU::writeCdb(ReservationStation* rs) {
 
 bool CPU::writeCdb() {
 	bool cdbOccupied = false;
+	writeCdb(rsStore);
 	cdbOccupied = writeCdb(rsAddSub);	
 	if (!cdbOccupied) {
 		cdbOccupied = writeCdb(rsMulDiv);
 	}
+	if (!cdbOccupied) {
+		cdbOccupied = writeCdb(rsLoad);
+	}
+	
 
 	//TODO load/store
 	if (cdbOccupied) {
