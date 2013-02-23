@@ -50,6 +50,7 @@ private:
 	MainMemory* ram;
 
 	// When the interfaces between memory components become available
+	int l1BusyUntil;
 	int l1L2InterfaceBusyUntil;
 	int l2RamInterfaceBusyUntil;
 

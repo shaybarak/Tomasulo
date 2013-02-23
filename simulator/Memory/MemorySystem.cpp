@@ -2,6 +2,11 @@
 #include <assert.h>
 
 int MemorySystem::read(int now, int address, int& value) {
+	if (now < l1BusyUntil) {
+		// Wait for L1 to become free for access
+		now = l1BusyUntil;
+	}
+
 	// Delay by L1 access time
 	now += l1->getAccessDelay();
 
@@ -10,6 +15,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		l1->registerHit();
 		value = l1->read(address);
 		// Delay should be L1 access delay
+		l1BusyUntil = now;
 		return now;
 	}
 
@@ -33,6 +39,7 @@ int MemorySystem::read(int now, int address, int& value) {
 		//now += l1->getBlockSize() / sizeof(int) - 1;
 
 		// Delay is L1 access + L2 access + time waiting for pending writes if relevant
+		l1BusyUntil = now;
 		return now;
 	}
 
@@ -90,6 +97,7 @@ int MemorySystem::read(int now, int address, int& value) {
 	}
 	//now += (l2->getBlockSize() - l1->getBlockSize()) / sizeof(int);
 
+	l1BusyUntil = now;
 	return now;
 }
 
@@ -98,6 +106,7 @@ int MemorySystem::write(int now, int address, int value) {
 	now = read(now, address, oldValue);
 	l1->write(address, value);
 	l2->write(address, value, l2->getPresentWay(address), true);
+	l1BusyUntil = now;
 	return now;
 }
 
