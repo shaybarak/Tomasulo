@@ -25,6 +25,8 @@ public:
 	// Dump to file, returns whether successful
 	bool dump(ostream& out);
 
+	void updateTags(ISA::Tag tag, int value);
+
 private:
 	Reg gpr[ISA::REG_COUNT];
 	Reg zero;  // Value of zero register
