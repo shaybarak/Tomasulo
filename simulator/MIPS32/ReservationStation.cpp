@@ -18,6 +18,6 @@ int ReservationStation::getFreeIndex() {
 		if (!entries[i].busy) {
 			return i;
 		}
-		return -1;
 	}
+	return -1;
 }
