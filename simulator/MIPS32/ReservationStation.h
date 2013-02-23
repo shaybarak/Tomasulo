@@ -41,6 +41,7 @@ public:
 	//update tags to values in response to CPU::writeCDB
 	void updateTags(ISA::Tag tag, int value);
 
+	bool hasPendingInstructions();
 
 private:
 	//Holds data on instructions

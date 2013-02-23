@@ -36,3 +36,12 @@ void ReservationStation::updateTags(ISA::Tag tag, int value) {
 		}
 	}
 }
+
+bool ReservationStation::hasPendingInstructions() {
+	for (int index = 0; index < entries.size(); index++) {
+		if (entries[index].busy) {
+			return true;
+		}
+	}
+	return false;
+}

@@ -17,8 +17,9 @@ void CPU::runOnce() {
 }
 
 bool CPU::hasPendingInstructions() {
-	// TODO
-	return false;
+	return (rsAddSub->hasPendingInstructions() || 
+		rsMulDiv->hasPendingInstructions() ||
+		rsLoad->hasPendingInstructions() || rsStore->hasPendingInstructions());
 }
 
 ReservationStation* CPU::getRs(ISA::Opcode opcode) {
