@@ -6,6 +6,7 @@
 #include "InstructionQueue.h"
 #include "ReservationStation.h"
 #include "../Output/Trace.h"
+#include <assert.h>
 #include <vector>
 using namespace std;
 
@@ -56,7 +57,7 @@ public:
 	bool isHalted() const { return halted; }
 
 	// Flushes all pending operations
-	void flush() {  0 / 0; }  // TODO: implement
+	void flush() {  assert(false); }  // TODO: implement
 
 private:
 
@@ -66,10 +67,13 @@ private:
 	//Add an instruction to rs (and updates gpr with new tag)
 	void addInstructionToRs(ReservationStation* rs, int index, Instruction* instruction);
 
-	//Writes value computed by execution units to gpr and reservation stations
-	void writeCDB();
+	// Execute a ready instruction from the reservation station
+	bool execute();
 
-	bool writeCDB(ReservationStation* rs);
+	//Writes value computed by execution units to gpr and reservation stations
+	void writeCdb();
+
+	bool writeCdb(ReservationStation* rs);
 
 
 	//compute return value from reservation station

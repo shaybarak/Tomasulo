@@ -140,7 +140,12 @@ bool CPU::issue() {
 	return true;
 }
 
-bool CPU::writeCDB(ReservationStation* rs) {
+bool CPU::execute() {
+	// TODO
+	return false;
+}
+
+bool CPU::writeCdb(ReservationStation* rs) {
 	bool cdbOccupied = false;
 	ReservationStation::Entry entry;
 	for (int index = 0; index < rs->getSize(); index++) {
@@ -186,11 +191,11 @@ bool CPU::writeCDB(ReservationStation* rs) {
 	return false;
 }
 
-void CPU::writeCDB() {
+void CPU::writeCdb() {
 	bool cdbOccupied = false;
-	cdbOccupied = writeCDB(rsAddSub);	
+	cdbOccupied = writeCdb(rsAddSub);	
 	if (!cdbOccupied) {
-		cdbOccupied = writeCDB(rsMulDiv);
+		cdbOccupied = writeCdb(rsMulDiv);
 	}
 
 	//TODO load/store
