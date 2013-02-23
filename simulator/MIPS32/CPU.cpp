@@ -12,26 +12,110 @@ void CPU::runOnce() {
 	if (halted) {
 		return;
 	}
-	Instruction* nextInstruction = decode();
-	if (nextInstruction != NULL) {
-		issue(nextInstruction);
-		execute(nextInstruction); // TODO change this to issue, execute later
-		instructionsCommitted++;  // TODO count instructions committed elsewhere
-		issued = true;
+	Instruction* instructionToIssue = decode();
+
+	//try to issue to instruction
+	if (instructionToIssue != NULL) {
+		issue(instructionToIssue);
 	}
+
+	//update values in reservation stations
+	//execute(instructionToIssue); // TODO change this to issue, execute later
+	instructionsCommitted++;  // TODO count instructions committed elsewhere
+	issued = true;
+	
 	fetch(issued);
 	now++;
 }
-void CPU::issue(Instruction* nextInstraction) {
-	int index;
-	switch (nextInstraction->getOpcode()) {
-	case ISA::MUL :
-	case ISA::div :
-		//index = rsMulDiv.getF
 
+ReservationStation* CPU::getRs(ISA::Opcode opcode) {
+	switch (opcode) {
+	
+	case ISA::mul:
+	case ISA::div:
+		return rsMulDiv;
+	
+	case ISA::add:
+	case ISA::addi:
+	case ISA::sub:
+	case ISA::subi:
+	case ISA::slt:
+	case ISA::slti:
+		return rsAddSub;
+	
+	case ISA::lw:
+		return rsLoad;	
+	case ISA::sw:
+		return rsStore;
 
-
+	default:
+		assert(false);
+		break; 
 	}
+}
+
+void CPU::addInstructionToRs(ReservationStation* rs, int index, Instruction* instruction) {
+
+	RTypeInstruction* rtype = NULL;
+	ITypeInstruction* itype = NULL;
+
+	ISA::Tag newTag;
+
+	(*rs)[index].busy = true;
+	(*rs)[index].instruction = instruction;
+	(*rs)[index].timeIssued = now;
+
+	newTag.index = index;
+	newTag.type = rs->getTagType();
+	newTag.valid = true;
+
+	switch (instruction->getOpcode()) {
+	
+	//RType
+	case ISA::add:
+	case ISA::sub:
+	case ISA::mul:
+	case ISA::div: 
+	case ISA::slt:
+		rtype = dynamic_cast<RTypeInstruction*>(instruction);
+		GPR::Reg jReg = (*gpr)[rtype->getRs()];
+		(*rs)[index].vj = jReg.value;
+		(*rs)[index].qj = jReg.tag;
+		GPR::Reg kReg = (*gpr)[rtype->getRt()];
+		(*rs)[index].vk = kReg.value;
+		(*rs)[index].qk = kReg.tag;	
+		(*gpr)[rtype->getRd()].tag = newTag;
+		break;
+
+	//IType
+	case ISA::addi:
+	case ISA::subi:
+	case ISA::slti:
+	case ISA::lw:
+	case ISA::sw:
+		itype = dynamic_cast<ITypeInstruction*>(instruction);
+		GPR::Reg jReg = (*gpr)[itype->getRs()];
+		(*rs)[index].vj = jReg.value;
+		(*rs)[index].qj = jReg.tag;
+		(*rs)[index].vk = itype->getImmediate();
+		(*rs)[index].qk.valid = false;
+		(*gpr)[itype->getRt()].tag = newTag;
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+}
+
+//TODO multiple issue?
+bool CPU::issue(Instruction* instruction) {
+	ReservationStation* chosenRs = getRs(instruction->getOpcode());
+	int index = chosenRs->getFreeIndex();
+	if (index == -1) {
+		return false;
+	}
+	addInstructionToRs(chosenRs,index, instruction);
 }
 
 void CPU::fetch(bool issued) {
@@ -42,6 +126,10 @@ void CPU::fetch(bool issued) {
 		memoryAccessCount++;
 	}
 }
+
+//void CPU::WriteCDB() {
+//	for (int i = 0; i < 
+//}
 
 Instruction* CPU::decode() {
 	return instructionQueue->tryGetNextInstruction(now);

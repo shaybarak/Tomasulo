@@ -54,10 +54,15 @@ private:
 	void fetch(bool issued);
 
 	//Try to issue the instruction just poped from instruction queue
-	void issue(Instruction* nextInstruction);
+	bool issue(Instruction* instruction);
+
+	//Add an instruction to rs (and updates gpr with new tag)
+	void addInstructionToRs(ReservationStation* rs, int index, Instruction* instruction);
 
 	// Pop instruction from queue
 	Instruction* decode();
+
+	void WriteCDB();
 
 	// Reads data
 	int readData(int address);
@@ -71,6 +76,9 @@ private:
 	 */
 	void execute(Instruction* instruction);
 	
+	//returns the reservation station matching for the opcode
+	ReservationStation* getRs(ISA::Opcode opcode);
+
 	// Size of data memory in bytes (such that memorySize == highest valid address + 1)
 	int dataMemorySize;
 	// General Purpose Registers

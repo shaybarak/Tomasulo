@@ -9,13 +9,14 @@ public:
 
 	// Holds data on instruction status
 	typedef struct {
-		Instruction* pInstruction;
+		Instruction* instruction;
 		bool busy;
 		int vj;
 		int vk;
 		ISA::Tag qj;
 		ISA::Tag qk;
 		int timeIssued;
+		int timeWriteCDB;
 		//TODO add address for load/store need to add struct in ISA, that includes reg index and offset
 	} Entry;
 
@@ -34,6 +35,7 @@ public:
 
 	//returns first free index, -1 if no free index available(rs is full)
 	int getFreeIndex();
+
 
 private:
 	//Holds data on instructions
