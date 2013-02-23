@@ -70,7 +70,6 @@ int ReservationStation::findIndexToExecute(int now) {
 	return selectedIndex;
 }
 
-
 void ReservationStation::execute(int now) {
 	int selectedIndex = findIndexToExecute(now);
 	if (selectedIndex == -1) {
