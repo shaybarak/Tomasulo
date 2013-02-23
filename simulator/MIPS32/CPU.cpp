@@ -200,7 +200,7 @@ bool CPU::writeCdb(ReservationStation* rs) {
 	ReservationStation::Entry entry;
 	for (int index = 0; index < rs->getSize(); index++) {
 		entry = (*rs)[index];
-		if ((entry.busy) && (entry.timeWriteCDB <= now)) {
+		if ((entry.busy) && (entry.timeWriteCDB >= 0) && (entry.timeWriteCDB <= now)) {
 			bool cdbWrite;
 			(*rs)[index].busy = false;
 			switch (entry.instruction->getOpcode()) {
