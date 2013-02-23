@@ -132,6 +132,9 @@ bool CPU::writeCDB(ReservationStation* rs) {
 			cdbTag.valid = true;
 			(*rs)[index].busy = false;
 			instructionsCommitted++;
+			trace->write((*rs)[index].instruction->toString(), 
+				(*rs)[index].timeIssued,(*rs)[index].timeWriteCDB - (*rs).getDelay(),
+				(*rs)[index].timeWriteCDB, now);
 			return true;
 		}
 	}
@@ -146,7 +149,6 @@ void CPU::writeCDB() {
 
 	//TODO load/store
 	if (cdbOccupied) {
-
 		gpr->updateTags(cdbTag, cdbValue);
 		rsAddSub->updateTags(cdbTag, cdbValue);
 		rsMulDiv->updateTags(cdbTag, cdbValue);
