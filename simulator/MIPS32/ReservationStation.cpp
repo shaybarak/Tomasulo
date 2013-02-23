@@ -3,6 +3,9 @@
 
 ReservationStation::ReservationStation(ISA::TagType tagType, int size, int delay): tagType(tagType), delay(delay) {
 	entries.resize(size);
+	for (int i = 0; i < entries.size(); i++) {
+		entries[i].busy = false;
+	}
 }
 
 ReservationStation::Entry& ReservationStation::operator[](int index) {
